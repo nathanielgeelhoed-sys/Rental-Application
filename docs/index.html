@@ -3,751 +3,1333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Customer Order Form - National TV Sales & Rental</title>
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <title>National TV Rental Application</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.5/signature_pad.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --primary-blue: #0066cc;
+            --primary-red: #cc0000;
+            --light-blue: #e6f0ff;
+            --light-red: #ffe6e6;
+            --dark-gray: #333;
+            --light-gray: #f5f5f5;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        
+
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        
+
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f7fa;
-            color: var(--dark);
+            background-color: #f9f9f9;
+            color: var(--dark-gray);
             line-height: 1.6;
             padding: 20px;
-        }
-        
-        .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
-            background: white;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            overflow: hidden;
         }
-        
+
         .header {
-            background: var(--primary);
-            color: white;
-            padding: 25px;
             text-align: center;
-            position: relative;
-        }
-        
-        .header h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-        
-        .header p {
-            font-size: 16px;
-            opacity: 0.9;
-        }
-        
-        .date-field {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .date-field label {
-            margin-right: 10px;
-            font-weight: 500;
-        }
-        
-        .date-field input {
-            padding: 8px 12px;
-            border: none;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 140px;
-        }
-        
-        .form-content {
-            padding: 30px;
-        }
-        
-        .section {
             margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eaeaea;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #004d99 100%);
+            border-radius: var(--border-radius);
+            color: white;
+            box-shadow: var(--box-shadow);
         }
-        
-        .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-left: 10px;
-            border-left: 4px solid var(--secondary);
+
+        .logo {
+            max-width: 200px;
+            margin-bottom: 15px;
         }
-        
-        .form-row {
+
+        h1 {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+        }
+
+        .application-container {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .collapsible-menu {
+            border-bottom: 1px solid #ddd;
+        }
+
+        .menu-header {
+            background-color: var(--primary-blue);
+            color: white;
+            padding: 15px 20px;
+            cursor: pointer;
             display: flex;
-            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.3s;
+        }
+
+        .menu-header:hover {
+            background-color: #0055aa;
+        }
+
+        .menu-header h2 {
+            margin: 0;
+            font-size: 1.4rem;
+        }
+
+        .menu-content {
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease;
+        }
+
+        .menu-content.active {
+            padding: 20px;
+            max-height: 5000px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 20px;
             margin-bottom: 20px;
         }
-        
+
         .form-group {
-            flex: 1;
-            min-width: 250px;
+            margin-bottom: 15px;
         }
-        
-        .form-group label {
+
+        label {
             display: block;
-            font-weight: 500;
-            margin-bottom: 8px;
-            color: var(--dark);
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark-gray);
         }
-        
-        .form-group input, 
-        .form-group select, 
-        .form-group textarea {
+
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
             width: 100%;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-            font-size: 15px;
-            transition: var(--transition);
-        }
-        
-        .form-group input:focus, 
-        .form-group select:focus, 
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-        
-        .required::after {
-            content: " *";
-            color: var(--accent);
-        }
-        
-        .ssn-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .ssn-part {
-            width: 60px;
-            text-align: center;
             padding: 12px;
             border: 1px solid #ddd;
-            border-radius: 6px;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border 0.3s;
         }
-        
-        .ssn-dash {
-            font-weight: bold;
-            color: var(--dark);
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary-blue);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
         }
-        
+
         .checkbox-group {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 10px;
-        }
-        
-        .checkbox-item {
-            display: flex;
             align-items: center;
-        }
-        
-        .checkbox-item input {
-            margin-right: 8px;
-        }
-        
-        .signature-container {
-            margin-top: 30px;
-            text-align: center;
-        }
-        
-        .signature-pad {
-            border: 1px solid #ddd;
-            border-radius: 6px;
             margin: 15px 0;
-            cursor: crosshair;
-            background: white;
         }
-        
+
+        .checkbox-group input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+        }
+
+        .conditional-section {
+            padding: 15px;
+            background-color: var(--light-blue);
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            display: none;
+        }
+
+        .signature-pad-container {
+            margin: 20px 0;
+            border: 2px solid var(--primary-blue);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+        }
+
+        .signature-pad {
+            width: 100%;
+            height: 200px;
+            background-color: white;
+            cursor: crosshair;
+        }
+
         .signature-actions {
             display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
+            justify-content: space-between;
+            margin-top: 10px;
         }
-        
+
         .btn {
-            padding: 10px 20px;
+            padding: 12px 20px;
             border: none;
-            border-radius: 6px;
-            font-weight: 500;
+            border-radius: var(--border-radius);
+            font-size: 16px;
             cursor: pointer;
-            transition: var(--transition);
+            transition: background-color 0.3s, transform 0.2s;
         }
-        
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
         .btn-primary {
-            background: var(--secondary);
+            background-color: var(--primary-blue);
             color: white;
         }
-        
+
         .btn-primary:hover {
-            background: #2980b9;
+            background-color: #0055aa;
         }
-        
-        .btn-secondary {
-            background: #95a5a6;
-            color: white;
-        }
-        
-        .btn-secondary:hover {
-            background: #7f8c8d;
-        }
-        
+
         .btn-danger {
-            background: var(--accent);
+            background-color: var(--primary-red);
             color: white;
         }
-        
+
         .btn-danger:hover {
-            background: #c0392b;
+            background-color: #b30000;
         }
-        
-        .signature-line {
-            border-top: 1px solid #ccc;
-            margin: 20px 0 5px;
-            padding-top: 5px;
-            font-style: italic;
-            color: #7f8c8d;
+
+        .btn-success {
+            background-color: #28a745;
+            color: white;
         }
-        
-        .footer {
-            margin-top: 40px;
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: var(--border-radius);
+            padding: 20px;
             text-align: center;
+            margin: 15px 0;
+            transition: border 0.3s;
         }
-        
-        .button-group {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
+
+        .upload-area:hover {
+            border-color: var(--primary-blue);
         }
-        
-        .btn-large {
-            padding: 12px 30px;
-            font-size: 16px;
+
+        .references-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
         }
-        
-        .deal-box {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 200px;
-            height: 200px;
-            background: linear-gradient(135deg, #ffdb58 0%, #ffcc33 100%);
-            transform: rotate(3deg);
+
+        .references-table th,
+        .references-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        .references-table th {
+            background-color: var(--light-blue);
+        }
+
+        .disclosure-box {
+            max-height: 200px;
+            overflow-y: auto;
             padding: 15px;
-            box-shadow: var(--shadow);
-            border: 2px solid #ff9900;
-            z-index: 100;
-            border-radius: 8px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            margin: 20px 0;
+            background-color: var(--light-gray);
         }
-        
-        .deal-header {
-            font-family: 'Fredoka One', cursive;
-            font-size: 16px;
+
+        .footer {
             text-align: center;
-            margin-bottom: 10px;
-            color: #ff5500;
-            border-bottom: 2px dashed #ff7700;
-            padding-bottom: 5px;
+            margin-top: 30px;
+            padding: 20px;
+            color: #666;
         }
-        
-        .deal-content {
-            font-family: 'Fredoka One', cursive;
-            font-size: 14px;
-            text-align: center;
-            color: #333;
-            height: 120px;
-            width: 100%;
-            background: transparent;
-            border: none;
-            resize: none;
-        }
-        
+
         @media (max-width: 768px) {
-            .form-row {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-header h2 {
+                font-size: 1.2rem;
+            }
+            
+            .signature-actions {
                 flex-direction: column;
-                gap: 15px;
+                gap: 10px;
             }
             
-            .date-field {
-                position: relative;
-                top: 0;
-                right: 0;
-                justify-content: center;
-                margin-top: 15px;
-            }
-            
-            .header {
-                padding: 20px 15px;
-            }
-            
-            .form-content {
-                padding: 20px;
-            }
-            
-            .deal-box {
-                position: relative;
-                margin: 30px auto;
-                transform: rotate(1deg);
-                width: 90%;
+            .btn {
+                width: 100%;
             }
         }
-        
-        .signature-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 600px;
+
+        .fun-element {
             text-align: center;
+            margin: 10px 0;
         }
-        
-        .signature-instructions {
-            margin-bottom: 15px;
-            color: #7f8c8d;
+
+        .fun-element i {
+            color: var(--primary-red);
+            margin: 0 5px;
+            font-size: 1.5rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>NATIONAL TV SALES & RENTAL</h1>
-            <p>Customer Order Form - Springfield Location</p>
-            <div class="date-field">
-                <label class="required">Date</label>
-                <input type="date" required>
-            </div>
-        </div>
-        
-        <div class="form-content">
-            <!-- Personal Information Section -->
-            <div class="section">
-                <h2 class="section-title">Personal Information</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">First Name</label>
-                        <input type="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">Last Name</label>
-                        <input type="text" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Email Address</label>
-                        <input type="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">Phone Number</label>
-                        <input type="tel" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Social Security Number</label>
-                        <div class="ssn-group">
-                            <input type="text" class="ssn-part" maxlength="3" pattern="[0-9]{3}" required>
-                            <span class="ssn-dash">-</span>
-                            <input type="text" class="ssn-part" maxlength="2" pattern="[0-9]{2}" required>
-                            <span class="ssn-dash">-</span>
-                            <input type="text" class="ssn-part" maxlength="4" pattern="[0-9]{4}" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">Date of Birth</label>
-                        <input type="date" required>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Contact Preferences -->
-            <div class="section">
-                <h2 class="section-title">Contact Preferences</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>Best Time to Contact</label>
-                        <select>
-                            <option value="">Select preferred time</option>
-                            <option value="morning">Morning (8am - 12pm)</option>
-                            <option value="afternoon">Afternoon (12pm - 5pm)</option>
-                            <option value="evening">Evening (5pm - 8pm)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Contact Method</label>
-                        <select>
-                            <option value="">Select preferred method</option>
-                            <option value="phone">Phone Call</option>
-                            <option value="text">Text Message</option>
-                            <option value="email">Email</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Address Information -->
-            <div class="section">
-                <h2 class="section-title">Address Information</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Street Address</label>
-                        <input type="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Apartment/Unit #</label>
-                        <input type="text">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">City</label>
-                        <input type="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">State</label>
-                        <input type="text" value="Missouri" disabled>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">ZIP Code</label>
-                        <input type="text" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label>How long at current address?</label>
-                        <select>
-                            <option value="">Select duration</option>
-                            <option value="lt1">Less than 1 year</option>
-                            <option value="1-2">1-2 years</option>
-                            <option value="3-5">3-5 years</option>
-                            <option value="gt5">More than 5 years</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Employment Information -->
-            <div class="section">
-                <h2 class="section-title">Employment Information</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Employer Name</label>
-                        <input type="text" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Position</label>
-                        <input type="text">
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Income Source</label>
-                        <select required>
-                            <option value="">Select income source</option>
-                            <option value="employment">Employment</option>
-                            <option value="self">Self-Employment</option>
-                            <option value="benefits">Benefits</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="required">Monthly Income ($)</label>
-                        <input type="number" required>
-                    </div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="commission" name="income-type">
-                            <label for="commission">Commission-based pay</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="self-employed" name="income-type">
-                            <label for="self-employed">Self-employed</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="gig-worker" name="income-type">
-                            <label for="gig-worker">Gig economy worker</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Signature Section -->
-            <div class="section">
-                <h2 class="section-title">Agreement & Signature</h2>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <p>By signing below, I certify that all information provided is accurate and complete to the best of my knowledge.</p>
-                    </div>
-                </div>
-                
-                <div class="signature-container">
-                    <label class="required">Signature</label>
-                    <div class="signature-pad" id="signature-pad" style="height: 150px; width: 100%;">
-                        <canvas id="signature-canvas" width="500" height="150" style="border: 1px solid #ddd; border-radius: 6px; cursor: crosshair;"></canvas>
-                    </div>
-                    <div class="signature-actions">
-                        <button class="btn btn-danger" id="clear-signature">Clear</button>
-                    </div>
-                    <div class="signature-line">Sign above this line</div>
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label class="required">Today's Date</label>
-                        <input type="text" value="" id="signature-date" readonly>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="footer">
-                <p>By submitting this form, you agree to our Terms of Service and Privacy Policy.</p>
-                <div class="button-group">
-                    <button class="btn btn-primary btn-large" id="submit-btn">Submit Form</button>
-                    <button class="btn btn-secondary btn-large" id="reset-btn">Clear Form</button>
-                </div>
-            </div>
-        </div>
+    <div class="header">
+        <img src="https://nationaltvrental.com/wp-content/uploads/2023/02/ntr-logo-white-1.png" alt="National TV Rental Logo" class="logo">
+        <h1>National TV Rental Application</h1>
     </div>
-    
-    <!-- Deal of the Day Box -->
-    <div class="deal-box">
-        <div class="deal-header">DEAL OF THE DAY</div>
-        <textarea class="deal-content" placeholder="Enter today's special promotion here..."></textarea>
+
+    <form id="rental-application" class="application-container">
+        <!-- Primary Renter Information Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-user-circle"></i> Primary Renter Information</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="first-name">First Name *</label>
+                        <input type="text" id="first-name" name="first-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="last-name">Last Name *</label>
+                        <input type="text" id="last-name" name="last-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="maiden-name">Maiden Name (if applicable)</label>
+                        <input type="text" id="maiden-name" name="maiden-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="birthdate">Birthdate *</label>
+                        <input type="date" id="birthdate" name="birthdate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="ssn">Social Security Number *</label>
+                        <input type="text" id="ssn" name="ssn" required pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contact-time">Best Time to Contact *</label>
+                        <select id="contact-time" name="contact-time" required>
+                            <option value="">Select a time</option>
+                            <option value="morning">Morning (8AM-12PM)</option>
+                            <option value="afternoon">Afternoon (12PM-5PM)</option>
+                            <option value="evening">Evening (5PM-9PM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="checkbox-group">
+                    <input type="checkbox" id="has-corener" name="has-corener" onchange="toggleCoRenterSection(this)">
+                    <label for="has-corener">I have a co-renter</label>
+                </div>
+
+                <div id="corener-section" class="conditional-section">
+                    <h3>Co-Renter Information</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="co-first-name">First Name *</label>
+                            <input type="text" id="co-first-name" name="co-first-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-last-name">Last Name *</label>
+                            <input type="text" id="co-last-name" name="co-last-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-maiden-name">Maiden Name (if applicable)</label>
+                            <input type="text" id="co-maiden-name" name="co-maiden-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-birthdate">Birthdate *</label>
+                            <input type="date" id="co-birthdate" name="co-birthdate">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-ssn">Social Security Number *</label>
+                            <input type="text" id="co-ssn" name="co-ssn" pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-email">Email Address *</label>
+                            <input type="email" id="co-email" name="co-email">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-phone">Phone Number *</label>
+                            <input type="tel" id="co-phone" name="co-phone">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-contact-time">Best Time to Contact *</label>
+                            <select id="co-contact-time" name="co-contact-time">
+                                <option value="">Select a time</option>
+                                <option value="morning">Morning (8AM-12PM)</option>
+                                <option value="afternoon">Afternoon (12PM-5PM)</option>
+                                <option value="evening">Evening (5PM-9PM)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <h3>Vehicle Information</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="vehicle-make">Make</label>
+                        <input type="text" id="vehicle-make" name="vehicle-make">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicle-model">Model</label>
+                        <input type="text" id="vehicle-model" name="vehicle-model">
+                    </div>
+                    <div class="form-group">
+                        <label for="license-plate">License Plate Number</label>
+                        <input type="text" id="license-plate" name="license-plate">
+                    </div>
+                    <div class="form-group">
+                        <label for="vehicle-color">Color</label>
+                        <input type="text" id="vehicle-color" name="vehicle-color">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Vehicle Status</label>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rented" name="vehicle-status" value="rented">
+                        <label for="rented">Rented</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="leased" name="vehicle-status" value="leased">
+                        <label for="leased">Leased</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="owned" name="vehicle-status" value="owned">
+                        <label for="owned">Owned</label>
+                    </div>
+                </div>
+
+                <div class="upload-area">
+                    <h3><i class="fas fa-id-card"></i> ID Upload</h3>
+                    <p>Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store.</p>
+                    <input type="file" id="id-upload" name="id-upload" accept=".jpg,.jpeg,.png,.pdf">
+                    <label for="id-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Choose File</label>
+                </div>
+
+                <div class="fun-element">
+                    <p>We're excited to help you get the perfect rental items for your home! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Income Information Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-money-bill-wave"></i> Income Information</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-group">
+                    <label>Is employment your primary source of income? *</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="employment-yes" name="employment-primary" value="yes" onchange="toggleEmploymentFields(this)">
+                        <label for="employment-yes">Yes</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="employment-no" name="employment-primary" value="no" onchange="toggleEmploymentFields(this)">
+                        <label for="employment-no">No</label>
+                    </div>
+                </div>
+
+                <div id="employment-fields" class="conditional-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="employer">Employer *</label>
+                            <input type="text" id="employer" name="employer">
+                        </div>
+                        <div class="form-group">
+                            <label for="job-title">Job Title *</label>
+                            <input type="text" id="job-title" name="job-title">
+                        </div>
+                        <div class="form-group">
+                            <label for="shift">Shift *</label>
+                            <select id="shift" name="shift">
+                                <option value="">Select shift</option>
+                                <option value="day">Day Shift</option>
+                                <option value="evening">Evening Shift</option>
+                                <option value="night">Night Shift</option>
+                                <option value="varied">Varied Shifts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="income-type">Income Type *</label>
+                            <select id="income-type" name="income-type" onchange="toggleIncomeFields(this)">
+                                <option value="">Select type</option>
+                                <option value="hourly">Hourly Rate</option>
+                                <option value="salary">Monthly Salary</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="hourly-rate-field">
+                            <label for="hourly-rate">Hourly Rate *</label>
+                            <input type="number" id="hourly-rate" name="hourly-rate" step="0.01">
+                        </div>
+                        <div class="form-group" id="monthly-salary-field">
+                            <label for="monthly-salary">Monthly Salary *</label>
+                            <input type="number" id="monthly-salary" name="monthly-salary" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="take-home-pay">Take Home Pay (after taxes) *</label>
+                            <input type="number" id="take-home-pay" name="take-home-pay" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Is your employer able to be contacted? *</label>
+                        <div class="checkbox-group">
+                            <input type="radio" id="contact-yes" name="employer-contact" value="yes" onchange="toggleContactWarning(this)">
+                            <label for="contact-yes">Yes</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="radio" id="contact-no" name="employer-contact" value="no" onchange="toggleContactWarning(this)">
+                            <label for="contact-no">No</label>
+                        </div>
+                    </div>
+
+                    <div id="contact-warning" class="conditional-section">
+                        <div class="upload-area">
+                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
+                            <input type="file" id="paystub-upload" name="paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
+                            <label for="paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Paystubs</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="other-income-fields" class="conditional-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="income-source">Income Source *</label>
+                            <input type="text" id="income-source" name="income-source">
+                        </div>
+                        <div class="form-group">
+                            <label for="other-take-home">Take Home Monthly Amount *</label>
+                            <input type="number" id="other-take-home" name="other-take-home" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="upload-area">
+                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
+                        <input type="file" id="income-proof-upload" name="income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
+                        <label for="income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Income</label>
+                    </div>
+                </div>
+
+                <div class="fun-element">
+                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Co-Renter Income Information Section (Initially Hidden) -->
+        <div id="co-income-section" class="collapsible-menu" style="display: none;">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-money-bill-wave"></i> Co-Renter Income Information</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-group">
+                    <label>Is employment your primary source of income? *</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="co-employment-yes" name="co-employment-primary" value="yes" onchange="toggleCoEmploymentFields(this)">
+                        <label for="co-employment-yes">Yes</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="co-employment-no" name="co-employment-primary" value="no" onchange="toggleCoEmploymentFields(this)">
+                        <label for="co-employment-no">No</label>
+                    </div>
+                </div>
+
+                <div id="co-employment-fields" class="conditional-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="co-employer">Employer *</label>
+                            <input type="text" id="co-employer" name="co-employer">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-job-title">Job Title *</label>
+                            <input type="text" id="co-job-title" name="co-job-title">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-shift">Shift *</label>
+                            <select id="co-shift" name="co-shift">
+                                <option value="">Select shift</option>
+                                <option value="day">Day Shift</option>
+                                <option value="evening">Evening Shift</option>
+                                <option value="night">Night Shift</option>
+                                <option value="varied">Varied Shifts</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="co-income-type">Income Type *</label>
+                            <select id="co-income-type" name="co-income-type" onchange="toggleCoIncomeFields(this)">
+                                <option value="">Select type</option>
+                                <option value="hourly">Hourly Rate</option>
+                                <option value="salary">Monthly Salary</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="co-hourly-rate-field">
+                            <label for="co-hourly-rate">Hourly Rate *</label>
+                            <input type="number" id="co-hourly-rate" name="co-hourly-rate" step="0.01">
+                        </div>
+                        <div class="form-group" id="co-monthly-salary-field">
+                            <label for="co-monthly-salary">Monthly Salary *</label>
+                            <input type="number" id="co-monthly-salary" name="co-monthly-salary" step="0.01">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-take-home-pay">Take Home Pay (after taxes) *</label>
+                            <input type="number" id="co-take-home-pay" name="co-take-home-pay" step="0.01">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Is your employer able to be contacted? *</label>
+                        <div class="checkbox-group">
+                            <input type="radio" id="co-contact-yes" name="co-employer-contact" value="yes" onchange="toggleCoContactWarning(this)">
+                            <label for="co-contact-yes">Yes</label>
+                        </div>
+                        <div class="checkbox-group">
+                            <input type="radio" id="co-contact-no" name="co-employer-contact" value="no" onchange="toggleCoContactWarning(this)">
+                            <label for="co-contact-no">No</label>
+                        </div>
+                    </div>
+
+                    <div id="co-contact-warning" class="conditional-section">
+                        <div class="upload-area">
+                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
+                            <input type="file" id="co-paystub-upload" name="co-paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
+                            <label for="co-paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Paystubs</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="co-other-income-fields" class="conditional-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="co-income-source">Income Source *</label>
+                            <input type="text" id="co-income-source" name="co-income-source">
+                        </div>
+                        <div class="form-group">
+                            <label for="co-other-take-home">Take Home Monthly Amount *</label>
+                            <input type="number" id="co-other-take-home" name="co-other-take-home" step="0.01">
+                        </div>
+                    </div>
+                    
+                    <div class="upload-area">
+                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
+                        <input type="file" id="co-income-proof-upload" name="co-income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
+                        <label for="co-income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Income</label>
+                    </div>
+                </div>
+
+                <div class="fun-element">
+                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Residency Information Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-home"></i> Residency Information</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-group">
+                    <label>Do you rent, own, or live with owner? *</label>
+                    <div class="checkbox-group">
+                        <input type="radio" id="residency-rent" name="residency-type" value="rent" onchange="toggleResidencyFields(this)">
+                        <label for="residency-rent">Rent</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="residency-own" name="residency-type" value="own" onchange="toggleResidencyFields(this)">
+                        <label for="residency-own">Own</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="radio" id="residency-live-with" name="residency-type" value="live-with" onchange="toggleResidencyFields(this)">
+                        <label for="residency-live-with">Live with Owner</label>
+                    </div>
+                </div>
+
+                <div id="rent-fields" class="conditional-section">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="landlord-name">Landlord/Property Manager/Apartment Complex Name *</label>
+                            <input type="text" id="landlord-name" name="landlord-name">
+                        </div>
+                        <div class="form-group">
+                            <label for="landlord-phone">Contact Number *</label>
+                            <input type="tel" id="landlord-phone" name="landlord-phone">
+                        </div>
+                    </div>
+
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="no-contact-landlord" name="no-contact-landlord" onchange="toggleLandlordContactWarning(this)">
+                        <label for="no-contact-landlord">Landlord cannot be contacted</label>
+                    </div>
+
+                    <div id="landlord-contact-warning" class="conditional-section">
+                        <div class="upload-area">
+                            <p><strong>Note:</strong> You will need to bring in a lease or utility bill with your legal name on the document or upload it here.</p>
+                            <input type="file" id="lease-upload" name="lease-upload" accept=".jpg,.jpeg,.png,.pdf">
+                            <label for="lease-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Lease or Utility Bill</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="own-fields" class="conditional-section">
+                    <div class="upload-area">
+                        <p>Please upload proof of ownership.</p>
+                        <input type="file" id="ownership-upload" name="ownership-upload" accept=".jpg,.jpeg,.png,.pdf">
+                        <label for="ownership-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Ownership</label>
+                    </div>
+                </div>
+
+                <div class="fun-element">
+                    <p>Almost done! Just a few more sections to go before you can enjoy your new rental items! <i class="fas fa-home"></i> <i class="fas fa-thumbs-up"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- References Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-users"></i> References</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-group">
+                    <p><strong>Reference Note:</strong> We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</p>
+                </div>
+
+                <table class="references-table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>First Name *</th>
+                            <th>Last Name *</th>
+                            <th>Phone Number *</th>
+                            <th>State *</th>
+                            <th>Job/Occupation</th>
+                            <th>What should we know before contacting?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Reference 1 (Required)</td>
+                            <td><input type="text" name="ref1-first" required></td>
+                            <td><input type="text" name="ref1-last" required></td>
+                            <td><input type="tel" name="ref1-phone" required></td>
+                            <td><input type="text" name="ref1-state" required></td>
+                            <td><input type="text" name="ref1-job"></td>
+                            <td><textarea name="ref1-notes" rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Reference 2 (Required)</td>
+                            <td><input type="text" name="ref2-first" required></td>
+                            <td><input type="text" name="ref2-last" required></td>
+                            <td><input type="tel" name="ref2-phone" required></td>
+                            <td><input type="text" name="ref2-state" required></td>
+                            <td><input type="text" name="ref2-job"></td>
+                            <td><textarea name="ref2-notes" rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Reference 3 (Optional)</td>
+                            <td><input type="text" name="ref3-first"></td>
+                            <td><input type="text" name="ref3-last"></td>
+                            <td><input type="tel" name="ref3-phone"></td>
+                            <td><input type="text" name="ref3-state"></td>
+                            <td><input type="text" name="ref3-job"></td>
+                            <td><textarea name="ref3-notes" rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Reference 4 (Optional)</td>
+                            <td><input type="text" name="ref4-first"></td>
+                            <td><input type="text" name="ref4-last"></td>
+                            <td><input type="tel" name="ref4-phone"></td>
+                            <td><input type="text" name="ref4-state"></td>
+                            <td><input type="text" name="ref4-job"></td>
+                            <td><textarea name="ref4-notes" rows="2"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td>Reference 5 (Optional)</td>
+                            <td><input type="text" name="ref5-first"></td>
+                            <td><input type="text" name="ref5-last"></td>
+                            <td><input type="tel" name="ref5-phone"></td>
+                            <td><input type="text" name="ref5-state"></td>
+                            <td><input type="text" name="ref5-job"></td>
+                            <td><textarea name="ref5-notes" rows="2"></textarea></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="fun-element">
+                    <p>References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy and Disclosures Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-shield-alt"></i> Privacy and Disclosures</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="disclosure-box">
+                    <p>The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established.</p>
+                    <p>By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion.</p>
+                </div>
+
+                <div class="form-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="agree-disclosure" name="agree-disclosure" required>
+                        <label for="agree-disclosure">I have read and agree to the above disclosures *</label>
+                    </div>
+                </div>
+
+                <div class="signature-pad-container">
+                    <p><strong>Primary Renter Signature:</strong></p>
+                    <canvas id="signature-pad" width="600" height="200" class="signature-pad"></canvas>
+                    <div class="signature-actions">
+                        <button type="button" class="btn btn-danger" onclick="clearSignature()"><i class="fas fa-trash"></i> Clear Signature</button>
+                        <button type="button" class="btn btn-primary" onclick="saveSignature()"><i class="fas fa-save"></i> Save Signature</button>
+                    </div>
+                </div>
+
+                <!-- Co-Renter Signature Section (Initially Hidden) -->
+                <div id="co-signature-section" class="signature-pad-container" style="display: none;">
+                    <p><strong>Co-Renter Signature:</strong></p>
+                    <canvas id="co-signature-pad" width="600" height="200" class="signature-pad"></canvas>
+                    <div class="signature-actions">
+                        <button type="button" class="btn btn-danger" onclick="clearCoSignature()"><i class="fas fa-trash"></i> Clear Signature</button>
+                        <button type="button" class="btn btn-primary" onclick="saveCoSignature()"><i class="fas fa-save"></i> Save Signature</button>
+                    </div>
+                </div>
+
+                <div class="fun-element">
+                    <p>Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group" style="padding: 20px; text-align: center;">
+            <button type="button" onclick="generatePDF()" class="btn btn-success"><i class="fas fa-file-pdf"></i> Save & Download Application</button>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Application</button>
+        </div>
+    </form>
+
+    <div class="footer">
+        <p>&copy; 2025 National TV Rental. All rights reserved.</p>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set today's date as default
-            const today = new Date().toISOString().substr(0, 10);
-            document.querySelector('input[type="date"]').value = today;
-            document.getElementById('signature-date').value = today;
-            
-            // Signature pad functionality
-            const canvas = document.getElementById('signature-canvas');
-            const ctx = canvas.getContext('2d');
-            let isDrawing = false;
-            let lastX = 0;
-            let lastY = 0;
-            
-            // Set canvas size correctly
-            function resizeCanvas() {
-                const displayWidth = canvas.clientWidth;
-                const displayHeight = canvas.clientHeight;
-                
-                if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
-                    canvas.width = displayWidth;
-                    canvas.height = displayHeight;
-                }
-            }
-            
-            resizeCanvas();
-            window.addEventListener('resize', resizeCanvas);
-            
-            // Drawing functions
-            function startDrawing(e) {
-                isDrawing = true;
-                [lastX, lastY] = [e.offsetX, e.offsetY];
-            }
-            
-            function draw(e) {
-                if (!isDrawing) return;
-                
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = '#000';
-                
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(e.offsetX, e.offsetY);
-                ctx.stroke();
-                
-                [lastX, lastY] = [e.offsetX, e.offsetY];
-            }
-            
-            function stopDrawing() {
-                isDrawing = false;
-            }
-            
-            // Touch events for mobile devices
-            function getTouchPos(e) {
-                const rect = canvas.getBoundingClientRect();
-                return {
-                    x: e.touches[0].clientX - rect.left,
-                    y: e.touches[0].clientY - rect.top
-                };
-            }
-            
-            function startDrawingTouch(e) {
-                e.preventDefault();
-                isDrawing = true;
-                const pos = getTouchPos(e);
-                [lastX, lastY] = [pos.x, pos.y];
-            }
-            
-            function drawTouch(e) {
-                e.preventDefault();
-                if (!isDrawing) return;
-                
-                const pos = getTouchPos(e);
-                
-                ctx.beginPath();
-                ctx.lineWidth = 2;
-                ctx.lineCap = 'round';
-                ctx.strokeStyle = '#000';
-                
-                ctx.moveTo(lastX, lastY);
-                ctx.lineTo(pos.x, pos.y);
-                ctx.stroke();
-                
-                [lastX, lastY] = [pos.x, pos.y];
-            }
-            
-            // Event listeners for mouse
-            canvas.addEventListener('mousedown', startDrawing);
-            canvas.addEventListener('mousemove', draw);
-            canvas.addEventListener('mouseup', stopDrawing);
-            canvas.addEventListener('mouseout', stopDrawing);
-            
-            // Event listeners for touch
-            canvas.addEventListener('touchstart', startDrawingTouch);
-            canvas.addEventListener('touchmove', drawTouch);
-            canvas.addEventListener('touchend', stopDrawing);
-            
-            // Clear signature
-            document.getElementById('clear-signature').addEventListener('click', function() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            });
-            
-            // Form submission
-            document.getElementById('submit-btn').addEventListener('click', function() {
-                // Basic validation
-                let isValid = true;
-                const requiredFields = document.querySelectorAll('input[required], select[required]');
-                
-                requiredFields.forEach(field => {
-                    if (!field.value.trim()) {
-                        field.style.borderColor = 'red';
-                        isValid = false;
-                    } else {
-                        field.style.borderColor = '';
-                    }
-                });
-                
-                // Check if signature is provided
-                const signatureEmpty = isCanvasEmpty(canvas);
-                if (signatureEmpty) {
-                    alert('Please provide your signature before submitting.');
-                    isValid = false;
-                }
-                
-                if (isValid) {
-                    alert('Form submitted successfully!');
-                    // Here you would typically send the form data to a server
-                }
-            });
-            
-            // Form reset
-            document.getElementById('reset-btn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear all form data?')) {
-                    document.querySelectorAll('input:not([readonly]):not([type="date"]), textarea, select').forEach(field => {
-                        field.value = '';
-                    });
-                    
-                    document.querySelector('input[type="date"]').value = today;
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                    
-                    // Uncheck all checkboxes
-                    document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                }
-            });
-            
-            // Helper function to check if canvas is empty
-            function isCanvasEmpty(canvas) {
-                const context = canvas.getContext('2d');
-                const pixelBuffer = new Uint32Array(
-                    context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-                );
-                return !pixelBuffer.some(color => color !== 0);
-            }
-            
-            // SSN auto-tab functionality
-            const ssnInputs = document.querySelectorAll('.ssn-part');
-            ssnInputs.forEach((input, index) => {
-                input.addEventListener('input', function(e) {
-                    if (this.value.length >= this.maxLength) {
-                        if (index < ssnInputs.length - 1) {
-                            ssnInputs[index + 1].focus();
-                        }
-                    }
-                    
-                    // Allow only numbers
-                    this.value = this.value.replace(/[^0-9]/g, '');
-                });
-            });
+        // Initialize signature pads
+        const canvas = document.getElementById('signature-pad');
+        const signaturePad = new SignaturePad(canvas, {
+            backgroundColor: 'rgb(255, 255, 255)'
         });
+
+        const coCanvas = document.getElementById('co-signature-pad');
+        const coSignaturePad = new SignaturePad(coCanvas, {
+            backgroundColor: 'rgb(255, 255, 255)'
+        });
+
+        // Adjust canvas for high DPI displays
+        function resizeCanvas() {
+            const ratio = Math.max(window.devicePixelRatio || 1, 1);
+            
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext('2d').scale(ratio, ratio);
+            
+            coCanvas.width = coCanvas.offsetWidth * ratio;
+            coCanvas.height = coCanvas.offsetHeight * ratio;
+            coCanvas.getContext('2d').scale(ratio, ratio);
+            
+            signaturePad.clear();
+            coSignaturePad.clear();
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Toggle collapsible menus
+        function toggleMenu(menuHeader) {
+            const menuContent = menuHeader.nextElementSibling;
+            const icon = menuHeader.querySelector('.menu-icon i');
+            
+            menuContent.classList.toggle('active');
+            
+            if (menuContent.classList.contains('active')) {
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        }
+
+        // Toggle co-renter section
+        function toggleCoRenterSection(checkbox) {
+            const coRenterSection = document.getElementById('corener-section');
+            const coIncomeSection = document.getElementById('co-income-section');
+            const coSignatureSection = document.getElementById('co-signature-section');
+            const coRenterInputs = coRenterSection.querySelectorAll('input, select');
+            
+            if (checkbox.checked) {
+                coRenterSection.style.display = 'block';
+                coIncomeSection.style.display = 'block';
+                coSignatureSection.style.display = 'block';
+                coRenterInputs.forEach(input => input.setAttribute('required', 'true'));
+            } else {
+                coRenterSection.style.display = 'none';
+                coIncomeSection.style.display = 'none';
+                coSignatureSection.style.display = 'none';
+                coRenterInputs.forEach(input => input.removeAttribute('required'));
+            }
+        }
+
+        // Toggle employment fields for primary renter
+        function toggleEmploymentFields(radio) {
+            const employmentFields = document.getElementById('employment-fields');
+            const otherIncomeFields = document.getElementById('other-income-fields');
+            
+            if (radio.value === 'yes') {
+                employmentFields.style.display = 'block';
+                otherIncomeFields.style.display = 'none';
+                
+                // Set required attributes for employment fields
+                const employmentInputs = employmentFields.querySelectorAll('input, select');
+                employmentInputs.forEach(input => {
+                    if (input.name !== 'employer-contact') {
+                        input.setAttribute('required', 'true');
+                    }
+                });
+                
+                // Remove required attributes from other income fields
+                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
+                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
+            } else {
+                employmentFields.style.display = 'none';
+                otherIncomeFields.style.display = 'block';
+                
+                // Remove required attributes from employment fields
+                const employmentInputs = employmentFields.querySelectorAll('input, select');
+                employmentInputs.forEach(input => input.removeAttribute('required'));
+                
+                // Set required attributes for other income fields
+                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
+                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
+            }
+        }
+
+        // Toggle employment fields for co-renter
+        function toggleCoEmploymentFields(radio) {
+            const employmentFields = document.getElementById('co-employment-fields');
+            const otherIncomeFields = document.getElementById('co-other-income-fields');
+            
+            if (radio.value === 'yes') {
+                employmentFields.style.display = 'block';
+                otherIncomeFields.style.display = 'none';
+                
+                // Set required attributes for employment fields
+                const employmentInputs = employmentFields.querySelectorAll('input, select');
+                employmentInputs.forEach(input => {
+                    if (input.name !== 'co-employer-contact') {
+                        input.setAttribute('required', 'true');
+                    }
+                });
+                
+                // Remove required attributes from other income fields
+                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
+                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
+            } else {
+                employmentFields.style.display = 'none';
+                otherIncomeFields.style.display = 'block';
+                
+                // Remove required attributes from employment fields
+                const employmentInputs = employmentFields.querySelectorAll('input, select');
+                employmentInputs.forEach(input => input.removeAttribute('required'));
+                
+                // Set required attributes for other income fields
+                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
+                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
+            }
+        }
+
+        // Toggle income type fields for primary renter
+        function toggleIncomeFields(select) {
+            const hourlyRateField = document.getElementById('hourly-rate-field');
+            const monthlySalaryField = document.getElementById('monthly-salary-field');
+            
+            if (select.value === 'hourly') {
+                hourlyRateField.style.display = 'block';
+                monthlySalaryField.style.display = 'none';
+                document.getElementById('hourly-rate').setAttribute('required', 'true');
+                document.getElementById('monthly-salary').removeAttribute('required');
+            } else if (select.value === 'salary') {
+                hourlyRateField.style.display = 'none';
+                monthlySalaryField.style.display = 'block';
+                document.getElementById('hourly-rate').removeAttribute('required');
+                document.getElementById('monthly-salary').setAttribute('required', 'true');
+            } else {
+                hourlyRateField.style.display = 'none';
+                monthlySalaryField.style.display = 'none';
+                document.getElementById('hourly-rate').removeAttribute('required');
+                document.getElementById('monthly-salary').removeAttribute('required');
+            }
+        }
+
+        // Toggle income type fields for co-renter
+        function toggleCoIncomeFields(select) {
+            const hourlyRateField = document.getElementById('co-hourly-rate-field');
+            const monthlySalaryField = document.getElementById('co-monthly-salary-field');
+            
+            if (select.value === 'hourly') {
+                hourlyRateField.style.display = 'block';
+                monthlySalaryField.style.display = 'none';
+                document.getElementById('co-hourly-rate').setAttribute('required', 'true');
+                document.getElementById('co-monthly-salary').removeAttribute('required');
+            } else if (select.value === 'salary') {
+                hourlyRateField.style.display = 'none';
+                monthlySalaryField.style.display = 'block';
+                document.getElementById('co-hourly-rate').removeAttribute('required');
+                document.getElementById('co-monthly-salary').setAttribute('required', 'true');
+            } else {
+                hourlyRateField.style.display = 'none';
+                monthlySalaryField.style.display = 'none';
+                document.getElementById('co-hourly-rate').removeAttribute('required');
+                document.getElementById('co-monthly-salary').removeAttribute('required');
+            }
+        }
+
+        // Toggle employer contact warning for primary renter
+        function toggleContactWarning(radio) {
+            const contactWarning = document.getElementById('contact-warning');
+            
+            if (radio.value === 'no') {
+                contactWarning.style.display = 'block';
+            } else {
+                contactWarning.style.display = 'none';
+            }
+        }
+
+        // Toggle employer contact warning for co-renter
+        function toggleCoContactWarning(radio) {
+            const contactWarning = document.getElementById('co-contact-warning');
+            
+            if (radio.value === 'no') {
+                contactWarning.style.display = 'block';
+            } else {
+                contactWarning.style.display = 'none';
+            }
+        }
+
+        // Toggle residency fields
+        function toggleResidencyFields(radio) {
+            const rentFields = document.getElementById('rent-fields');
+            const ownFields = document.getElementById('own-fields');
+            
+            if (radio.value === 'rent') {
+                rentFields.style.display = 'block';
+                ownFields.style.display = 'none';
+                
+                // Set required attributes for rent fields
+                const rentInputs = rentFields.querySelectorAll('input');
+                rentInputs.forEach(input => input.setAttribute('required', 'true'));
+                
+                // Remove required attributes from own fields
+                const ownInputs = ownFields.querySelectorAll('input');
+                ownInputs.forEach(input => input.removeAttribute('required'));
+            } else if (radio.value === 'own') {
+                rentFields.style.display = 'none';
+                ownFields.style.display = 'block';
+                
+                // Remove required attributes from rent fields
+                const rentInputs = rentFields.querySelectorAll('input');
+                rentInputs.forEach(input => input.removeAttribute('required'));
+                
+                // Set required attributes for own fields
+                const ownInputs = ownFields.querySelectorAll('input');
+                ownInputs.forEach(input => input.setAttribute('required', 'true'));
+            } else {
+                rentFields.style.display = 'none';
+                ownFields.style.display = 'none';
+                
+                // Remove required attributes from all fields
+                const rentInputs = rentFields.querySelectorAll('input');
+                rentInputs.forEach(input => input.removeAttribute('required'));
+                
+                const ownInputs = ownFields.querySelectorAll('input');
+                ownInputs.forEach(input => input.removeAttribute('required'));
+            }
+        }
+
+        // Toggle landlord contact warning
+        function toggleLandlordContactWarning(checkbox) {
+            const landlordContactWarning = document.getElementById('landlord-contact-warning');
+            
+            if (checkbox.checked) {
+                landlordContactWarning.style.display = 'block';
+            } else {
+                landlordContactWarning.style.display = 'none';
+            }
+        }
+
+        // Clear signature pad for primary renter
+        function clearSignature() {
+            signaturePad.clear();
+        }
+
+        // Clear signature pad for co-renter
+        function clearCoSignature() {
+            coSignaturePad.clear();
+        }
+
+        // Save signature for primary renter
+        function saveSignature() {
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature first.");
+            } else {
+                alert("Signature saved successfully!");
+            }
+        }
+
+        // Save signature for co-renter
+        function saveCoSignature() {
+            if (coSignaturePad.isEmpty()) {
+                alert("Please provide a signature first.");
+            } else {
+                alert("Co-renter signature saved successfully!");
+            }
+        }
+
+        // Generate PDF
+        function generatePDF() {
+            // Validate form first
+            const form = document.getElementById('rental-application');
+            if (!form.checkValidity()) {
+                alert("Please fill out all required fields before generating the PDF.");
+                form.reportValidity();
+                return;
+            }
+            
+            // Validate signature
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature before generating the PDF.");
+                return;
+            }
+            
+            // Validate co-signature if co-renter exists
+            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
+                alert("Please provide a co-renter signature before generating the PDF.");
+                return;
+            }
+            
+            // Create PDF
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add date
+            const now = new Date();
+            const dateString = now.toLocaleDateString();
+            doc.setFontSize(10);
+            doc.text(`Application Date: ${dateString}`, 160, 15);
+            
+            // Add logo and title
+            doc.setFontSize(20);
+            doc.setTextColor(0, 102, 204);
+            doc.text("National TV Rental Application", 105, 30, null, null, "center");
+            
+            // Add line separator
+            doc.setDrawColor(204, 0, 0);
+            doc.line(20, 35, 190, 35);
+            
+            // Add content from form
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            
+            // Primary Renter Information
+            doc.setFont(undefined, 'bold');
+            doc.text("Primary Renter Information", 20, 45);
+            doc.setFont(undefined, 'normal');
+            
+            let yPosition = 55;
+            
+            const primaryFields = [
+                `Name: ${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`,
+                `Maiden Name: ${document.getElementById('maiden-name').value || 'N/A'}`,
+                `Birthdate: ${document.getElementById('birthdate').value}`,
+                `SSN: ${document.getElementById('ssn').value}`,
+                `Email: ${document.getElementById('email').value}`,
+                `Phone: ${document.getElementById('phone').value}`,
+                `Best Time to Contact: ${document.getElementById('contact-time').value}`
+            ];
+            
+            primaryFields.forEach(field => {
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                doc.text(field, 20, yPosition);
+                yPosition += 7;
+            });
+            
+            // Check if co-renter exists
+            if (document.getElementById('has-corener').checked) {
+                yPosition += 3;
+                doc.setFont(undefined, 'bold');
+                doc.text("Co-Renter Information", 20, yPosition);
+                doc.setFont(undefined, 'normal');
+                yPosition += 7;
+                
+                const coRenterFields = [
+                    `Name: ${document.getElementById('co-first-name').value} ${document.getElementById('co-last-name').value}`,
+                    `Maiden Name: ${document.getElementById('co-maiden-name').value || 'N/A'}`,
+                    `Birthdate: ${document.getElementById('co-birthdate').value}`,
+                    `SSN: ${document.getElementById('co-ssn').value}`,
+                    `Email: ${document.getElementById('co-email').value}`,
+                    `Phone: ${document.getElementById('co-phone').value}`,
+                    `Best Time to Contact: ${document.getElementById('co-contact-time').value}`
+                ];
+                
+                coRenterFields.forEach(field => {
+                    if (yPosition > 270) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                    doc.text(field, 20, yPosition);
+                    yPosition += 7;
+                });
+            }
+            
+            // Vehicle Information
+            yPosition += 5;
+            doc.setFont(undefined, 'bold');
+            doc.text("Vehicle Information", 20, yPosition);
+            doc.setFont(undefined, 'normal');
+            yPosition += 7;
+            
+            const vehicleFields = [
+                `Make: ${document.getElementById('vehicle-make').value || 'N/A'}`,
+                `Model: ${document.getElementById('vehicle-model').value || 'N/A'}`,
+                `License Plate: ${document.getElementById('license-plate').value || 'N/A'}`,
+                `Color: ${document.getElementById('vehicle-color').value || 'N/A'}`
+            ];
+            
+            vehicleFields.forEach(field => {
+                if (yPosition > 270) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                doc.text(field, 20, yPosition);
+                yPosition += 7;
+            });
+            
+            // Add more sections similarly for income, residency, references, etc.
+            
+            // Add signatures
+            const signatureDataURL = signaturePad.toDataURL();
+            doc.addPage();
+            doc.text("Primary Renter Signature", 20, 20);
+            doc.addImage(signatureDataURL, 'PNG', 20, 30, 100, 40);
+            
+            if (document.getElementById('has-corener').checked) {
+                const coSignatureDataURL = coSignaturePad.toDataURL();
+                doc.text("Co-Renter Signature", 20, 80);
+                doc.addImage(coSignatureDataURL, 'PNG', 20, 90, 100, 40);
+            }
+            
+            // Save the PDF
+            doc.save('National-TV-Rental-Application.pdf');
+            
+            alert("PDF generated successfully! Please also remember to bring any required documents to the store.");
+        }
+
+        // Form submission
+        document.getElementById('rental-application').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            if (!this.checkValidity()) {
+                alert("Please fill out all required fields before submitting.");
+                this.reportValidity();
+                return;
+            }
+            
+            // Validate signature
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature before submitting.");
+                return;
+            }
+            
+            // Validate co-signature if co-renter exists
+            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
+                alert("Please provide a co-renter signature before submitting.");
+                return;
+            }
+            
+            // If all valid, show success message
+            alert("Application submitted successfully! Please remember to bring any required documents to the store.");
+            // In a real application, you would send the data to a server here
+        });
+
+        // Initialize hidden sections
+        window.onload = function() {
+            document.getElementById('corener-section').style.display = 'none';
+            document.getElementById('co-income-section').style.display = 'none';
+            document.getElementById('co-signature-section').style.display = 'none';
+            document.getElementById('employment-fields').style.display = 'none';
+            document.getElementById('other-income-fields').style.display = 'none';
+            document.getElementById('hourly-rate-field').style.display = 'none';
+            document.getElementById('monthly-salary-field').style.display = 'none';
+            document.getElementById('contact-warning').style.display = 'none';
+            document.getElementById('co-employment-fields').style.display = 'none';
+            document.getElementById('co-other-income-fields').style.display = 'none';
+            document.getElementById('co-hourly-rate-field').style.display = 'none';
+            document.getElementById('co-monthly-salary-field').style.display = 'none';
+            document.getElementById('co-contact-warning').style.display = 'none';
+            document.getElementById('rent-fields').style.display = 'none';
+            document.getElementById('own-fields').style.display = 'none';
+            document.getElementById('landlord-contact-warning').style.display = 'none';
+        };
     </script>
 </body>
 </html>
