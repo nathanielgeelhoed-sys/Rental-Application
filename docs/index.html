@@ -234,10 +234,15 @@
             border-color: var(--primary-blue);
         }
 
+        .references-container {
+            overflow-x: auto;
+            max-height: 400px;
+            margin: 20px 0;
+        }
+
         .references-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
         }
 
         .references-table th,
@@ -245,10 +250,13 @@
             border: 1px solid #ddd;
             padding: 12px;
             text-align: left;
+            white-space: nowrap;
         }
 
         .references-table th {
             background-color: var(--light-blue);
+            position: sticky;
+            top: 0;
         }
 
         .disclosure-box {
@@ -285,6 +293,10 @@
             .btn {
                 width: 100%;
             }
+            
+            .references-container {
+                overflow-x: auto;
+            }
         }
 
         .fun-element {
@@ -297,11 +309,47 @@
             margin: 0 5px;
             font-size: 1.5rem;
         }
+        
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-application, #printable-application * {
+                visibility: visible;
+            }
+            #printable-application {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 15px;
+                font-size: 12px;
+            }
+            .print-section {
+                margin-bottom: 15px;
+                page-break-inside: avoid;
+            }
+            .print-field {
+                margin-bottom: 5px;
+            }
+            .print-label {
+                font-weight: bold;
+                display: inline-block;
+                width: 160px;
+            }
+            .signature-img {
+                max-width: 250px;
+                border-top: 1px solid #000;
+                margin-top: 40px;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="https://www.google.com/gasearch?q=national%20tv%20sales%20and%20rental%20aurora%20reviews&source=sh/x/gs/m2/5#ebo=1" class="logo">
+        <!-- Replaced with the provided URL -->
+        <img src="https://drive.google.com/file/d/1XyI8-JzPeo_yz2nqEz2N5UE4o_BVNEqm/view?usp=drivesdk" class="logo">
         <h1>National TV Rental Application</h1>
     </div>
 
@@ -738,66 +786,68 @@
                     <p><strong>Reference Note:</strong> We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</p>
                 </div>
 
-                <table class="references-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>First Name *</th>
-                            <th>Last Name *</th>
-                            <th>Phone Number *</th>
-                            <th>State *</th>
-                            <th>Job/Occupation</th>
-                            <th>What should we know before contacting?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Reference 1 (Required)</td>
-                            <td><input type="text" name="ref1-first" required></td>
-                            <td><input type="text" name="ref1-last" required></td>
-                            <td><input type="tel" name="ref1-phone" required></td>
-                            <td><input type="text" name="ref1-state" required></td>
-                            <td><input type="text" name="ref1-job"></td>
-                            <td><textarea name="ref1-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 2 (Required)</td>
-                            <td><input type="text" name="ref2-first" required></td>
-                            <td><input type="text" name="ref2-last" required></td>
-                            <td><input type="tel" name="ref2-phone" required></td>
-                            <td><input type="text" name="ref2-state" required></td>
-                            <td><input type="text" name="ref2-job"></td>
-                            <td><textarea name="ref2-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 3 (Optional)</td>
-                            <td><input type="text" name="ref3-first"></td>
-                            <td><input type="text" name="ref3-last"></td>
-                            <td><input type="tel" name="ref3-phone"></td>
-                            <td><input type="text" name="ref3-state"></td>
-                            <td><input type="text" name="ref3-job"></td>
-                            <td><textarea name="ref3-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 4 (Optional)</td>
-                            <td><input type="text" name="ref4-first"></td>
-                            <td><input type="text" name="ref4-last"></td>
-                            <td><input type="tel" name="ref4-phone"></td>
-                            <td><input type="text" name="ref4-state"></td>
-                            <td><input type="text" name="ref4-job"></td>
-                            <td><textarea name="ref4-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 5 (Optional)</td>
-                            <td><input type="text" name="ref5-first"></td>
-                            <td><input type="text" name="ref5-last"></td>
-                            <td><input type="tel" name="ref5-phone"></td>
-                            <td><input type="text" name="ref5-state"></td>
-                            <td><input type="text" name="ref5-job"></td>
-                            <td><textarea name="ref5-notes" rows="2"></textarea></td>
-                        </tr>
-                    </tbody>
-                </table>
+                <div class="references-container">
+                    <table class="references-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>First Name *</th>
+                                <th>Last Name *</th>
+                                <th>Phone Number *</th>
+                                <th>State *</th>
+                                <th>Job/Occupation</th>
+                                <th>What should we know before contacting?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Reference 1 (Required)</td>
+                                <td><input type="text" name="ref1-first" required></td>
+                                <td><input type="text" name="ref1-last" required></td>
+                                <td><input type="tel" name="ref1-phone" required></td>
+                                <td><input type="text" name="ref1-state" required></td>
+                                <td><input type="text" name="ref1-job"></td>
+                                <td><textarea name="ref1-notes" rows="2"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>Reference 2 (Required)</td>
+                                <td><input type="text" name="ref2-first" required></td>
+                                <td><input type="text" name="ref2-last" required></td>
+                                <td><input type="tel" name="ref2-phone" required></td>
+                                <td><input type="text" name="ref2-state" required></td>
+                                <td><input type="text" name="ref2-job"></td>
+                                <td><textarea name="ref2-notes" rows="2"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>Reference 3 (Optional)</td>
+                                <td><input type="text" name="ref3-first"></td>
+                                <td><input type="text" name="ref3-last"></td>
+                                <td><input type="tel" name="ref3-phone"></td>
+                                <td><input type="text" name="ref3-state"></td>
+                                <td><input type="text" name="ref3-job"></td>
+                                <td><textarea name="ref3-notes" rows="2"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>Reference 4 (Optional)</td>
+                                <td><input type="text" name="ref4-first"></td>
+                                <td><input type="text" name="ref4-last"></td>
+                                <td><input type="tel" name="ref4-phone"></td>
+                                <td><input type="text" name="ref4-state"></td>
+                                <td><input type="text" name="ref4-job"></td>
+                                <td><textarea name="ref4-notes" rows="2"></textarea></td>
+                            </tr>
+                            <tr>
+                                <td>Reference 5 (Optional)</td>
+                                <td><input type="text" name="ref5-first"></td>
+                                <td><input type="text" name="ref5-last"></td>
+                                <td><input type="tel" name="ref5-phone"></td>
+                                <td><input type="text" name="ref5-state"></td>
+                                <td><input type="text" name="ref5-job"></td>
+                                <td><textarea name="ref5-notes" rows="2"></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
                 <div class="fun-element">
                     <p>References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
@@ -849,11 +899,17 @@
             </div>
         </div>
 
+        <!-- Single button to generate printable copy -->
         <div class="form-group" style="padding: 20px; text-align: center;">
-            <button type="button" onclick="generatePDF()" class="btn btn-success"><i class="fas fa-file-pdf"></i> Save & Download Application</button>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Application</button>
+            <button type="button" onclick="generatePrintable()" class="btn btn-primary"><i class="fas fa-print"></i> Generate Printable Application</button>
         </div>
     </form>
+
+    <!-- Hidden printable version -->
+    <div id="printable-application" style="display: none;">
+        <h2 style="text-align: center; color: #0066cc;">National TV Rental Application</h2>
+        <div id="print-content"></div>
+    </div>
 
     <div class="footer">
         <p>&copy; 2025 National TV Rental. All rights reserved.</p>
@@ -1141,175 +1197,221 @@
             }
         }
 
-        // Generate PDF
-        function generatePDF() {
+        // Generate printable version
+        function generatePrintable() {
             // Validate form first
             const form = document.getElementById('rental-application');
             if (!form.checkValidity()) {
-                alert("Please fill out all required fields before generating the PDF.");
+                alert("Please fill out all required fields before generating the printable version.");
                 form.reportValidity();
                 return;
             }
             
             // Validate signature
             if (signaturePad.isEmpty()) {
-                alert("Please provide a signature before generating the PDF.");
+                alert("Please provide a signature before generating the printable version.");
                 return;
             }
             
             // Validate co-signature if co-renter exists
             if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert("Please provide a co-renter signature before generating the PDF.");
+                alert("Please provide a co-renter signature before generating the printable version.");
                 return;
             }
             
-            // Create PDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
+            // Create printable content
+            const printContent = document.getElementById('print-content');
+            printContent.innerHTML = '';
             
-            // Add date
+            // Add application date
             const now = new Date();
             const dateString = now.toLocaleDateString();
-            doc.setFontSize(10);
-            doc.text(`Application Date: ${dateString}`, 160, 15);
-            
-            // Add logo and title
-            doc.setFontSize(20);
-            doc.setTextColor(0, 102, 204);
-            doc.text("National TV Rental Application", 105, 30, null, null, "center");
-            
-            // Add line separator
-            doc.setDrawColor(204, 0, 0);
-            doc.line(20, 35, 190, 35);
-            
-            // Add content from form
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'print-section';
+            dateDiv.innerHTML = `<div class="print-field"><span class="print-label">Application Date:</span> ${dateString}</div>`;
+            printContent.appendChild(dateDiv);
             
             // Primary Renter Information
-            doc.setFont(undefined, 'bold');
-            doc.text("Primary Renter Information", 20, 45);
-            doc.setFont(undefined, 'normal');
+            const primarySection = document.createElement('div');
+            primarySection.className = 'print-section';
+            primarySection.innerHTML = `
+                <h3>Primary Renter Information</h3>
+                <div class="print-field"><span class="print-label">Name:</span> ${document.getElementById('first-name').value} ${document.getElementById('last-name').value}</div>
+                <div class="print-field"><span class="print-label">Maiden Name:</span> ${document.getElementById('maiden-name').value || 'N/A'}</div>
+                <div class="print-field"><span class="print-label">Birthdate:</span> ${document.getElementById('birthdate').value}</div>
+                <div class="print-field"><span class="print-label">SSN:</span> ${document.getElementById('ssn').value}</div>
+                <div class="print-field"><span class="print-label">Email:</span> ${document.getElementById('email').value}</div>
+                <div class="print-field"><span class="print-label">Phone:</span> ${document.getElementById('phone').value}</div>
+                <div class="print-field"><span class="print-label">Best Time to Contact:</span> ${document.getElementById('contact-time').value}</div>
+            `;
+            printContent.appendChild(primarySection);
             
-            let yPosition = 55;
-            
-            const primaryFields = [
-                `Name: ${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`,
-                `Maiden Name: ${document.getElementById('maiden-name').value || 'N/A'}`,
-                `Birthdate: ${document.getElementById('birthdate').value}`,
-                `SSN: ${document.getElementById('ssn').value}`,
-                `Email: ${document.getElementById('email').value}`,
-                `Phone: ${document.getElementById('phone').value}`,
-                `Best Time to Contact: ${document.getElementById('contact-time').value}`
-            ];
-            
-            primaryFields.forEach(field => {
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                doc.text(field, 20, yPosition);
-                yPosition += 7;
-            });
-            
-            // Check if co-renter exists
+            // Co-Renter Information if exists
             if (document.getElementById('has-corener').checked) {
-                yPosition += 3;
-                doc.setFont(undefined, 'bold');
-                doc.text("Co-Renter Information", 20, yPosition);
-                doc.setFont(undefined, 'normal');
-                yPosition += 7;
-                
-                const coRenterFields = [
-                    `Name: ${document.getElementById('co-first-name').value} ${document.getElementById('co-last-name').value}`,
-                    `Maiden Name: ${document.getElementById('co-maiden-name').value || 'N/A'}`,
-                    `Birthdate: ${document.getElementById('co-birthdate').value}`,
-                    `SSN: ${document.getElementById('co-ssn').value}`,
-                    `Email: ${document.getElementById('co-email').value}`,
-                    `Phone: ${document.getElementById('co-phone').value}`,
-                    `Best Time to Contact: ${document.getElementById('co-contact-time').value}`
-                ];
-                
-                coRenterFields.forEach(field => {
-                    if (yPosition > 270) {
-                        doc.addPage();
-                        yPosition = 20;
-                    }
-                    doc.text(field, 20, yPosition);
-                    yPosition += 7;
-                });
+                const coSection = document.createElement('div');
+                coSection.className = 'print-section';
+                coSection.innerHTML = `
+                    <h3>Co-Renter Information</h3>
+                    <div class="print-field"><span class="print-label">Name:</span> ${document.getElementById('co-first-name').value} ${document.getElementById('co-last-name').value}</div>
+                    <div class="print-field"><span class="print-label">Maiden Name:</span> ${document.getElementById('co-maiden-name').value || 'N/A'}</div>
+                    <div class="print-field"><span class="print-label">Birthdate:</span> ${document.getElementById('co-birthdate').value}</div>
+                    <div class="print-field"><span class="print-label">SSN:</span> ${document.getElementById('co-ssn').value}</div>
+                    <div class="print-field"><span class="print-label">Email:</span> ${document.getElementById('co-email').value}</div>
+                    <div class="print-field"><span class="print-label">Phone:</span> ${document.getElementById('co-phone').value}</div>
+                    <div class="print-field"><span class="print-label">Best Time to Contact:</span> ${document.getElementById('co-contact-time').value}</div>
+                `;
+                printContent.appendChild(coSection);
             }
             
             // Vehicle Information
-            yPosition += 5;
-            doc.setFont(undefined, 'bold');
-            doc.text("Vehicle Information", 20, yPosition);
-            doc.setFont(undefined, 'normal');
-            yPosition += 7;
+            const vehicleSection = document.createElement('div');
+            vehicleSection.className = 'print-section';
+            vehicleSection.innerHTML = `
+                <h3>Vehicle Information</h3>
+                <div class="print-field"><span class="print-label">Make:</span> ${document.getElementById('vehicle-make').value || 'N/A'}</div>
+                <div class="print-field"><span class="print-label">Model:</span> ${document.getElementById('vehicle-model').value || 'N/A'}</div>
+                <div class="print-field"><span class="print-label">License Plate:</span> ${document.getElementById('license-plate').value || 'N/A'}</div>
+                <div class="print-field"><span class="print-label">Color:</span> ${document.getElementById('vehicle-color').value || 'N/A'}</div>
+            `;
+            printContent.appendChild(vehicleSection);
             
-            const vehicleFields = [
-                `Make: ${document.getElementById('vehicle-make').value || 'N/A'}`,
-                `Model: ${document.getElementById('vehicle-model').value || 'N/A'}`,
-                `License Plate: ${document.getElementById('license-plate').value || 'N/A'}`,
-                `Color: ${document.getElementById('vehicle-color').value || 'N/A'}`
-            ];
+            // Income Information
+            const incomeSection = document.createElement('div');
+            incomeSection.className = 'print-section';
+            incomeSection.innerHTML = '<h3>Income Information</h3>';
             
-            vehicleFields.forEach(field => {
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 20;
+            if (document.getElementById('employment-yes').checked) {
+                incomeSection.innerHTML += `
+                    <div class="print-field"><span class="print-label">Employment Status:</span> Employed</div>
+                    <div class="print-field"><span class="print-label">Employer:</span> ${document.getElementById('employer').value}</div>
+                    <div class="print-field"><span class="print-label">Job Title:</span> ${document.getElementById('job-title').value}</div>
+                    <div class="print-field"><span class="print-label">Shift:</span> ${document.getElementById('shift').value}</div>
+                `;
+                
+                if (document.getElementById('income-type').value === 'hourly') {
+                    incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('hourly-rate').value}</div>`;
+                } else {
+                    incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('monthly-salary').value}</div>`;
                 }
-                doc.text(field, 20, yPosition);
-                yPosition += 7;
-            });
+                
+                incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Take Home Pay:</span> $${document.getElementById('take-home-pay').value}</div>`;
+            } else {
+                incomeSection.innerHTML += `
+                    <div class="print-field"><span class="print-label">Employment Status:</span> Other Income Source</div>
+                    <div class="print-field"><span class="print-label">Income Source:</span> ${document.getElementById('income-source').value}</div>
+                    <div class="print-field"><span class="print-label">Monthly Amount:</span> $${document.getElementById('other-take-home').value}</div>
+                `;
+            }
+            printContent.appendChild(incomeSection);
             
-            // Add more sections similarly for income, residency, references, etc.
+            // Co-Renter Income Information if exists
+            if (document.getElementById('has-corener').checked) {
+                const coIncomeSection = document.createElement('div');
+                coIncomeSection.className = 'print-section';
+                coIncomeSection.innerHTML = '<h3>Co-Renter Income Information</h3>';
+                
+                if (document.getElementById('co-employment-yes').checked) {
+                    coIncomeSection.innerHTML += `
+                        <div class="print-field"><span class="print-label">Employment Status:</span> Employed</div>
+                        <div class="print-field"><span class="print-label">Employer:</span> ${document.getElementById('co-employer').value}</div>
+                        <div class="print-field"><span class="print-label">Job Title:</span> ${document.getElementById('co-job-title').value}</div>
+                        <div class="print-field"><span class="print-label">Shift:</span> ${document.getElementById('co-shift').value}</div>
+                    `;
+                    
+                    if (document.getElementById('co-income-type').value === 'hourly') {
+                        coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('co-hourly-rate').value}</div>`;
+                    } else {
+                        coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('co-monthly-salary').value}</div>`;
+                    }
+                    
+                    coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Take Home Pay:</span> $${document.getElementById('co-take-home-pay').value}</div>`;
+                } else {
+                    coIncomeSection.innerHTML += `
+                        <div class="print-field"><span class="print-label">Employment Status:</span> Other Income Source</div>
+                        <div class="print-field"><span class="print-label">Income Source:</span> ${document.getElementById('co-income-source').value}</div>
+                        <div class="print-field"><span class="print-label">Monthly Amount:</span> $${document.getElementById('co-other-take-home').value}</div>
+                    `;
+                }
+                printContent.appendChild(coIncomeSection);
+            }
             
-            // Add signatures
-            const signatureDataURL = signaturePad.toDataURL();
-            doc.addPage();
-            doc.text("Primary Renter Signature", 20, 20);
-            doc.addImage(signatureDataURL, 'PNG', 20, 30, 100, 40);
+            // Residency Information
+            const residencySection = document.createElement('div');
+            residencySection.className = 'print-section';
+            residencySection.innerHTML = '<h3>Residency Information</h3>';
+            
+            if (document.getElementById('residency-rent').checked) {
+                residencySection.innerHTML += `
+                    <div class="print-field"><span class="print-label">Residency Type:</span> Rent</div>
+                    <div class="print-field"><span class="print-label">Landlord/Property Manager:</span> ${document.getElementById('landlord-name').value}</div>
+                    <div class="print-field"><span class="print-label">Contact Number:</span> ${document.getElementById('landlord-phone').value}</div>
+                `;
+            } else if (document.getElementById('residency-own').checked) {
+                residencySection.innerHTML += `<div class="print-field"><span class="print-label">Residency Type:</span> Own</div>`;
+            } else {
+                residencySection.innerHTML += `<div class="print-field"><span class="print-label">Residency Type:</span> Live with Owner</div>`;
+            }
+            printContent.appendChild(residencySection);
+            
+            // References
+            const referencesSection = document.createElement('div');
+            referencesSection.className = 'print-section';
+            referencesSection.innerHTML = '<h3>References</h3>';
+            
+            // Reference 1 (Required)
+            referencesSection.innerHTML += `
+                <div class="print-field"><span class="print-label">Reference 1:</span> ${document.querySelector('[name="ref1-first"]').value} ${document.querySelector('[name="ref1-last"]').value}</div>
+                <div class="print-field"><span class="print-label">Phone:</span> ${document.querySelector('[name="ref1-phone"]').value}</div>
+                <div class="print-field"><span class="print-label">State:</span> ${document.querySelector('[name="ref1-state"]').value}</div>
+            `;
+            
+            // Reference 2 (Required)
+            referencesSection.innerHTML += `
+                <div class="print-field"><span class="print-label">Reference 2:</span> ${document.querySelector('[name="ref2-first"]').value} ${document.querySelector('[name="ref2-last"]').value}</div>
+                <div class="print-field"><span class="print-label">Phone:</span> ${document.querySelector('[name="ref2-phone"]').value}</div>
+                <div class="print-field"><span class="print-label">State:</span> ${document.querySelector('[name="ref2-state"]').value}</div>
+            `;
+            
+            // Optional references if filled out
+            for (let i = 3; i <= 5; i++) {
+                const refFirstName = document.querySelector(`[name="ref${i}-first"]`).value;
+                if (refFirstName) {
+                    referencesSection.innerHTML += `
+                        <div class="print-field"><span class="print-label">Reference ${i}:</span> ${refFirstName} ${document.querySelector(`[name="ref${i}-last"]`).value}</div>
+                        <div class="print-field"><span class="print-label">Phone:</span> ${document.querySelector(`[name="ref${i}-phone"]`).value}</div>
+                        <div class="print-field"><span class="print-label">State:</span> ${document.querySelector(`[name="ref${i}-state"]`).value}</div>
+                    `;
+                }
+            }
+            printContent.appendChild(referencesSection);
+            
+            // Signatures
+            const signatureSection = document.createElement('div');
+            signatureSection.className = 'print-section';
+            signatureSection.innerHTML = `
+                <h3>Signatures</h3>
+                <div class="print-field">
+                    <span class="print-label">Primary Renter Signature:</span><br>
+                    <img src="${signaturePad.toDataURL()}" class="signature-img">
+                </div>
+            `;
             
             if (document.getElementById('has-corener').checked) {
-                const coSignatureDataURL = coSignaturePad.toDataURL();
-                doc.text("Co-Renter Signature", 20, 80);
-                doc.addImage(coSignatureDataURL, 'PNG', 20, 90, 100, 40);
+                signatureSection.innerHTML += `
+                    <div class="print-field">
+                        <span class="print-label">Co-Renter Signature:</span><br>
+                        <img src="${coSignaturePad.toDataURL()}" class="signature-img">
+                    </div>
+                `;
             }
+            printContent.appendChild(signatureSection);
             
-            // Save the PDF
-            doc.save('National-TV-Rental-Application.pdf');
-            
-            alert("PDF generated successfully! Please also remember to bring any required documents to the store.");
+            // Show printable version and print
+            const printableApp = document.getElementById('printable-application');
+            printableApp.style.display = 'block';
+            window.print();
+            printableApp.style.display = 'none';
         }
-
-        // Form submission
-        document.getElementById('rental-application').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!this.checkValidity()) {
-                alert("Please fill out all required fields before submitting.");
-                this.reportValidity();
-                return;
-            }
-            
-            // Validate signature
-            if (signaturePad.isEmpty()) {
-                alert("Please provide a signature before submitting.");
-                return;
-            }
-            
-            // Validate co-signature if co-renter exists
-            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert("Please provide a co-renter signature before submitting.");
-                return;
-            }
-            
-            // If all valid, show success message
-            alert("Application submitted successfully! Please remember to bring any required documents to the store.");
-            // In a real application, you would send the data to a server here
-        });
 
         // Initialize hidden sections
         window.onload = function() {
