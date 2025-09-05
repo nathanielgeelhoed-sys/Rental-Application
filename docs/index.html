@@ -1035,7 +1035,7 @@
         });
 
         // Apps Script Web App URL - Replace with your actual URL
-        const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
+        const SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1Lj5EkdVagM51OykHnmmYnmi7h5yKdWBuvq_9XH60Vm0/edit?usp=drivesdk" ;
 
         // Store signature states
         let primarySignatureSaved = false;
@@ -1739,7 +1739,7 @@
             fd.append('application_pdf', pdfBlob, 'Application_Summary.pdf');
             
             try {
-                const res = await fetch("https://docs.google.com/spreadsheets/d/1Lj5EkdVagM51OykHnmmYnmi7h5yKdWBuvq_9XH60Vm0/edit?usp=sharing", { method:'POST', body:fd });
+                const res = await fetch(Sample PDF, { method:'POST', body:fd });
                 const text = await res.text();
                 alert('Submitted! Server said: '+text);
             } catch(err) { 
