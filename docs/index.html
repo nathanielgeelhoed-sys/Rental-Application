@@ -1695,7 +1695,7 @@
         }
 
         // Submit to Google Drive
-        async function submitToGoogle(https://script.google.com/macros/s/AKfycby_TUL92oVQxVZsBVx5c7KUELde0kmuDEqsgzz8yCISeqTltUowSB4R572pvMr4IV2bTA/exec) {
+        async function submitToGoogle() {
             // Validate form first
             const validation = validateForm();
             if (!validation.isValid) {
@@ -1739,7 +1739,7 @@
             fd.append('application_pdf', pdfBlob, 'Application_Summary.pdf');
             
             try {
-                const res = await fetch(SCRIPT_URL, { method:'POST', body:fd });
+                const res = await fetch("https://docs.google.com/spreadsheets/d/1Lj5EkdVagM51OykHnmmYnmi7h5yKdWBuvq_9XH60Vm0/edit?usp=sharing", { method:'POST', body:fd });
                 const text = await res.text();
                 alert('Submitted! Server said: '+text);
             } catch(err) { 
