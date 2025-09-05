@@ -348,7 +348,6 @@
 </head>
 <body>
     <div class="header">
-        <!-- Replaced with the provided URL -->
         <img src="https://drive.google.com/file/d/1XyI8-JzPeo_yz2nqEz2N5UE4o_BVNEqm/view?usp=drivesdk" class="logo">
         <h1>National TV Rental Application</h1>
     </div>
@@ -435,7 +434,7 @@
                         </div>
                         <div class="form-group">
                             <label for="co-phone">Phone Number *</label>
-                            <input type="tel" id="co-phone" name="co-phone">
+                        <input type="tel" id="co-phone" name="co-phone">
                         </div>
                         <div class="form-group">
                             <label for="co-contact-time">Best Time to Contact *</label>
@@ -549,6 +548,16 @@
                             <label for="hourly-rate">Hourly Rate *</label>
                             <input type="number" id="hourly-rate" name="hourly-rate" step="0.01">
                         </div>
+                        <div class="form-group" id="pay-frequency-field">
+                            <label for="pay-frequency">Pay Frequency *</label>
+                            <select id="pay-frequency" name="pay-frequency">
+                                <option value="">Select</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                                <option value="semimonthly">Semi-Monthly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
                         <div class="form-group" id="monthly-salary-field">
                             <label for="monthly-salary">Monthly Salary *</label>
                             <input type="number" id="monthly-salary" name="monthly-salary" step="0.01">
@@ -655,6 +664,16 @@
                         <div class="form-group" id="co-hourly-rate-field">
                             <label for="co-hourly-rate">Hourly Rate *</label>
                             <input type="number" id="co-hourly-rate" name="co-hourly-rate" step="0.01">
+                        </div>
+                        <div class="form-group" id="co-pay-frequency-field">
+                            <label for="co-pay-frequency">Pay Frequency *</label>
+                            <select id="co-pay-frequency" name="co-pay-frequency">
+                                <option value="">Select</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                                <option value="semimonthly">Semi-Monthly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
                         </div>
                         <div class="form-group" id="co-monthly-salary-field">
                             <label for="co-monthly-salary">Monthly Salary *</label>
@@ -899,9 +918,24 @@
             </div>
         </div>
 
-        <!-- Single button to generate printable copy -->
+        <!-- Additional Documents Section -->
+        <div class="collapsible-menu">
+            <div class="menu-header" onclick="toggleMenu(this)">
+                <h2><i class="fas fa-file-upload"></i> Additional Documents</h2>
+                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
+            </div>
+            <div class="menu-content">
+                <div class="form-group">
+                    <label for="additional-docs">Upload any additional supporting documents</label>
+                    <input type="file" id="additional-docs" name="additional-docs" multiple accept=".jpg,.jpeg,.png,.pdf">
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
         <div class="form-group" style="padding: 20px; text-align: center;">
             <button type="button" onclick="generatePrintable()" class="btn btn-primary"><i class="fas fa-print"></i> Generate Printable Application</button>
+            <button type="button" onclick="submitToGoogle()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> Submit to Google Drive</button>
         </div>
     </form>
 
@@ -926,6 +960,9 @@
         const coSignaturePad = new SignaturePad(coCanvas, {
             backgroundColor: 'rgb(255, 255, 255)'
         });
+
+        // Apps Script Web App URL - Replace with your actual URL
+        const SCRIPT_URL = "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE";
 
         // Adjust canvas for high DPI displays
         function resizeCanvas() {
@@ -1054,22 +1091,29 @@
         function toggleIncomeFields(select) {
             const hourlyRateField = document.getElementById('hourly-rate-field');
             const monthlySalaryField = document.getElementById('monthly-salary-field');
+            const payFrequencyField = document.getElementById('pay-frequency-field');
             
             if (select.value === 'hourly') {
                 hourlyRateField.style.display = 'block';
                 monthlySalaryField.style.display = 'none';
+                payFrequencyField.style.display = 'block';
                 document.getElementById('hourly-rate').setAttribute('required', 'true');
                 document.getElementById('monthly-salary').removeAttribute('required');
+                document.getElementById('pay-frequency').setAttribute('required', 'true');
             } else if (select.value === 'salary') {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'block';
+                payFrequencyField.style.display = 'block';
                 document.getElementById('hourly-rate').removeAttribute('required');
                 document.getElementById('monthly-salary').setAttribute('required', 'true');
+                document.getElementById('pay-frequency').setAttribute('required', 'true');
             } else {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'none';
+                payFrequencyField.style.display = 'none';
                 document.getElementById('hourly-rate').removeAttribute('required');
                 document.getElementById('monthly-salary').removeAttribute('required');
+                document.getElementById('pay-frequency').removeAttribute('required');
             }
         }
 
@@ -1077,22 +1121,29 @@
         function toggleCoIncomeFields(select) {
             const hourlyRateField = document.getElementById('co-hourly-rate-field');
             const monthlySalaryField = document.getElementById('co-monthly-salary-field');
+            const payFrequencyField = document.getElementById('co-pay-frequency-field');
             
             if (select.value === 'hourly') {
                 hourlyRateField.style.display = 'block';
                 monthlySalaryField.style.display = 'none';
+                payFrequencyField.style.display = 'block';
                 document.getElementById('co-hourly-rate').setAttribute('required', 'true');
                 document.getElementById('co-monthly-salary').removeAttribute('required');
+                document.getElementById('co-pay-frequency').setAttribute('required', 'true');
             } else if (select.value === 'salary') {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'block';
+                payFrequencyField.style.display = 'block';
                 document.getElementById('co-hourly-rate').removeAttribute('required');
                 document.getElementById('co-monthly-salary').setAttribute('required', 'true');
+                document.getElementById('co-pay-frequency').setAttribute('required', 'true');
             } else {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'none';
+                payFrequencyField.style.display = 'none';
                 document.getElementById('co-hourly-rate').removeAttribute('required');
                 document.getElementById('co-monthly-salary').removeAttribute('required');
+                document.getElementById('co-pay-frequency').removeAttribute('required');
             }
         }
 
@@ -1197,6 +1248,127 @@
             }
         }
 
+        // Collect all form fields
+        function collectFields() {
+            const form = document.getElementById('rental-application');
+            const map = new Map();
+            form.querySelectorAll('input,select,textarea').forEach(el => {
+                if (el.type !== 'file' && el.name) map.set(el.name, el.value);
+            });
+            return map;
+        }
+
+        // Convert data URL to Blob
+        function dataURLToBlob(dataURL) {
+            const parts = dataURL.split(',');
+            const byteString = atob(parts[1]);
+            const mimeString = parts[0].split(':')[1].split(';')[0];
+            const ab = new ArrayBuffer(byteString.length);
+            const ia = new Uint8Array(ab);
+            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+            return new Blob([ab], { type: mimeString });
+        }
+
+        // Build PDF summary
+        function buildPdfSummary() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ unit:'pt', format:'letter' });
+            let y = 40;
+            doc.setFontSize(16); 
+            doc.text('National TV Rental Application', 40, y); 
+            y+=30;
+            doc.setFontSize(11);
+            
+            collectFields().forEach((v,k)=>{ 
+                doc.text(`${k}: ${v}`, 40, y); 
+                y+=15; 
+            });
+            
+            if (!signaturePad.isEmpty()) {
+                const sigDataUrl = signaturePad.toDataURL('image/png');
+                doc.text('Primary Renter Signature:', 40, y); 
+                y+=20;
+                doc.addImage(sigDataUrl, 'PNG', 40, y, 300, 80);
+                y+=90;
+            }
+            
+            if (document.getElementById('has-corener').checked && !coSignaturePad.isEmpty()) {
+                const coSigDataUrl = coSignaturePad.toDataURL('image/png');
+                doc.text('Co-Renter Signature:', 40, y); 
+                y+=20;
+                doc.addImage(coSigDataUrl, 'PNG', 40, y, 300, 80);
+                y+=90;
+            }
+            
+            return Promise.resolve(doc.output('blob'));
+        }
+
+        // Submit to Google Drive
+        async function submitToGoogle() {
+            // Validate form first
+            const form = document.getElementById('rental-application');
+            if (!form.checkValidity()) {
+                alert("Please fill out all required fields before submitting.");
+                form.reportValidity();
+                return;
+            }
+            
+            // Validate signature
+            if (signaturePad.isEmpty()) {
+                alert("Please provide a signature before submitting.");
+                return;
+            }
+            
+            // Validate co-signature if co-renter exists
+            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
+                alert("Please provide a co-renter signature before submitting.");
+                return;
+            }
+            
+            const fd = new FormData();
+            collectFields().forEach((v,k)=> fd.append(k,v));
+            
+            if (!signaturePad.isEmpty()) {
+                fd.append('signature_png', dataURLToBlob(signaturePad.toDataURL('image/png')), 'signature.png');
+            }
+            
+            if (document.getElementById('has-corener').checked && !coSignaturePad.isEmpty()) {
+                fd.append('co_signature_png', dataURLToBlob(coSignaturePad.toDataURL('image/png')), 'co_signature.png');
+            }
+            
+            const idFile = document.getElementById('id-upload').files[0];
+            const paystubFile = document.getElementById('paystub-upload').files[0];
+            const incomeProofFile = document.getElementById('income-proof-upload').files[0];
+            const leaseFile = document.getElementById('lease-upload').files[0];
+            const ownershipFile = document.getElementById('ownership-upload').files[0];
+            const coPaystubFile = document.getElementById('co-paystub-upload').files[0];
+            const coIncomeProofFile = document.getElementById('co-income-proof-upload').files[0];
+            const additionalDocs = document.getElementById('additional-docs').files;
+            
+            if (idFile) fd.append('file_id', idFile, idFile.name);
+            if (paystubFile) fd.append('file_paystub', paystubFile, paystubFile.name);
+            if (incomeProofFile) fd.append('file_income_proof', incomeProofFile, incomeProofFile.name);
+            if (leaseFile) fd.append('file_lease', leaseFile, leaseFile.name);
+            if (ownershipFile) fd.append('file_ownership', ownershipFile, ownershipFile.name);
+            if (coPaystubFile) fd.append('file_co_paystub', coPaystubFile, coPaystubFile.name);
+            if (coIncomeProofFile) fd.append('file_co_income_proof', coIncomeProofFile, coIncomeProofFile.name);
+            
+            for (let i=0;i<additionalDocs.length;i++){ 
+                fd.append('file_additional_'+i, additionalDocs[i], additionalDocs[i].name); 
+            }
+            
+            const pdfBlob = await buildPdfSummary();
+            fd.append('application_pdf', pdfBlob, 'Application_Summary.pdf');
+            
+            try {
+                const res = await fetch(SCRIPT_URL, { method:'POST', body:fd });
+                const text = await res.text();
+                alert('Submitted! Server said: '+text);
+            } catch(err) { 
+                alert('Submission failed: '+err); 
+            }
+        }
+
         // Generate printable version
         function generatePrintable() {
             // Validate form first
@@ -1289,9 +1461,15 @@
                 `;
                 
                 if (document.getElementById('income-type').value === 'hourly') {
-                    incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('hourly-rate').value}</div>`;
+                    incomeSection.innerHTML += `
+                        <div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('hourly-rate').value}</div>
+                        <div class="print-field"><span class="print-label">Pay Frequency:</span> ${document.getElementById('pay-frequency').value}</div>
+                    `;
                 } else {
-                    incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('monthly-salary').value}</div>`;
+                    incomeSection.innerHTML += `
+                        <div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('monthly-salary').value}</div>
+                        <div class="print-field"><span class="print-label">Pay Frequency:</span> ${document.getElementById('pay-frequency').value}</div>
+                    `;
                 }
                 
                 incomeSection.innerHTML += `<div class="print-field"><span class="print-label">Take Home Pay:</span> $${document.getElementById('take-home-pay').value}</div>`;
@@ -1319,9 +1497,15 @@
                     `;
                     
                     if (document.getElementById('co-income-type').value === 'hourly') {
-                        coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('co-hourly-rate').value}</div>`;
+                        coIncomeSection.innerHTML += `
+                            <div class="print-field"><span class="print-label">Hourly Rate:</span> $${document.getElementById('co-hourly-rate').value}</div>
+                            <div class="print-field"><span class="print-label">Pay Frequency:</span> ${document.getElementById('co-pay-frequency').value}</div>
+                        `;
                     } else {
-                        coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('co-monthly-salary').value}</div>`;
+                        coIncomeSection.innerHTML += `
+                            <div class="print-field"><span class="print-label">Monthly Salary:</span> $${document.getElementById('co-monthly-salary').value}</div>
+                            <div class="print-field"><span class="print-label">Pay Frequency:</span> ${document.getElementById('co-pay-frequency').value}</div>
+                        `;
                     }
                     
                     coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">Take Home Pay:</span> $${document.getElementById('co-take-home-pay').value}</div>`;
@@ -1422,11 +1606,13 @@
             document.getElementById('other-income-fields').style.display = 'none';
             document.getElementById('hourly-rate-field').style.display = 'none';
             document.getElementById('monthly-salary-field').style.display = 'none';
+            document.getElementById('pay-frequency-field').style.display = 'none';
             document.getElementById('contact-warning').style.display = 'none';
             document.getElementById('co-employment-fields').style.display = 'none';
             document.getElementById('co-other-income-fields').style.display = 'none';
             document.getElementById('co-hourly-rate-field').style.display = 'none';
             document.getElementById('co-monthly-salary-field').style.display = 'none';
+            document.getElementById('co-pay-frequency-field').style.display = 'none';
             document.getElementById('co-contact-warning').style.display = 'none';
             document.getElementById('rent-fields').style.display = 'none';
             document.getElementById('own-fields').style.display = 'none';
