@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>National TV Rental Application</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.5/signature_pad.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
     <style>
         :root {
             --primary-blue: #0066cc;
@@ -69,7 +66,7 @@
         }
 
         .menu-header {
-            background-color: var(--primary-blue);
+            background-color: var(--primary-red);
             color: white;
             padding: 15px 20px;
             cursor: pointer;
@@ -80,7 +77,7 @@
         }
 
         .menu-header:hover {
-            background-color: #0055aa;
+            background-color: #aa0000;
         }
 
         .menu-header h2 {
@@ -161,26 +158,6 @@
             display: none;
         }
 
-        .signature-pad-container {
-            margin: 20px 0;
-            border: 2px solid var(--primary-blue);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        .signature-pad {
-            width: 100%;
-            height: 200px;
-            background-color: white;
-            cursor: crosshair;
-        }
-
-        .signature-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
         .btn {
             padding: 12px 20px;
             border: none;
@@ -188,24 +165,17 @@
             font-size: 16px;
             cursor: pointer;
             transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-primary {
             background-color: var(--primary-blue);
             color: white;
         }
 
-        .btn-primary:hover {
+        .btn:hover {
+            transform: translateY(-2px);
             background-color: #0055aa;
         }
 
         .btn-danger {
             background-color: var(--primary-red);
-            color: white;
         }
 
         .btn-danger:hover {
@@ -214,7 +184,6 @@
 
         .btn-success {
             background-color: #28a745;
-            color: white;
         }
 
         .btn-success:hover {
@@ -285,9 +254,8 @@
                 font-size: 1.2rem;
             }
             
-            .signature-actions {
+            .action-buttons {
                 flex-direction: column;
-                gap: 10px;
             }
             
             .btn {
@@ -299,312 +267,232 @@
             }
         }
 
+        /* Validation styles */
+        .validation-error {
+            border: 2px solid var(--primary-red) !important;
+        }
+
+        .validation-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border: 2px solid var(--primary-red);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            z-index: 10000;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .validation-popup h3 {
+            color: var(--primary-red);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .validation-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+
+        .validation-item {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .validation-buttons {
+            text-align: center;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+
+        /* Day of week and date selectors */
+        .day-selector, .date-selector {
+            display: none;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .action-buttons .btn {
+            flex: 1;
+            max-width: 250px;
+        }
+        
         .fun-element {
             text-align: center;
             margin: 10px 0;
         }
-
+        
         .fun-element i {
             color: var(--primary-red);
             margin: 0 5px;
             font-size: 1.5rem;
         }
-        
-        /* Language Toggle */
-        .language-toggle {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 1000;
-            background: white;
-            padding: 10px 15px;
-            border-radius: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .language-toggle label {
-            margin: 0;
-            font-weight: normal;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 30px;
-        }
-        
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .slider {
-            background-color: var(--primary-blue);
-        }
-        
-        input:checked + .slider:before {
-            transform: translateX(30px);
-        }
-        
-        /* Print styles */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printable-application, #printable-application * {
-                visibility: visible;
-            }
-            #printable-application {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                padding: 15px;
-                font-size: 12px;
-            }
-            .print-section {
-                margin-bottom: 15px;
-                page-break-inside: avoid;
-            }
-            .print-field {
-                margin-bottom: 5px;
-            }
-            .print-label {
-                font-weight: bold;
-                display: inline-block;
-                width: 160px;
-            }
-            .signature-img {
-                max-width: 250px;
-                border-top: 1px solid #000;
-                margin-top: 40px;
-            }
-            .print-upload {
-                page-break-inside: avoid;
-                margin-bottom: 10px;
-            }
-            .print-upload-title {
-                font-weight: bold;
-                margin-bottom: 5px;
-            }
-            .print-upload-image {
-                max-width: 100%;
-                max-height: 300px;
-            }
-        }
-        
-        /* Signature saved state */
-        .signature-saved {
-            display: none;
-            text-align: center;
-            padding: 15px;
-            border: 2px solid #28a745;
-            border-radius: var(--border-radius);
-            margin: 20px 0;
-        }
-        
-        .signature-saved p {
-            margin-bottom: 10px;
-            color: #28a745;
-            font-weight: bold;
-        }
-        
-        .signature-edit-btn {
-            background-color: var(--primary-blue);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
-    <!-- Language Toggle -->
-    <div class="language-toggle">
-        <label for="language-toggle">English</label>
-        <div class="toggle-switch">
-            <input type="checkbox" id="language-toggle" onchange="toggleLanguage()">
-            <span class="slider"></span>
-        </div>
-        <label for="language-toggle">Español</label>
-    </div>
-
     <div class="header">
-        <img src="https://i.postimg.cc/mgntq2LV/IMG-4221.png" class="logo">
-        <h1 data-en="National TV Rental Application" data-es="Solicitud de Alquiler de National TV">National TV Rental Application</h1>
+        <h1>National TV Rental Application</h1>
     </div>
 
     <form id="rental-application" class="application-container">
         <!-- Primary Renter Information Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-user-circle"></i> <span data-en="Primary Renter Information" data-es="Información del Arrendatario Principal">Primary Renter Information</span></h2>
+                <h2><i class="fas fa-user-circle"></i> Primary Renter Information</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="first-name" data-en="First Name *" data-es="Nombre *">First Name *</label>
+                        <label for="first-name">First Name *</label>
                         <input type="text" id="first-name" name="first-name" required>
                     </div>
                     <div class="form-group">
-                        <label for="last-name" data-en="Last Name *" data-es="Apellido *">Last Name *</label>
+                        <label for="last-name">Last Name *</label>
                         <input type="text" id="last-name" name="last-name" required>
                     </div>
                     <div class="form-group">
-                        <label for="maiden-name" data-en="Maiden Name (if applicable)" data-es="Apellido de Soltera (si aplica)">Maiden Name (if applicable)</label>
+                        <label for="maiden-name">Maiden Name (if applicable)</label>
                         <input type="text" id="maiden-name" name="maiden-name">
                     </div>
                     <div class="form-group">
-                        <label for="birthdate" data-en="Birthdate *" data-es="Fecha de Nacimiento *">Birthdate *</label>
+                        <label for="birthdate">Birthdate *</label>
                         <input type="date" id="birthdate" name="birthdate" required>
                     </div>
                     <div class="form-group">
-                        <label for="ssn" data-en="Social Security Number *" data-es="Número de Seguro Social *">Social Security Number *</label>
+                        <label for="ssn">Social Security Number *</label>
                         <input type="text" id="ssn" name="ssn" required pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
                     </div>
                     <div class="form-group">
-                        <label for="email" data-en="Email Address *" data-es="Correo Electrónico *">Email Address *</label>
+                        <label for="email">Email Address *</label>
                         <input type="email" id="email" name="email" required>
                     </div>
                     <div class="form-group">
-                        <label for="phone" data-en="Phone Number *" data-es="Número de Teléfono *">Phone Number *</label>
+                        <label for="phone">Phone Number *</label>
                         <input type="tel" id="phone" name="phone" required>
                     </div>
                     <div class="form-group">
-                        <label for="contact-time" data-en="Best Time to Contact *" data-es="Mejor Horario para Contactar *">Best Time to Contact *</label>
+                        <label for="contact-time">Best Time to Contact *</label>
                         <select id="contact-time" name="contact-time" required>
-                            <option value="" data-en="Select a time" data-es="Seleccione un horario">Select a time</option>
-                            <option value="morning" data-en="Morning (8AM-12PM)" data-es="Mañana (8AM-12PM)">Morning (8AM-12PM)</option>
-                            <option value="afternoon" data-en="Afternoon (12PM-5PM)" data-es="Tarde (12PM-5PM)">Afternoon (12PM-5PM)</option>
-                            <option value="evening" data-en="Evening (5PM-9PM)" data-es="Noche (5PM-9PM)">Evening (5PM-9PM)</option>
+                            <option value="">Select a time</option>
+                            <option value="morning">Morning (8AM-12PM)</option>
+                            <option value="afternoon">Afternoon (12PM-5PM)</option>
+                            <option value="evening">Evening (5PM-9PM)</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="checkbox-group">
                     <input type="checkbox" id="has-corener" name="has-corener" onchange="toggleCoRenterSection(this)">
-                    <label for="has-corener" data-en="I have a co-renter" data-es="Tengo un co-arrendatario">I have a co-renter</label>
+                    <label for="has-corener">I have a co-renter</label>
                 </div>
 
                 <div id="corener-section" class="conditional-section">
-                    <h3 data-en="Co-Renter Information" data-es="Información del Co-Arrendatario">Co-Renter Information</h3>
+                    <h3>Co-Renter Information</h3>
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="co-first-name" data-en="First Name *" data-es="Nombre *">First Name *</label>
+                            <label for="co-first-name">First Name *</label>
                             <input type="text" id="co-first-name" name="co-first-name">
                         </div>
                         <div class="form-group">
-                            <label for="co-last-name" data-en="Last Name *" data-es="Apellido *">Last Name *</label>
+                            <label for="co-last-name">Last Name *</label>
                             <input type="text" id="co-last-name" name="co-last-name">
                         </div>
                         <div class="form-group">
-                            <label for="co-maiden-name" data-en="Maiden Name (if applicable)" data-es="Apellido de Soltera (si aplica)">Maiden Name (if applicable)</label>
+                            <label for="co-maiden-name">Maiden Name (if applicable)</label>
                             <input type="text" id="co-maiden-name" name="co-maiden-name">
                         </div>
                         <div class="form-group">
-                            <label for="co-birthdate" data-en="Birthdate *" data-es="Fecha de Nacimiento *">Birthdate *</label>
+                            <label for="co-birthdate">Birthdate *</label>
                             <input type="date" id="co-birthdate" name="co-birthdate">
                         </div>
                         <div class="form-group">
-                            <label for="co-ssn" data-en="Social Security Number *" data-es="Número de Seguro Social *">Social Security Number *</label>
+                            <label for="co-ssn">Social Security Number *</label>
                             <input type="text" id="co-ssn" name="co-ssn" pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
                         </div>
                         <div class="form-group">
-                            <label for="co-email" data-en="Email Address *" data-es="Correo Electrónico *">Email Address *</label>
+                            <label for="co-email">Email Address *</label>
                             <input type="email" id="co-email" name="co-email">
                         </div>
                         <div class="form-group">
-                            <label for="co-phone" data-en="Phone Number *" data-es="Número de Teléfono *">Phone Number *</label>
-                        <input type="tel" id="co-phone" name="co-phone">
+                            <label for="co-phone">Phone Number *</label>
+                            <input type="tel" id="co-phone" name="co-phone">
                         </div>
                         <div class="form-group">
-                            <label for="co-contact-time" data-en="Best Time to Contact *" data-es="Mejor Horario para Contactar *">Best Time to Contact *</label>
+                            <label for="co-contact-time">Best Time to Contact *</label>
                             <select id="co-contact-time" name="co-contact-time">
-                                <option value="" data-en="Select a time" data-es="Seleccione un horario">Select a time</option>
-                                <option value="morning" data-en="Morning (8AM-12PM)" data-es="Mañana (8AM-12PM)">Morning (8AM-12PM)</option>
-                                <option value="afternoon" data-en="Afternoon (12PM-5PM)" data-es="Tarde (12PM-5PM)">Afternoon (12PM-5PM)</option>
-                                <option value="evening" data-en="Evening (5PM-9PM)" data-es="Noche (5PM-9PM)">Evening (5PM-9PM)</option>
+                                <option value="">Select a time</option>
+                                <option value="morning">Morning (8AM-12PM)</option>
+                                <option value="afternoon">Afternoon (12PM-5PM)</option>
+                                <option value="evening">Evening (5PM-9PM)</option>
                             </select>
                         </div>
                     </div>
                 </div>
 
-                <h3 data-en="Vehicle Information" data-es="Información del Vehículo">Vehicle Information</h3>
+                <h3>Vehicle Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="vehicle-make" data-en="Make" data-es="Marca">Make</label>
+                        <label for="vehicle-make">Make</label>
                         <input type="text" id="vehicle-make" name="vehicle-make">
                     </div>
                     <div class="form-group">
-                        <label for="vehicle-model" data-en="Model" data-es="Modelo">Model</label>
+                        <label for="vehicle-model">Model</label>
                         <input type="text" id="vehicle-model" name="vehicle-model">
                     </div>
                     <div class="form-group">
-                        <label for="license-plate" data-en="License Plate Number" data-es="Número de Placa">License Plate Number</label>
+                        <label for="license-plate">License Plate Number</label>
                         <input type="text" id="license-plate" name="license-plate">
                     </div>
                     <div class="form-group">
-                        <label for="vehicle-color" data-en="Color" data-es="Color">Color</label>
+                        <label for="vehicle-color">Color</label>
                         <input type="text" id="vehicle-color" name="vehicle-color">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label data-en="Vehicle Status" data-es="Estado del Vehículo">Vehicle Status</label>
+                    <label>Vehicle Status</label>
                     <div class="checkbox-group">
                         <input type="checkbox" id="rented" name="vehicle-status" value="rented">
-                        <label for="rented" data-en="Rented" data-es="Alquilado">Rented</label>
+                        <label for="rented">Rented</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="leased" name="vehicle-status" value="leased">
-                        <label for="leased" data-en="Leased" data-es="Arrendado">Leased</label>
+                        <label for="leased">Leased</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="checkbox" id="owned" name="vehicle-status" value="owned">
-                        <label for="owned" data-en="Owned" data-es="Propio">Owned</label>
+                        <label for="owned">Owned</label>
                     </div>
                 </div>
 
                 <div class="upload-area">
-                    <h3><i class="fas fa-id-card"></i> <span data-en="ID Upload" data-es="Subir Identificación">ID Upload</span></h3>
-                    <p data-en="Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store." data-es="Suba una copia de su identificación oficial. Si no sube ahora, necesitará traer una copia vigente a la tienda.">Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store.</p>
+                    <h3><i class="fas fa-id-card"></i> ID Upload</h3>
+                    <p>Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store.</p>
                     <input type="file" id="id-upload" name="id-upload" accept=".jpg,.jpeg,.png,.pdf">
-                    <label for="id-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Choose File" data-es="Seleccionar Archivo">Choose File</span></label>
+                    <label for="id-upload" class="btn"><i class="fas fa-upload"></i> Choose File</label>
                 </div>
 
                 <div class="fun-element">
-                    <p data-en="We're excited to help you get the perfect rental items for your home!" data-es="¡Estamos emocionados de ayudarle a encontrar los artículos de alquiler perfectos para su hogar!">We're excited to help you get the perfect rental items for your home! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
+                    <p>We're excited to help you get the perfect rental items for your home! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
                 </div>
             </div>
         </div>
@@ -612,91 +500,124 @@
         <!-- Income Information Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> <span data-en="Income Information" data-es="Información de Ingresos">Income Information</span></h2>
+                <h2><i class="fas fa-money-bill-wave"></i> Income Information</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <div class="form-group">
-                    <label data-en="Is employment your primary source of income? *" data-es="¿Es el empleo su principal fuente de ingresos? *">Is employment your primary source of income? *</label>
+                    <label>Is employment your primary source of income? *</label>
                     <div class="checkbox-group">
                         <input type="radio" id="employment-yes" name="employment-primary" value="yes" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-yes" data-en="Yes" data-es="Sí">Yes</label>
+                        <label for="employment-yes">Yes</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="radio" id="employment-no" name="employment-primary" value="no" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-no" data-en="No" data-es="No">No</label>
+                        <label for="employment-no">No</label>
                     </div>
                 </div>
 
                 <div id="employment-fields" class="conditional-section">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="employer" data-en="Employer *" data-es="Empleador *">Employer *</label>
+                            <label for="employer">Employer *</label>
                             <input type="text" id="employer" name="employer">
                         </div>
                         <div class="form-group">
-                            <label for="job-title" data-en="Job Title *" data-es="Puesto de Trabajo *">Job Title *</label>
+                            <label for="job-title">Job Title *</label>
                             <input type="text" id="job-title" name="job-title">
                         </div>
                         <div class="form-group">
-                            <label for="shift" data-en="Shift *" data-es="Turno *">Shift *</label>
+                            <label for="shift">Shift *</label>
                             <select id="shift" name="shift">
-                                <option value="" data-en="Select shift" data-es="Seleccione turno">Select shift</option>
-                                <option value="day" data-en="Day Shift" data-es="Turno Diurno">Day Shift</option>
-                                <option value="evening" data-en="Evening Shift" data-es="Turno Vespertino">Evening Shift</option>
-                                <option value="night" data-en="Night Shift" data-es="Turno Nocturno">Night Shift</option>
-                                <option value="varied" data-en="Varied Shifts" data-es="Turnos Variados">Varied Shifts</option>
+                                <option value="">Select shift</option>
+                                <option value="day">Day Shift</option>
+                                <option value="evening">Evening Shift</option>
+                                <option value="night">Night Shift</option>
+                                <option value="varied">Varied Shifts</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <label for="income-type" data-en="Income Type *" data-es="Tipo de Ingreso *">Income Type *</label>
+                            <label for="income-type">Income Type *</label>
                             <select id="income-type" name="income-type" onchange="toggleIncomeFields(this)">
-                                <option value="" data-en="Select type" data-es="Seleccione tipo">Select type</option>
-                                <option value="hourly" data-en="Hourly Rate" data-es="Tarifa por Hora">Hourly Rate</option>
-                                <option value="salary" data-en="Monthly Salary" data-es="Salario Mensual">Monthly Salary</option>
+                                <option value="">Select type</option>
+                                <option value="hourly">Hourly Rate</option>
+                                <option value="salary">Monthly Salary</option>
                             </select>
                         </div>
                         <div class="form-group" id="hourly-rate-field">
-                            <label for="hourly-rate" data-en="Hourly Rate *" data-es="Tarifa por Hora *">Hourly Rate *</label>
+                            <label for="hourly-rate">Hourly Rate *</label>
                             <input type="number" id="hourly-rate" name="hourly-rate" step="0.01">
                         </div>
                         <div class="form-group" id="pay-frequency-field">
-                            <label for="pay-frequency" data-en="Pay Frequency *" data-es="Frecuencia de Pago *">Pay Frequency *</label>
-                            <select id="pay-frequency" name="pay-frequency">
-                                <option value="" data-en="Select" data-es="Seleccionar">Select</option>
-                                <option value="weekly" data-en="Weekly" data-es="Semanal">Weekly</option>
-                                <option value="biweekly" data-en="Bi-Weekly" data-es="Quincenal">Bi-Weekly</option>
-                                <option value="semimonthly" data-en="Semi-Monthly" data-es="Quincenal">Semi-Monthly</option>
-                                <option value="monthly" data-en="Monthly" data-es="Mensual">Monthly</option>
+                            <label for="pay-frequency">Pay Frequency *</label>
+                            <select id="pay-frequency" name="pay-frequency" onchange="togglePayFrequencyFields(this)">
+                                <option value="">Select</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="biweekly">Bi-Weekly</option>
+                                <option value="semimonthly">Semi-Monthly</option>
+                                <option value="monthly">Monthly</option>
                             </select>
                         </div>
                         <div class="form-group" id="monthly-salary-field">
-                            <label for="monthly-salary" data-en="Monthly Salary *" data-es="Salario Mensual *">Monthly Salary *</label>
+                            <label for="monthly-salary">Monthly Salary *</label>
                             <input type="number" id="monthly-salary" name="monthly-salary" step="0.01">
                         </div>
                         <div class="form-group">
-                            <label for="take-home-pay" data-en="Take Home Pay (after taxes) *" data-es="Salario Neto (después de impuestos) *">Take Home Pay (after taxes) *</label>
+                            <label for="take-home-pay">Take Home Pay (after taxes) *</label>
                             <input type="number" id="take-home-pay" name="take-home-pay" step="0.01">
                         </div>
                     </div>
 
+                    <!-- Day of week selector for weekly/bi-weekly -->
+                    <div id="day-of-week-field" class="form-group day-selector">
+                        <label for="pay-day">Day of Week You Get Paid *</label>
+                        <select id="pay-day" name="pay-day">
+                            <option value="">Select day</option>
+                            <option value="monday">Monday</option>
+                            <option value="tuesday">Tuesday</option>
+                            <option value="wednesday">Wednesday</option>
+                            <option value="thursday">Thursday</option>
+                            <option value="friday">Friday</option>
+                            <option value="saturday">Saturday</option>
+                            <option value="sunday">Sunday</option>
+                        </select>
+                    </div>
+
+                    <!-- Date selectors for semi-monthly -->
+                    <div id="semi-monthly-dates" class="date-selector">
+                        <div class="form-group">
+                            <label for="first-pay-date">First Pay Date (e.g., 5th) *</label>
+                            <input type="number" id="first-pay-date" name="first-pay-date" min="1" max="31">
+                        </div>
+                        <div class="form-group">
+                            <label for="second-pay-date">Second Pay Date (e.g., 20th) *</label>
+                            <input type="number" id="second-pay-date" name="second-pay-date" min="1" max="31">
+                        </div>
+                    </div>
+
+                    <!-- Date selector for monthly -->
+                    <div id="monthly-date" class="form-group date-selector">
+                        <label for="monthly-pay-date">Pay Date (e.g., 1st) *</label>
+                        <input type="number" id="monthly-pay-date" name="monthly-pay-date" min="1" max="31">
+                    </div>
+
                     <div class="form-group">
-                        <label data-en="Is your employer able to be contacted? *" data-es="¿Se puede contactar a su empleador? *">Is your employer able to be contacted? *</label>
+                        <label>Is your employer able to be contacted? *</label>
                         <div class="checkbox-group">
                             <input type="radio" id="contact-yes" name="employer-contact" value="yes" onchange="toggleContactWarning(this)">
-                            <label for="contact-yes" data-en="Yes" data-es="Sí">Yes</label>
+                            <label for="contact-yes">Yes</label>
                         </div>
                         <div class="checkbox-group">
                             <input type="radio" id="contact-no" name="employer-contact" value="no" onchange="toggleContactWarning(this)">
-                            <label for="contact-no" data-en="No" data-es="No">No</label>
+                            <label for="contact-no">No</label>
                         </div>
                     </div>
 
                     <div id="contact-warning" class="conditional-section">
                         <div class="upload-area">
-                            <p><strong data-en="Note:" data-es="Nota:">Note:</strong> <span data-en="You must provide paystubs either in person or upload them here." data-es="Debe proporcionar comprobantes de pago en persona o subirlos aquí.">You must provide paystubs either in person or upload them here.</span></p>
+                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
                             <input type="file" id="paystub-upload" name="paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Paystubs" data-es="Subir Comprobantes de Pago">Upload Paystubs</span></label>
+                            <label for="paystub-upload" class="btn"><i class="fas fa-upload"></i> Upload Paystubs</label>
                         </div>
                     </div>
                 </div>
@@ -704,24 +625,44 @@
                 <div id="other-income-fields" class="conditional-section">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="income-source" data-en="Income Source *" data-es="Fuente de Ingresos *">Income Source *</label>
+                            <label for="income-source">Income Source *</label>
                             <input type="text" id="income-source" name="income-source">
                         </div>
                         <div class="form-group">
-                            <label for="other-take-home" data-en="Take Home Monthly Amount *" data-es="Cantidad Neta Mensual *">Take Home Monthly Amount *</label>
+                            <label for="other-take-home">Take Home Monthly Amount *</label>
                             <input type="number" id="other-take-home" name="other-take-home" step="0.01">
                         </div>
                     </div>
                     
                     <div class="upload-area">
-                        <p><strong data-en="Note:" data-es="Nota:">Note:</strong> <span data-en="You will be required to bring in official proof of income to the store or upload it here." data-es="Deberá traer prueba oficial de ingresos a la tienda o subirla aquí.">You will be required to bring in official proof of income to the store or upload it here.</span></p>
+                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
                         <input type="file" id="income-proof-upload" name="income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Proof of Income" data-es="Subir Prueba de Ingresos">Upload Proof of Income</span></label>
+                        <label for="income-proof-upload" class="btn"><i class="fas fa-upload"></i> Upload Proof of Income</label>
+                    </div>
+                </div>
+
+                <!-- Optional Additional Income Source -->
+                <div class="checkbox-group">
+                    <input type="checkbox" id="additional-income" name="additional-income" onchange="toggleAdditionalIncome(this)">
+                    <label for="additional-income">Add another income source (optional)</label>
+                </div>
+
+                <div id="additional-income-section" class="conditional-section">
+                    <h3>Additional Income Source (Optional)</h3>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="additional-income-source">Income Source</label>
+                            <input type="text" id="additional-income-source" name="additional-income-source">
+                        </div>
+                        <div class="form-group">
+                            <label for="additional-income-amount">Monthly Amount</label>
+                            <input type="number" id="additional-income-amount" name="additional-income-amount" step="0.01">
+                        </div>
                     </div>
                 </div>
 
                 <div class="fun-element">
-                    <p data-en="We know talking about money isn't always fun, but it helps us help you find the perfect rental items!" data-es="¡Sabemos que hablar de dinero no siempre es divertido, pero nos ayuda a ayudarle a encontrar los artículos de alquiler perfectos!">We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
+                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
                 </div>
             </div>
         </div>
@@ -729,146 +670,41 @@
         <!-- Co-Renter Income Information Section (Initially Hidden) -->
         <div id="co-income-section" class="collapsible-menu" style="display: none;">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> <span data-en="Co-Renter Income Information" data-es="Información de Ingresos del Co-Arrendatario">Co-Renter Income Information</span></h2>
+                <h2><i class="fas fa-money-bill-wave"></i> Co-Renter Income Information</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
-                <div class="form-group">
-                    <label data-en="Is employment your primary source of income? *" data-es="¿Es el empleo su principal fuente de ingresos? *">Is employment your primary source of income? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="co-employment-yes" name="co-employment-primary" value="yes" onchange="toggleCoEmploymentFields(this)">
-                        <label for="co-employment-yes" data-en="Yes" data-es="Sí">Yes</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="co-employment-no" name="co-employment-primary" value="no" onchange="toggleCoEmploymentFields(this)">
-                        <label for="co-employment-no" data-en="No" data-es="No">No</label>
-                    </div>
-                </div>
-
-                <div id="co-employment-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-employer" data-en="Employer *" data-es="Empleador *">Employer *</label>
-                            <input type="text" id="co-employer" name="co-employer">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-job-title" data-en="Job Title *" data-es="Puesto de Trabajo *">Job Title *</label>
-                            <input type="text" id="co-job-title" name="co-job-title">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-shift" data-en="Shift *" data-es="Turno *">Shift *</label>
-                            <select id="co-shift" name="co-shift">
-                                <option value="" data-en="Select shift" data-es="Seleccione turno">Select shift</option>
-                                <option value="day" data-en="Day Shift" data-es="Turno Diurno">Day Shift</option>
-                                <option value="evening" data-en="Evening Shift" data-es="Turno Vespertino">Evening Shift</option>
-                                <option value="night" data-en="Night Shift" data-es="Turno Nocturno">Night Shift</option>
-                                <option value="varied" data-en="Varied Shifts" data-es="Turnos Variados">Varied Shifts</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="co-income-type" data-en="Income Type *" data-es="Tipo de Ingreso *">Income Type *</label>
-                            <select id="co-income-type" name="co-income-type" onchange="toggleCoIncomeFields(this)">
-                                <option value="" data-en="Select type" data-es="Seleccione tipo">Select type</option>
-                                <option value="hourly" data-en="Hourly Rate" data-es="Tarifa por Hora">Hourly Rate</option>
-                                <option value="salary" data-en="Monthly Salary" data-es="Salario Mensual">Monthly Salary</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="co-hourly-rate-field">
-                            <label for="co-hourly-rate" data-en="Hourly Rate *" data-es="Tarifa por Hora *">Hourly Rate *</label>
-                            <input type="number" id="co-hourly-rate" name="co-hourly-rate" step="0.01">
-                        </div>
-                        <div class="form-group" id="co-pay-frequency-field">
-                            <label for="co-pay-frequency" data-en="Pay Frequency *" data-es="Frecuencia de Pago *">Pay Frequency *</label>
-                            <select id="co-pay-frequency" name="co-pay-frequency">
-                                <option value="" data-en="Select" data-es="Seleccionar">Select</option>
-                                <option value="weekly" data-en="Weekly" data-es="Semanal">Weekly</option>
-                                <option value="biweekly" data-en="Bi-Weekly" data-es="Quincenal">Bi-Weekly</option>
-                                <option value="semimonthly" data-en="Semi-Monthly" data-es="Quincenal">Semi-Monthly</option>
-                                <option value="monthly" data-en="Monthly" data-es="Mensual">Monthly</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="co-monthly-salary-field">
-                            <label for="co-monthly-salary" data-en="Monthly Salary *" data-es="Salario Mensual *">Monthly Salary *</label>
-                            <input type="number" id="co-monthly-salary" name="co-monthly-salary" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-take-home-pay" data-en="Take Home Pay (after taxes) *" data-es="Salario Neto (después de impuestos) *">Take Home Pay (after taxes) *</label>
-                            <input type="number" id="co-take-home-pay" name="co-take-home-pay" step="0.01">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label data-en="Is your employer able to be contacted? *" data-es="¿Se puede contactar a su empleador? *">Is your employer able to be contacted? *</label>
-                        <div class="checkbox-group">
-                            <input type="radio" id="co-contact-yes" name="co-employer-contact" value="yes" onchange="toggleCoContactWarning(this)">
-                            <label for="co-contact-yes" data-en="Yes" data-es="Sí">Yes</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="radio" id="co-contact-no" name="co-employer-contact" value="no" onchange="toggleCoContactWarning(this)">
-                            <label for="co-contact-no" data-en="No" data-es="No">No</label>
-                        </div>
-                    </div>
-
-                    <div id="co-contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong data-en="Note:" data-es="Nota:">Note:</strong> <span data-en="You must provide paystubs either in person or upload them here." data-es="Debe proporcionar comprobantes de pago en persona o subirlos aquí.">You must provide paystubs either in person or upload them here.</span></p>
-                            <input type="file" id="co-paystub-upload" name="co-paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="co-paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Paystubs" data-es="Subir Comprobantes de Pago">Upload Paystubs</span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="co-other-income-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-income-source" data-en="Income Source *" data-es="Fuente de Ingresos *">Income Source *</label>
-                            <input type="text" id="co-income-source" name="co-income-source">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-other-take-home" data-en="Take Home Monthly Amount *" data-es="Cantidad Neta Mensual *">Take Home Monthly Amount *</label>
-                            <input type="number" id="co-other-take-home" name="co-other-take-home" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="upload-area">
-                        <p><strong data-en="Note:" data-es="Nota:">Note:</strong> <span data-en="You will be required to bring in official proof of income to the store or upload it here." data-es="Deberá traer prueba oficial de ingresos a la tienda o subirla aquí.">You will be required to bring in official proof of income to the store or upload it here.</span></p>
-                        <input type="file" id="co-income-proof-upload" name="co-income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="co-income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Proof of Income" data-es="Subir Prueba de Ingresos">Upload Proof of Income</span></label>
-                    </div>
-                </div>
-
-                <div class="fun-element">
-                    <p data-en="We know talking about money isn't always fun, but it helps us help you find the perfect rental items!" data-es="¡Sabemos que hablar de dinero no siempre es divertido, pero nos ayuda a ayudarle a encontrar los artículos de alquiler perfectos!">We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
-                </div>
+                <!-- Content would be similar to primary income section -->
+                <p>Co-renter income information would be displayed here when co-renter is selected.</p>
             </div>
         </div>
 
         <!-- Residency Information Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-home"></i> <span data-en="Residency Information" data-es="Información de Residencia">Residency Information</span></h2>
+                <h2><i class="fas fa-home"></i> Residency Information</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <!-- Address Fields for All Users -->
-                <h3 data-en="Address Information" data-es="Información de Dirección">Address Information</h3>
+                <h3>Address Information</h3>
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="street-address" data-en="Street Address *" data-es="Dirección *">Street Address *</label>
+                        <label for="street-address">Street Address *</label>
                         <input type="text" id="street-address" name="street-address" required>
                     </div>
                     <div class="form-group">
-                        <label for="apt-number" data-en="Apt/Unit Number" data-es="Número de Apartamento/Unidad">Apt/Unit Number</label>
+                        <label for="apt-number">Apt/Unit Number</label>
                         <input type="text" id="apt-number" name="apt-number">
                     </div>
                     <div class="form-group">
-                        <label for="city" data-en="City *" data-es="Ciudad *">City *</label>
+                        <label for="city">City *</label>
                         <input type="text" id="city" name="city" required>
                     </div>
                     <div class="form-group">
-                        <label for="state" data-en="State *" data-es="Estado *">State *</label>
+                        <label for="state">State *</label>
                         <select id="state" name="state" required>
-                            <option value="" data-en="Select State" data-es="Seleccionar Estado">Select State</option>
+                            <option value="">Select State</option>
                             <option value="AL">Alabama</option>
                             <option value="AK">Alaska</option>
                             <option value="AZ">Arizona</option>
@@ -922,63 +758,63 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="zip-code" data-en="ZIP Code *" data-es="Código Postal *">ZIP Code *</label>
+                        <label for="zip-code">ZIP Code *</label>
                         <input type="text" id="zip-code" name="zip-code" required pattern="[0-9]{5}(-[0-9]{4})?" title="Please enter a valid ZIP code">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label data-en="Do you rent, own, or live with owner? *" data-es="¿Alquila, es propietario o vive con el propietario? *">Do you rent, own, or live with owner? *</label>
+                    <label>Do you rent, own, or live with owner? *</label>
                     <div class="checkbox-group">
                         <input type="radio" id="residency-rent" name="residency-type" value="rent" onchange="toggleResidencyFields(this)">
-                        <label for="residency-rent" data-en="Rent" data-es="Alquilar">Rent</label>
+                        <label for="residency-rent">Rent</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="radio" id="residency-own" name="residency-type" value="own" onchange="toggleResidencyFields(this)">
-                        <label for="residency-own" data-en="Own" data-es="Propio">Own</label>
+                        <label for="residency-own">Own</label>
                     </div>
                     <div class="checkbox-group">
                         <input type="radio" id="residency-live-with" name="residency-type" value="live-with" onchange="toggleResidencyFields(this)">
-                        <label for="residency-live-with" data-en="Live with Owner" data-es="Vivir con el Propietario">Live with Owner</label>
+                        <label for="residency-live-with">Live with Owner</label>
                     </div>
                 </div>
 
                 <div id="rent-fields" class="conditional-section">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label for="landlord-name" data-en="Landlord/Property Manager/Apartment Complex Name *" data-es="Nombre del Propietario/Administrador de Propiedades/Complejo de Apartamentos *">Landlord/Property Manager/Apartment Complex Name *</label>
+                            <label for="landlord-name">Landlord/Property Manager/Apartment Complex Name *</label>
                             <input type="text" id="landlord-name" name="landlord-name">
                         </div>
                         <div class="form-group">
-                            <label for="landlord-phone" data-en="Contact Number *" data-es="Número de Contacto *">Contact Number *</label>
+                            <label for="landlord-phone">Contact Number *</label>
                             <input type="tel" id="landlord-phone" name="landlord-phone">
                         </div>
                     </div>
 
                     <div class="checkbox-group">
                         <input type="checkbox" id="no-contact-landlord" name="no-contact-landlord" onchange="toggleLandlordContactWarning(this)">
-                        <label for="no-contact-landlord" data-en="Landlord cannot be contacted" data-es="No se puede contactar al propietario">Landlord cannot be contacted</label>
+                        <label for="no-contact-landlord">Landlord cannot be contacted</label>
                     </div>
 
                     <div id="landlord-contact-warning" class="conditional-section">
                         <div class="upload-area">
-                            <p><strong data-en="Note:" data-es="Nota:">Note:</strong> <span data-en="You will need to bring in a lease or utility bill with your legal name on the document or upload it here." data-es="Necesitará traer un contrato de arrendamiento o factura de servicio público con su nombre legal en el documento o subirlo aquí.">You will need to bring in a lease or utility bill with your legal name on the document or upload it here.</span></p>
+                            <p><strong>Note:</strong> You will need to bring in a lease or utility bill with your legal name on the document or upload it here.</p>
                             <input type="file" id="lease-upload" name="lease-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="lease-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Lease or Utility Bill" data-es="Subir Contrato o Factura de Servicio">Upload Lease or Utility Bill</span></label>
+                            <label for="lease-upload" class="btn"><i class="fas fa-upload"></i> Upload Lease or Utility Bill</label>
                         </div>
                     </div>
                 </div>
 
                 <div id="own-fields" class="conditional-section">
                     <div class="upload-area">
-                        <p data-en="Please upload proof of ownership." data-es="Por favor, suba prueba de propiedad.">Please upload proof of ownership.</p>
+                        <p>Please upload proof of ownership.</p>
                         <input type="file" id="ownership-upload" name="ownership-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="ownership-upload" class="btn btn-primary"><i class="fas fa-upload"></i> <span data-en="Upload Proof of Ownership" data-es="Subir Prueba de Propiedad">Upload Proof of Ownership</span></label>
+                        <label for="ownership-upload" class="btn"><i class="fas fa-upload"></i> Upload Proof of Ownership</label>
                     </div>
                 </div>
 
                 <div class="fun-element">
-                    <p data-en="Almost done! Just a few more sections to go before you can enjoy your new rental items!" data-es="¡Casi terminado! Solo faltan algunas secciones más para que pueda disfrutar de sus nuevos artículos de alquiler.">Almost done! Just a few more sections to go before you can enjoy your new rental items! <i class="fas fa-home"></i> <i class="fas fa-thumbs-up"></i></p>
+                    <p>Almost done! Just a few more sections to go before you can enjoy your new rental items! <i class="fas fa-home"></i> <i class="fas fa-thumbs-up"></i></p>
                 </div>
             </div>
         </div>
@@ -986,31 +822,31 @@
         <!-- References Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-users"></i> <span data-en="References" data-es="Referencias">References</span></h2>
+                <h2><i class="fas fa-users"></i> References</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <div class="form-group">
-                    <p><strong data-en="Reference Note:" data-es="Nota de Referencias:">Reference Note:</strong> <span data-en="We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred." data-es="Preferimos referencias parentales/familiares como padres o abuelos, luego familiares cercanos, luego amigos o compañeros de trabajo. Se deben proporcionar dos referencias, pero se prefieren cinco.">We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</span></p>
+                    <p><strong>Reference Note:</strong> We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</p>
                 </div>
 
                 <div class="references-container">
                     <table class="references-table">
                         <thead>
                             <tr>
-                                <th data-en="Type" data-es="Tipo">Type</th>
-                                <th data-en="First Name *" data-es="Nombre *">First Name *</th>
-                                <th data-en="Last Name *" data-es="Apellido *">Last Name *</th>
-                                <th data-en="Relationship *" data-es="Relación *">Relationship *</th>
-                                <th data-en="Phone Number *" data-es="Número de Teléfono *">Phone Number *</th>
-                                <th data-en="State *" data-es="Estado *">State *</th>
-                                <th data-en="Job/Occupation" data-es="Trabajo/Ocupación">Job/Occupation</th>
-                                <th data-en="What should we know before contacting?" data-es="¿Qué debemos saber antes de contactar?">What should we know before contacting?</th>
+                                <th>Type</th>
+                                <th>First Name *</th>
+                                <th>Last Name *</th>
+                                <th>Relationship *</th>
+                                <th>Phone Number *</th>
+                                <th>State *</th>
+                                <th>Job/Occupation</th>
+                                <th>What should we know before contacting?</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
-                                <td data-en="Reference 1 (Required)" data-es="Referencia 1 (Requerida)">Reference 1 (Required)</td>
+                                <td>Reference 1 (Required)</td>
                                 <td><input type="text" name="ref1-first" required></td>
                                 <td><input type="text" name="ref1-last" required></td>
                                 <td><input type="text" name="ref1-relationship" required></td>
@@ -1020,7 +856,7 @@
                                 <td><textarea name="ref1-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td data-en="Reference 2 (Required)" data-es="Referencia 2 (Requerida)">Reference 2 (Required)</td>
+                                <td>Reference 2 (Required)</td>
                                 <td><input type="text" name="ref2-first" required></td>
                                 <td><input type="text" name="ref2-last" required></td>
                                 <td><input type="text" name="ref2-relationship" required></td>
@@ -1030,7 +866,7 @@
                                 <td><textarea name="ref2-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td data-en="Reference 3 (Optional)" data-es="Referencia 3 (Opcional)">Reference 3 (Optional)</td>
+                                <td>Reference 3 (Optional)</td>
                                 <td><input type="text" name="ref3-first"></td>
                                 <td><input type="text" name="ref3-last"></td>
                                 <td><input type="text" name="ref3-relationship"></td>
@@ -1040,7 +876,7 @@
                                 <td><textarea name="ref3-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td data-en="Reference 4 (Optional)" data-es="Referencia 4 (Opcional)">Reference 4 (Optional)</td>
+                                <td>Reference 4 (Optional)</td>
                                 <td><input type="text" name="ref4-first"></td>
                                 <td><input type="text" name="ref4-last"></td>
                                 <td><input type="text" name="ref4-relationship"></td>
@@ -1050,7 +886,7 @@
                                 <td><textarea name="ref4-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td data-en="Reference 5 (Optional)" data-es="Referencia 5 (Opcional)">Reference 5 (Optional)</td>
+                                <td>Reference 5 (Optional)</td>
                                 <td><input type="text" name="ref5-first"></td>
                                 <td><input type="text" name="ref5-last"></td>
                                 <td><input type="text" name="ref5-relationship"></td>
@@ -1064,7 +900,7 @@
                 </div>
 
                 <div class="fun-element">
-                    <p data-en="References help us get to know you better!" data-es="¡Las referencias nos ayudan a conocerte mejor!">References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
+                    <p>References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
                 </div>
             </div>
         </div>
@@ -1072,58 +908,24 @@
         <!-- Privacy and Disclosures Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-shield-alt"></i> <span data-en="Privacy and Disclosures" data-es="Privacidad y Divulgaciones">Privacy and Disclosures</span></h2>
+                <h2><i class="fas fa-shield-alt"></i> Privacy and Disclosures</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <div class="disclosure-box">
-                    <p data-en="The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established." data-es="La información recopilada en este formulario es utilizada únicamente por National TV para procesar solicitudes de alquiler. Se puede contactar a todos los contactos con el único propósito de procesar esta solicitud. Toda la información se descartará de forma segura en caso de que la solicitud de alquiler sea denegada o no se establezca una relación adecuada entre consumidor y empresa.">The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established.</p>
-                    <p data-en="By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion." data-es="Al enviar este formulario a National TV, certifico que toda la información proporcionada es precisa según mi leal saber y entender, y que doy mi consentimiento para que National TV, o sus delegados, a su sola discreción, utilicen esta información con el propósito de procesar mi solicitud. Entiendo que al enviar este formulario, National TV se reserva el derecho de aprobar o denegar esta solicitud a su discreción.">By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion.</p>
+                    <p>The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established.</p>
+                    <p>By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion.</p>
                 </div>
 
                 <div class="form-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="agree-disclosure" name="agree-disclosure" required>
-                        <label for="agree-disclosure" data-en="I have read and agree to the above disclosures *" data-es="He leído y estoy de acuerdo con las divulgaciones anteriores *">I have read and agree to the above disclosures *</label>
-                    </div>
-                </div>
-
-                <!-- Primary Signature Section -->
-                <div id="primary-signature-container">
-                    <div class="signature-pad-container" id="primary-signature-pad-container">
-                        <p><strong data-en="Primary Renter Signature:" data-es="Firma del Arrendatario Principal:">Primary Renter Signature:</strong></p>
-                        <canvas id="signature-pad" width="600" height="200" class="signature-pad"></canvas>
-                        <div class="signature-actions">
-                            <button type="button" class="btn btn-danger" onclick="clearSignature()"><i class="fas fa-trash"></i> <span data-en="Clear Signature" data-es="Borrar Firma">Clear Signature</span></button>
-                            <button type="button" class="btn btn-primary" onclick="saveSignature()"><i class="fas fa-save"></i> <span data-en="Save Signature" data-es="Guardar Firma">Save Signature</span></button>
-                        </div>
-                    </div>
-                    <div class="signature-saved" id="primary-signature-saved">
-                        <p data-en="Signature saved successfully!" data-es="¡Firma guardada con éxito!">Signature saved successfully!</p>
-                        <button type="button" class="signature-edit-btn" onclick="editSignature('primary')"><i class="fas fa-edit"></i> <span data-en="Edit Signature" data-es="Editar Firma">Edit Signature</span></button>
-                    </div>
-                </div>
-
-                <!-- Co-Renter Signature Section (Initially Hidden) -->
-                <div id="co-signature-section" style="display: none;">
-                    <div id="co-signature-container">
-                        <div class="signature-pad-container" id="co-signature-pad-container">
-                            <p><strong data-en="Co-Renter Signature:" data-es="Firma del Co-Arrendatario:">Co-Renter Signature:</strong></p>
-                            <canvas id="co-signature-pad" width="600" height="200" class="signature-pad"></canvas>
-                            <div class="signature-actions">
-                                <button type="button" class="btn btn-danger" onclick="clearCoSignature()"><i class="fas fa-trash"></i> <span data-en="Clear Signature" data-es="Borrar Firma">Clear Signature</span></button>
-                                <button type="button" class="btn btn-primary" onclick="saveCoSignature()"><i class="fas fa-save"></i> <span data-en="Save Signature" data-es="Guardar Firma">Save Signature</span></button>
-                            </div>
-                        </div>
-                        <div class="signature-saved" id="co-signature-saved">
-                            <p data-en="Signature saved successfully!" data-es="¡Firma guardada con éxito!">Signature saved successfully!</p>
-                            <button type="button" class="signature-edit-btn" onclick="editSignature('co')"><i class="fas fa-edit"></i> <span data-en="Edit Signature" data-es="Editar Firma">Edit Signature</span></button>
-                        </div>
+                        <label for="agree-disclosure">I have read and agree to the above disclosures *</label>
                     </div>
                 </div>
 
                 <div class="fun-element">
-                    <p data-en="Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics!" data-es="¡Gracias por completar nuestra solicitud! Esperamos ayudarle a encontrar los electrodomésticos, muebles y electrónicos perfectos.">Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
+                    <p>Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
                 </div>
             </div>
         </div>
@@ -1131,102 +933,29 @@
         <!-- Additional Documents Section -->
         <div class="collapsible-menu">
             <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-file-upload"></i> <span data-en="Additional Documents" data-es="Documentos Adicionales">Additional Documents</span></h2>
+                <h2><i class="fas fa-file-upload"></i> Additional Documents</h2>
                 <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
             </div>
             <div class="menu-content">
                 <div class="form-group">
-                    <label for="additional-docs" data-en="Upload any additional supporting documents" data-es="Suba cualquier documento de apoyo adicional">Upload any additional supporting documents</label>
+                    <label for="additional-docs">Upload any additional supporting documents</label>
                     <input type="file" id="additional-docs" name="additional-docs" multiple accept=".jpg,.jpeg,.png,.pdf">
                 </div>
             </div>
         </div>
 
         <!-- Action buttons -->
-        <div class="form-group" style="padding: 20px; text-align: center;">
-            <button type="button" onclick="generatePrintable()" class="btn btn-primary"><i class="fas fa-print"></i> <span data-en="Generate Printable Application" data-es="Generar Solicitud Imprimible">Generate Printable Application</span></button>
-            <button type="button" onclick="submitToGoogle()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> <span data-en="Submit to Google Drive" data-es="Enviar a Google Drive">Submit to Google Drive</span></button>
+        <div class="action-buttons">
+            <button type="button" onclick="validateForm()" class="btn"><i class="fas fa-print"></i> Print</button>
+            <button type="button" onclick="validateForm()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> Submit Application</button>
         </div>
     </form>
 
-    <!-- Hidden printable version -->
-    <div id="printable-application" style="display: none;">
-        <h2 style="text-align: center; color: #0066cc;" data-en="National TV Rental Application" data-es="Solicitud de Alquiler de National TV">National TV Rental Application</h2>
-        <div id="print-content"></div>
-    </div>
-
     <div class="footer">
-        <p>&copy; 2025 National TV Rental. <span data-en="All rights reserved." data-es="Todos los derechos reservados.">All rights reserved.</span></p>
+        <p>&copy; 2025 National TV Rental. All rights reserved.</p>
     </div>
 
     <script>
-        // Initialize signature pads
-        const canvas = document.getElementById('signature-pad');
-        const signaturePad = new SignaturePad(canvas, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
-
-        const coCanvas = document.getElementById('co-signature-pad');
-        const coSignaturePad = new SignaturePad(coCanvas, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
-
-        // Apps Script Web App URL - Replace with your actual URL
-        const SCRIPT_URL = "https://docs.google.com/spreadsheets/d/1Lj5EkdVagM51OykHnmmYnmi7h5yKdWBuvq_9XH60Vm0/edit?usp=drivesdk";
-
-        // Language state
-        let isSpanish = false;
-
-        // Adjust canvas for high DPI displays
-        function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext('2d').scale(ratio, ratio);
-            
-            coCanvas.width = coCanvas.offsetWidth * ratio;
-            coCanvas.height = coCanvas.offsetHeight * ratio;
-            coCanvas.getContext('2d').scale(ratio, ratio);
-            
-            signaturePad.clear();
-            coSignaturePad.clear();
-        }
-
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        // Toggle language function
-        function toggleLanguage() {
-            const toggle = document.getElementById('language-toggle');
-            isSpanish = toggle.checked;
-            
-            // Update all elements with data attributes
-            document.querySelectorAll('[data-en], [data-es]').forEach(element => {
-                if (isSpanish) {
-                    if (element.hasAttribute('data-es')) {
-                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                            element.placeholder = element.getAttribute('data-es');
-                        } else if (element.tagName === 'OPTION') {
-                            element.textContent = element.getAttribute('data-es');
-                        } else {
-                            element.textContent = element.getAttribute('data-es');
-                        }
-                    }
-                } else {
-                    if (element.hasAttribute('data-en')) {
-                        if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
-                            element.placeholder = element.getAttribute('data-en');
-                        } else if (element.tagName === 'OPTION') {
-                            element.textContent = element.getAttribute('data-en');
-                        } else {
-                            element.textContent = element.getAttribute('data-en');
-                        }
-                    }
-                }
-            });
-        }
-
         // Toggle collapsible menus
         function toggleMenu(menuHeader) {
             const menuContent = menuHeader.nextElementSibling;
@@ -1247,23 +976,17 @@
         function toggleCoRenterSection(checkbox) {
             const coRenterSection = document.getElementById('corener-section');
             const coIncomeSection = document.getElementById('co-income-section');
-            const coSignatureSection = document.getElementById('co-signature-section');
-            const coRenterInputs = coRenterSection.querySelectorAll('input, select');
             
             if (checkbox.checked) {
                 coRenterSection.style.display = 'block';
                 coIncomeSection.style.display = 'block';
-                coSignatureSection.style.display = 'block';
-                coRenterInputs.forEach(input => input.setAttribute('required', 'true'));
             } else {
                 coRenterSection.style.display = 'none';
                 coIncomeSection.style.display = 'none';
-                coSignatureSection.style.display = 'none';
-                coRenterInputs.forEach(input => input.removeAttribute('required'));
             }
         }
 
-        // Toggle employment fields for primary renter
+        // Toggle employment fields
         function toggleEmploymentFields(radio) {
             const employmentFields = document.getElementById('employment-fields');
             const otherIncomeFields = document.getElementById('other-income-fields');
@@ -1271,140 +994,64 @@
             if (radio.value === 'yes') {
                 employmentFields.style.display = 'block';
                 otherIncomeFields.style.display = 'none';
-                
-                // Set required attributes for employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => {
-                    if (input.name !== 'employer-contact') {
-                        input.setAttribute('required', 'true');
-                    }
-                });
-                
-                // Remove required attributes from other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
             } else {
                 employmentFields.style.display = 'none';
                 otherIncomeFields.style.display = 'block';
-                
-                // Remove required attributes from employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
             }
         }
 
-        // Toggle employment fields for co-renter
-        function toggleCoEmploymentFields(radio) {
-            const employmentFields = document.getElementById('co-employment-fields');
-            const otherIncomeFields = document.getElementById('co-other-income-fields');
-            
-            if (radio.value === 'yes') {
-                employmentFields.style.display = 'block';
-                otherIncomeFields.style.display = 'none';
-                
-                // Set required attributes for employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => {
-                    if (input.name !== 'co-employer-contact') {
-                        input.setAttribute('required', 'true');
-                    }
-                });
-                
-                // Remove required attributes from other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
-            } else {
-                employmentFields.style.display = 'none';
-                otherIncomeFields.style.display = 'block';
-                
-                // Remove required attributes from employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
-            }
-        }
-
-        // Toggle income type fields for primary renter
+        // Toggle income type fields
         function toggleIncomeFields(select) {
             const hourlyRateField = document.getElementById('hourly-rate-field');
             const monthlySalaryField = document.getElementById('monthly-salary-field');
-            const payFrequencyField = document.getElementById('pay-frequency-field');
             
             if (select.value === 'hourly') {
                 hourlyRateField.style.display = 'block';
                 monthlySalaryField.style.display = 'none';
-                payFrequencyField.style.display = 'block';
-                document.getElementById('hourly-rate').setAttribute('required', 'true');
-                document.getElementById('monthly-salary').removeAttribute('required');
-                document.getElementById('pay-frequency').setAttribute('required', 'true');
             } else if (select.value === 'salary') {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'block';
-                payFrequencyField.style.display = 'block';
-                document.getElementById('hourly-rate').removeAttribute('required');
-                document.getElementById('monthly-salary').setAttribute('required', 'true');
-                document.getElementById('pay-frequency').setAttribute('required', 'true');
             } else {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'none';
-                payFrequencyField.style.display = 'none';
-                document.getElementById('hourly-rate').removeAttribute('required');
-                document.getElementById('monthly-salary').removeAttribute('required');
-                document.getElementById('pay-frequency').removeAttribute('required');
             }
         }
 
-        // Toggle income type fields for co-renter
-        function toggleCoIncomeFields(select) {
-            const hourlyRateField = document.getElementById('co-hourly-rate-field');
-            const monthlySalaryField = document.getElementById('co-monthly-salary-field');
-            const payFrequencyField = document.getElementById('co-pay-frequency-field');
+        // Toggle pay frequency fields
+        function togglePayFrequencyFields(select) {
+            const dayOfWeekField = document.getElementById('day-of-week-field');
+            const semiMonthlyDates = document.getElementById('semi-monthly-dates');
+            const monthlyDate = document.getElementById('monthly-date');
             
-            if (select.value === 'hourly') {
-                hourlyRateField.style.display = 'block';
-                monthlySalaryField.style.display = 'none';
-                payFrequencyField.style.display = 'block';
-                document.getElementById('co-hourly-rate').setAttribute('required', 'true');
-                document.getElementById('co-monthly-salary').removeAttribute('required');
-                document.getElementById('co-pay-frequency').setAttribute('required', 'true');
-            } else if (select.value === 'salary') {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'block';
-                payFrequencyField.style.display = 'block';
-                document.getElementById('co-hourly-rate').removeAttribute('required');
-                document.getElementById('co-monthly-salary').setAttribute('required', 'true');
-                document.getElementById('co-pay-frequency').setAttribute('required', 'true');
-            } else {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'none';
-                payFrequencyField.style.display = 'none';
-                document.getElementById('co-hourly-rate').removeAttribute('required');
-                document.getElementById('co-monthly-salary').removeAttribute('required');
-                document.getElementById('co-pay-frequency').removeAttribute('required');
+            // Hide all first
+            dayOfWeekField.style.display = 'none';
+            semiMonthlyDates.style.display = 'none';
+            monthlyDate.style.display = 'none';
+            
+            // Show appropriate fields based on selection
+            if (select.value === 'weekly' || select.value === 'biweekly') {
+                dayOfWeekField.style.display = 'block';
+            } else if (select.value === 'semimonthly') {
+                semiMonthlyDates.style.display = 'block';
+            } else if (select.value === 'monthly') {
+                monthlyDate.style.display = 'block';
             }
         }
 
-        // Toggle employer contact warning for primary renter
+        // Toggle additional income section
+        function toggleAdditionalIncome(checkbox) {
+            const additionalIncomeSection = document.getElementById('additional-income-section');
+            
+            if (checkbox.checked) {
+                additionalIncomeSection.style.display = 'block';
+            } else {
+                additionalIncomeSection.style.display = 'none';
+            }
+        }
+
+        // Toggle employer contact warning
         function toggleContactWarning(radio) {
             const contactWarning = document.getElementById('contact-warning');
-            
-            if (radio.value === 'no') {
-                contactWarning.style.display = 'block';
-            } else {
-                contactWarning.style.display = 'none';
-            }
-        }
-
-        // Toggle employer contact warning for co-renter
-        function toggleCoContactWarning(radio) {
-            const contactWarning = document.getElementById('co-contact-warning');
             
             if (radio.value === 'no') {
                 contactWarning.style.display = 'block';
@@ -1421,35 +1068,12 @@
             if (radio.value === 'rent') {
                 rentFields.style.display = 'block';
                 ownFields.style.display = 'none';
-                
-                // Set required attributes for rent fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.setAttribute('required', 'true'));
-                
-                // Remove required attributes from own fields
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.removeAttribute('required'));
             } else if (radio.value === 'own') {
                 rentFields.style.display = 'none';
                 ownFields.style.display = 'block';
-                
-                // Remove required attributes from rent fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for own fields
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.setAttribute('required', 'true'));
             } else {
                 rentFields.style.display = 'none';
                 ownFields.style.display = 'none';
-                
-                // Remove required attributes from all fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.removeAttribute('required'));
-                
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.removeAttribute('required'));
             }
         }
 
@@ -1464,487 +1088,152 @@
             }
         }
 
-        // Clear signature pad for primary renter
-        function clearSignature() {
-            signaturePad.clear();
-        }
-
-        // Clear signature pad for co-renter
-        function clearCoSignature() {
-            coSignaturePad.clear();
-        }
-
-        // Save signature for primary renter
-        function saveSignature() {
-            if (signaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma primero." : "Please provide a signature first.");
-            } else {
-                document.getElementById('primary-signature-pad-container').style.display = 'none';
-                document.getElementById('primary-signature-saved').style.display = 'block';
-            }
-        }
-
-        // Save signature for co-renter
-        function saveCoSignature() {
-            if (coSignaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma primero." : "Please provide a signature first.");
-            } else {
-                document.getElementById('co-signature-pad-container').style.display = 'none';
-                document.getElementById('co-signature-saved').style.display = 'block';
-            }
-        }
-
-        // Edit signature
-        function editSignature(type) {
-            if (type === 'primary') {
-                document.getElementById('primary-signature-pad-container').style.display = 'block';
-                document.getElementById('primary-signature-saved').style.display = 'none';
-            } else if (type === 'co') {
-                document.getElementById('co-signature-pad-container').style.display = 'block';
-                document.getElementById('co-signature-saved').style.display = 'none';
-            }
-        }
-
-        // Collect all form fields
-        function collectFields() {
-            const form = document.getElementById('rental-application');
-            const map = new Map();
-            form.querySelectorAll('input,select,textarea').forEach(el => {
-                if (el.type !== 'file' && el.name) map.set(el.name, el.value);
-            });
-            return map;
-        }
-
-        // Convert data URL to Blob
-        function dataURLToBlob(dataURL) {
-            const parts = dataURL.split(',');
-            const byteString = atob(parts[1]);
-            const mimeString = parts[0].split(':')[1].split(';')[0];
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            return new Blob([ab], { type: mimeString });
-        }
-
-        // Build PDF summary
-        function buildPdfSummary() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({ unit:'pt', format:'letter' });
-            let y = 40;
-            doc.setFontSize(16); 
-            doc.text(isSpanish ? 'Solicitud de Alquiler de National TV' : 'National TV Rental Application', 40, y); 
-            y+=30;
-            doc.setFontSize(11);
-            
-            collectFields().forEach((v,k)=>{ 
-                doc.text(`${k}: ${v}`, 40, y); 
-                y+=15; 
+        // Validation function
+        function validateForm() {
+            // Clear previous validation errors
+            document.querySelectorAll('.validation-error').forEach(el => {
+                el.classList.remove('validation-error');
             });
             
-            if (!signaturePad.isEmpty()) {
-                const sigDataUrl = signaturePad.toDataURL('image/png');
-                doc.text(isSpanish ? 'Firma del Arrendatario Principal:' : 'Primary Renter Signature:', 40, y); 
-                y+=20;
-                doc.addImage(sigDataUrl, 'PNG', 40, y, 300, 80);
-                y+=90;
-            }
-            
-            if (document.getElementById('has-corener').checked && !coSignaturePad.isEmpty()) {
-                const coSigDataUrl = coSignaturePad.toDataURL('image/png');
-                doc.text(isSpanish ? 'Firma del Co-Arrendatario:' : 'Co-Renter Signature:', 40, y); 
-                y+=20;
-                doc.addImage(coSigDataUrl, 'PNG', 40, y, 300, 80);
-                y+=90;
-            }
-            
-            return Promise.resolve(doc.output('blob'));
-        }
-
-        // Submit to Google Drive
-        async function submitToGoogle() {
-            // Validate form first
+            const errors = [];
             const form = document.getElementById('rental-application');
-            if (!form.checkValidity()) {
-                alert(isSpanish ? "Por favor, complete todos los campos obligatorios antes de enviar." : "Please fill out all required fields before submitting.");
-                form.reportValidity();
-                return;
-            }
             
-            // Validate signature
-            if (signaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma antes de enviar." : "Please provide a signature before submitting.");
-                return;
-            }
+            // Check all visible required fields
+            const requiredFields = form.querySelectorAll('[required]');
             
-            // Validate co-signature if co-renter exists
-            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma de co-arrendatario antes de enviar." : "Please provide a co-renter signature before submitting.");
-                return;
-            }
-            
-            const fd = new FormData();
-            collectFields().forEach((v,k)=> fd.append(k,v));
-            
-            if (!signaturePad.isEmpty()) {
-                fd.append('signature_png', dataURLToBlob(signaturePad.toDataURL('image/png')), 'signature.png');
-            }
-            
-            if (document.getElementById('has-corener').checked && !coSignaturePad.isEmpty()) {
-                fd.append('co_signature_png', dataURLToBlob(coSignaturePad.toDataURL('image/png')), 'co_signature.png');
-            }
-            
-            const idFile = document.getElementById('id-upload').files[0];
-            const paystubFile = document.getElementById('paystub-upload').files[0];
-            const incomeProofFile = document.getElementById('income-proof-upload').files[0];
-            const leaseFile = document.getElementById('lease-upload').files[0];
-            const ownershipFile = document.getElementById('ownership-upload').files[0];
-            const coPaystubFile = document.getElementById('co-paystub-upload').files[0];
-            const coIncomeProofFile = document.getElementById('co-income-proof-upload').files[0];
-            const additionalDocs = document.getElementById('additional-docs').files;
-            
-            if (idFile) fd.append('file_id', idFile, idFile.name);
-            if (paystubFile) fd.append('file_paystub', paystubFile, paystubFile.name);
-            if (incomeProofFile) fd.append('file_income_proof', incomeProofFile, incomeProofFile.name);
-            if (leaseFile) fd.append('file_lease', leaseFile, leaseFile.name);
-            if (ownershipFile) fd.append('file_ownership', ownershipFile, ownershipFile.name);
-            if (coPaystubFile) fd.append('file_co_paystub', coPaystubFile, coPaystubFile.name);
-            if (coIncomeProofFile) fd.append('file_co_income_proof', coIncomeProofFile, coIncomeProofFile.name);
-            
-            for (let i=0;i<additionalDocs.length;i++){ 
-                fd.append('file_additional_'+i, additionalDocs[i], additionalDocs[i].name); 
-            }
-            
-            const pdfBlob = await buildPdfSummary();
-            fd.append('application_pdf', pdfBlob, 'Application_Summary.pdf');
-            
-            try {
-                const res = await fetch(SCRIPT_URL, { method:'POST', body:fd });
-                const text = await res.text();
-                alert(isSpanish ? '¡Enviado! El servidor respondió: ' + text : 'Submitted! Server said: '+text);
-            } catch(err) { 
-                alert(isSpanish ? 'Error en el envío: ' + err : 'Submission failed: '+err); 
-            }
-        }
-
-        // Generate printable version
-        function generatePrintable() {
-            // Validate form first
-            const form = document.getElementById('rental-application');
-            if (!form.checkValidity()) {
-                alert(isSpanish ? "Por favor, complete todos los campos obligatorios antes de generar la versión imprimible." : "Please fill out all required fields before generating the printable version.");
-                form.reportValidity();
-                return;
-            }
-            
-            // Validate signature
-            if (signaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma antes de generar la versión imprimible." : "Please provide a signature before generating the printable version.");
-                return;
-            }
-            
-            // Validate co-signature if co-renter exists
-            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert(isSpanish ? "Por favor, proporcione una firma de co-arrendatario antes de generar la versión imprimible." : "Please provide a co-renter signature before generating the printable version.");
-                return;
-            }
-            
-            // Create printable content
-            const printContent = document.getElementById('print-content');
-            printContent.innerHTML = '';
-            
-            // Add application date
-            const now = new Date();
-            const dateString = now.toLocaleDateString();
-            const dateDiv = document.createElement('div');
-            dateDiv.className = 'print-section';
-            dateDiv.innerHTML = `<div class="print-field"><span class="print-label">${isSpanish ? 'Fecha de Solicitud:' : 'Application Date:'}</span> ${dateString}</div>`;
-            printContent.appendChild(dateDiv);
-            
-            // Primary Renter Information
-            const primarySection = document.createElement('div');
-            primarySection.className = 'print-section';
-            primarySection.innerHTML = `
-                <h3>${isSpanish ? 'Información del Arrendatario Principal' : 'Primary Renter Information'}</h3>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Nombre:' : 'Name:'}</span> ${document.getElementById('first-name').value} ${document.getElementById('last-name').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Apellido de Soltera:' : 'Maiden Name:'}</span> ${document.getElementById('maiden-name').value || 'N/A'}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Fecha de Nacimiento:' : 'Birthdate:'}</span> ${document.getElementById('birthdate').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Número de Seguro Social:' : 'SSN:'}</span> ${document.getElementById('ssn').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Correo Electrónico:' : 'Email:'}</span> ${document.getElementById('email').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Teléfono:' : 'Phone:'}</span> ${document.getElementById('phone').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Mejor Horario para Contactar:' : 'Best Time to Contact:'}</span> ${document.getElementById('contact-time').value}</div>
-            `;
-            printContent.appendChild(primarySection);
-            
-            // Co-Renter Information if exists
-            if (document.getElementById('has-corener').checked) {
-                const coSection = document.createElement('div');
-                coSection.className = 'print-section';
-                coSection.innerHTML = `
-                    <h3>${isSpanish ? 'Información del Co-Arrendatario' : 'Co-Renter Information'}</h3>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Nombre:' : 'Name:'}</span> ${document.getElementById('co-first-name').value} ${document.getElementById('co-last-name').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Apellido de Soltera:' : 'Maiden Name:'}</span> ${document.getElementById('co-maiden-name').value || 'N/A'}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Fecha de Nacimiento:' : 'Birthdate:'}</span> ${document.getElementById('co-birthdate').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Número de Seguro Social:' : 'SSN:'}</span> ${document.getElementById('co-ssn').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Correo Electrónico:' : 'Email:'}</span> ${document.getElementById('co-email').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Teléfono:' : 'Phone:'}</span> ${document.getElementById('co-phone').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Mejor Horario para Contactar:' : 'Best Time to Contact:'}</span> ${document.getElementById('co-contact-time').value}</div>
-                `;
-                printContent.appendChild(coSection);
-            }
-            
-            // Address Information
-            const addressSection = document.createElement('div');
-            addressSection.className = 'print-section';
-            addressSection.innerHTML = `
-                <h3>${isSpanish ? 'Información de Dirección' : 'Address Information'}</h3>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Dirección:' : 'Street Address:'}</span> ${document.getElementById('street-address').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Apartamento/Unidad:' : 'Apt/Unit Number:'}</span> ${document.getElementById('apt-number').value || 'N/A'}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Ciudad:' : 'City:'}</span> ${document.getElementById('city').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Estado:' : 'State:'}</span> ${document.getElementById('state').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Código Postal:' : 'ZIP Code:'}</span> ${document.getElementById('zip-code').value}</div>
-            `;
-            printContent.appendChild(addressSection);
-            
-            // Vehicle Information
-            const vehicleSection = document.createElement('div');
-            vehicleSection.className = 'print-section';
-            vehicleSection.innerHTML = `
-                <h3>${isSpanish ? 'Información del Vehículo' : 'Vehicle Information'}</h3>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Marca:' : 'Make:'}</span> ${document.getElementById('vehicle-make').value || 'N/A'}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Modelo:' : 'Model:'}</span> ${document.getElementById('vehicle-model').value || 'N/A'}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Placa:' : 'License Plate:'}</span> ${document.getElementById('license-plate').value || 'N/A'}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Color:' : 'Color:'}</span> ${document.getElementById('vehicle-color').value || 'N/A'}</div>
-            `;
-            printContent.appendChild(vehicleSection);
-            
-            // Income Information
-            const incomeSection = document.createElement('div');
-            incomeSection.className = 'print-section';
-            incomeSection.innerHTML = `<h3>${isSpanish ? 'Información de Ingresos' : 'Income Information'}</h3>`;
-            
-            if (document.getElementById('employment-yes').checked) {
-                incomeSection.innerHTML += `
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Estado de Empleo:' : 'Employment Status:'}</span> ${isSpanish ? 'Empleado' : 'Employed'}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Empleador:' : 'Employer:'}</span> ${document.getElementById('employer').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Puesto de Trabajo:' : 'Job Title:'}</span> ${document.getElementById('job-title').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Turno:' : 'Shift:'}</span> ${document.getElementById('shift').value}</div>
-                `;
-                
-                if (document.getElementById('income-type').value === 'hourly') {
-                    incomeSection.innerHTML += `
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Tarifa por Hora:' : 'Hourly Rate:'}</span> $${document.getElementById('hourly-rate').value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Frecuencia de Pago:' : 'Pay Frequency:'}</span> ${document.getElementById('pay-frequency').value}</div>
-                    `;
-                } else {
-                    incomeSection.innerHTML += `
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Salario Mensual:' : 'Monthly Salary:'}</span> $${document.getElementById('monthly-salary').value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Frecuencia de Pago:' : 'Pay Frequency:'}</span> ${document.getElementById('pay-frequency').value}</div>
-                    `;
+            requiredFields.forEach(field => {
+                // Skip validation for hidden fields
+                if (!field.offsetParent || field.closest('[style*="display: none"]')) {
+                    return;
                 }
                 
-                incomeSection.innerHTML += `<div class="print-field"><span class="print-label">${isSpanish ? 'Salario Neto:' : 'Take Home Pay:'}</span> $${document.getElementById('take-home-pay').value}</div>`;
-            } else {
-                incomeSection.innerHTML += `
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Estado de Empleo:' : 'Employment Status:'}</span> ${isSpanish ? 'Otra Fuente de Ingresos' : 'Other Income Source'}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Fuente de Ingresos:' : 'Income Source:'}</span> ${document.getElementById('income-source').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Cantidad Mensual:' : 'Monthly Amount:'}</span> $${document.getElementById('other-take-home').value}</div>
-                `;
-            }
-            printContent.appendChild(incomeSection);
-            
-            // Co-Renter Income Information if exists
-            if (document.getElementById('has-corener').checked) {
-                const coIncomeSection = document.createElement('div');
-                coIncomeSection.className = 'print-section';
-                coIncomeSection.innerHTML = `<h3>${isSpanish ? 'Información de Ingresos del Co-Arrendatario' : 'Co-Renter Income Information'}</h3>`;
-                
-                if (document.getElementById('co-employment-yes').checked) {
-                    coIncomeSection.innerHTML += `
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Estado de Empleo:' : 'Employment Status:'}</span> ${isSpanish ? 'Empleado' : 'Employed'}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Empleador:' : 'Employer:'}</span> ${document.getElementById('co-employer').value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Puesto de Trabajo:' : 'Job Title:'}</span> ${document.getElementById('co-job-title').value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Turno:' : 'Shift:'}</span> ${document.getElementById('co-shift').value}</div>
-                    `;
+                if (!field.value) {
+                    field.classList.add('validation-error');
+                    const label = form.querySelector(`label[for="${field.id}"]`) || 
+                                 field.closest('.form-group').querySelector('label') ||
+                                 field.closest('td').previousElementSibling;
                     
-                    if (document.getElementById('co-income-type').value === 'hourly') {
-                        coIncomeSection.innerHTML += `
-                            <div class="print-field"><span class="print-label">${isSpanish ? 'Tarifa por Hora:' : 'Hourly Rate:'}</span> $${document.getElementById('co-hourly-rate').value}</div>
-                            <div class="print-field"><span class="print-label">${isSpanish ? 'Frecuencia de Pago:' : 'Pay Frequency:'}</span> ${document.getElementById('co-pay-frequency').value}</div>
-                        `;
-                    } else {
-                        coIncomeSection.innerHTML += `
-                            <div class="print-field"><span class="print-label">${isSpanish ? 'Salario Mensual:' : 'Monthly Salary:'}</span> $${document.getElementById('co-monthly-salary').value}</div>
-                            <div class="print-field"><span class="print-label">${isSpanish ? 'Frecuencia de Pago:' : 'Pay Frequency:'}</span> ${document.getElementById('co-pay-frequency').value}</div>
-                        `;
+                    let fieldName = 'Field';
+                    if (label) {
+                        fieldName = label.textContent.replace('*', '').trim();
                     }
                     
-                    coIncomeSection.innerHTML += `<div class="print-field"><span class="print-label">${isSpanish ? 'Salario Neto:' : 'Take Home Pay:'}</span> $${document.getElementById('co-take-home-pay').value}</div>`;
-                } else {
-                    coIncomeSection.innerHTML += `
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Estado de Empleo:' : 'Employment Status:'}</span> ${isSpanish ? 'Otra Fuente de Ingresos' : 'Other Income Source'}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Fuente de Ingresos:' : 'Income Source:'}</span> ${document.getElementById('co-income-source').value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Cantidad Mensual:' : 'Monthly Amount:'}</span> $${document.getElementById('co-other-take-home').value}</div>
-                    `;
-                }
-                printContent.appendChild(coIncomeSection);
-            }
-            
-            // Residency Information
-            const residencySection = document.createElement('div');
-            residencySection.className = 'print-section';
-            residencySection.innerHTML = `<h3>${isSpanish ? 'Información de Residencia' : 'Residency Information'}</h3>`;
-            
-            if (document.getElementById('residency-rent').checked) {
-                residencySection.innerHTML += `
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Tipo de Residencia:' : 'Residency Type:'}</span> ${isSpanish ? 'Alquiler' : 'Rent'}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Propietario/Administrador:' : 'Landlord/Property Manager:'}</span> ${document.getElementById('landlord-name').value}</div>
-                    <div class="print-field"><span class="print-label">${isSpanish ? 'Número de Contacto:' : 'Contact Number:'}</span> ${document.getElementById('landlord-phone').value}</div>
-                `;
-            } else if (document.getElementById('residency-own').checked) {
-                residencySection.innerHTML += `<div class="print-field"><span class="print-label">${isSpanish ? 'Tipo de Residencia:' : 'Residency Type:'}</span> ${isSpanish ? 'Propio' : 'Own'}</div>`;
-            } else {
-                residencySection.innerHTML += `<div class="print-field"><span class="print-label">${isSpanish ? 'Tipo de Residencia:' : 'Residency Type:'}</span> ${isSpanish ? 'Vivir con el Propietario' : 'Live with Owner'}</div>`;
-            }
-            printContent.appendChild(residencySection);
-            
-            // References
-            const referencesSection = document.createElement('div');
-            referencesSection.className = 'print-section';
-            referencesSection.innerHTML = `<h3>${isSpanish ? 'Referencias' : 'References'}</h3>`;
-            
-            // Reference 1 (Required)
-            referencesSection.innerHTML += `
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Referencia 1:' : 'Reference 1:'}</span> ${document.querySelector('[name="ref1-first"]').value} ${document.querySelector('[name="ref1-last"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Relación:' : 'Relationship:'}</span> ${document.querySelector('[name="ref1-relationship"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Teléfono:' : 'Phone:'}</span> ${document.querySelector('[name="ref1-phone"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Estado:' : 'State:'}</span> ${document.querySelector('[name="ref1-state"]').value}</div>
-            `;
-            
-            // Reference 2 (Required)
-            referencesSection.innerHTML += `
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Referencia 2:' : 'Reference 2:'}</span> ${document.querySelector('[name="ref2-first"]').value} ${document.querySelector('[name="ref2-last"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Relación:' : 'Relationship:'}</span> ${document.querySelector('[name="ref2-relationship"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Teléfono:' : 'Phone:'}</span> ${document.querySelector('[name="ref2-phone"]').value}</div>
-                <div class="print-field"><span class="print-label">${isSpanish ? 'Estado:' : 'State:'}</span> ${document.querySelector('[name="ref2-state"]').value}</div>
-            `;
-            
-            // Optional references if filled out
-            for (let i = 3; i <= 5; i++) {
-                const refFirstName = document.querySelector(`[name="ref${i}-first"]`).value;
-                if (refFirstName) {
-                    referencesSection.innerHTML += `
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Referencia ' + i + ':' : 'Reference ' + i + ':'}</span> ${refFirstName} ${document.querySelector(`[name="ref${i}-last"]`).value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Relación:' : 'Relationship:'}</span> ${document.querySelector(`[name="ref${i}-relationship"]`).value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Teléfono:' : 'Phone:'}</span> ${document.querySelector(`[name="ref${i}-phone"]`).value}</div>
-                        <div class="print-field"><span class="print-label">${isSpanish ? 'Estado:' : 'State:'}</span> ${document.querySelector(`[name="ref${i}-state"]`).value}</div>
-                    `;
-                }
-            }
-            printContent.appendChild(referencesSection);
-            
-            // Uploaded documents if any
-            const uploadsSection = document.createElement('div');
-            uploadsSection.className = 'print-section';
-            uploadsSection.innerHTML = `<h3>${isSpanish ? 'Documentos Subidos' : 'Uploaded Documents'}</h3>`;
-            
-            // Check each file input and add to print if exists
-            const fileInputs = [
-                {id: 'id-upload', label: isSpanish ? 'Identificación' : 'ID'},
-                {id: 'paystub-upload', label: isSpanish ? 'Comprobantes de Pago' : 'Paystubs'},
-                {id: 'income-proof-upload', label: isSpanish ? 'Prueba de Ingresos' : 'Proof of Income'},
-                {id: 'lease-upload', label: isSpanish ? 'Contrato/Factura de Servicio' : 'Lease/Utility Bill'},
-                {id: 'ownership-upload', label: isSpanish ? 'Prueba de Propiedad' : 'Proof of Ownership'},
-                {id: 'co-paystub-upload', label: isSpanish ? 'Comprobantes de Pago (Co-Arrendatario)' : 'Paystubs (Co-Renter)'},
-                {id: 'co-income-proof-upload', label: isSpanish ? 'Prueba de Ingresos (Co-Arrendatario)' : 'Proof of Income (Co-Renter)'}
-            ];
-            
-            let hasUploads = false;
-            
-            fileInputs.forEach(input => {
-                const fileInput = document.getElementById(input.id);
-                if (fileInput && fileInput.files.length > 0) {
-                    hasUploads = true;
-                    uploadsSection.innerHTML += `
-                        <div class="print-upload">
-                            <div class="print-upload-title">${input.label}:</div>
-                            <div>${fileInput.files[0].name}</div>
-                        </div>
-                    `;
+                    errors.push({
+                        field: field,
+                        message: `${fieldName} is required`
+                    });
+                } else if (field.type === 'email' && !isValidEmail(field.value)) {
+                    field.classList.add('validation-error');
+                    errors.push({
+                        field: field,
+                        message: 'Please enter a valid email address'
+                    });
+                } else if (field.id === 'ssn' && !isValidSSN(field.value)) {
+                    field.classList.add('validation-error');
+                    errors.push({
+                        field: field,
+                        message: 'Please enter a valid 9-digit SSN'
+                    });
+                } else if (field.id === 'zip-code' && !isValidZipCode(field.value)) {
+                    field.classList.add('validation-error');
+                    errors.push({
+                        field: field,
+                        message: 'Please enter a valid ZIP code'
+                    });
                 }
             });
             
-            // Additional documents
-            const additionalDocs = document.getElementById('additional-docs');
-            if (additionalDocs && additionalDocs.files.length > 0) {
-                hasUploads = true;
-                uploadsSection.innerHTML += `
-                    <div class="print-upload">
-                        <div class="print-upload-title">${isSpanish ? 'Documentos Adicionales' : 'Additional Documents'}:</div>
-                `;
-                
-                for (let i = 0; i < additionalDocs.files.length; i++) {
-                    uploadsSection.innerHTML += `<div>${additionalDocs.files[i].name}</div>`;
-                }
-                
-                uploadsSection.innerHTML += `</div>`;
+            if (errors.length > 0) {
+                showValidationErrors(errors);
+                return false;
             }
             
-            if (hasUploads) {
-                printContent.appendChild(uploadsSection);
+            alert('Form validation successful! This would normally submit the form.');
+            return true;
+        }
+
+        // Helper validation functions
+        function isValidEmail(email) {
+            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return re.test(email);
+        }
+
+        function isValidSSN(ssn) {
+            const re = /^\d{9}$/;
+            return re.test(ssn.replace(/-/g, ''));
+        }
+
+        function isValidZipCode(zip) {
+            const re = /^\d{5}(-\d{4})?$/;
+            return re.test(zip);
+        }
+
+        // Show validation errors in a popup
+        function showValidationErrors(errors) {
+            // Remove any existing validation popup
+            const existingPopup = document.getElementById('validation-popup');
+            if (existingPopup) {
+                existingPopup.remove();
             }
             
-            // Signatures at the bottom
-            const signatureSection = document.createElement('div');
-            signatureSection.className = 'print-section';
-            signatureSection.innerHTML = `
-                <h3>${isSpanish ? 'Firmas' : 'Signatures'}</h3>
-                <div class="print-field">
-                    <span class="print-label">${isSpanish ? 'Firma del Arrendatario Principal:' : 'Primary Renter Signature:'}</span><br>
-                    <img src="${signaturePad.toDataURL()}" class="signature-img">
-                </div>
-            `;
-            
-            if (document.getElementById('has-corener').checked) {
-                signatureSection.innerHTML += `
-                    <div class="print-field">
-                        <span class="print-label">${isSpanish ? 'Firma del Co-Arrendatario:' : 'Co-Renter Signature:'}</span><br>
-                        <img src="${coSignaturePad.toDataURL()}" class="signature-img">
-                    </div>
-                `;
+            const existingOverlay = document.querySelector('.overlay');
+            if (existingOverlay) {
+                existingOverlay.remove();
             }
-            printContent.appendChild(signatureSection);
             
-            // Show printable version and print
-            const printableApp = document.getElementById('printable-application');
-            printableApp.style.display = 'block';
-            window.print();
-            printableApp.style.display = 'none';
+            // Create overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'overlay';
+            document.body.appendChild(overlay);
+            
+            // Create popup
+            const popup = document.createElement('div');
+            popup.className = 'validation-popup';
+            popup.id = 'validation-popup';
+            
+            let html = '<h3>Please complete the following fields:</h3>';
+            html += '<div class="validation-list">';
+            
+            errors.forEach(error => {
+                html += `<div class="validation-item">${error.message}</div>`;
+            });
+            
+            html += '</div>';
+            html += '<div class="validation-buttons">';
+            html += '<button class="btn btn-primary" onclick="closeValidationPopup()">OK</button>';
+            html += '</div>';
+            
+            popup.innerHTML = html;
+            document.body.appendChild(popup);
+        }
+
+        // Close validation popup
+        function closeValidationPopup() {
+            const popup = document.getElementById('validation-popup');
+            const overlay = document.querySelector('.overlay');
+            
+            if (popup) popup.remove();
+            if (overlay) overlay.remove();
         }
 
         // Initialize hidden sections
         window.onload = function() {
             document.getElementById('corener-section').style.display = 'none';
             document.getElementById('co-income-section').style.display = 'none';
-            document.getElementById('co-signature-section').style.display = 'none';
             document.getElementById('employment-fields').style.display = 'none';
             document.getElementById('other-income-fields').style.display = 'none';
             document.getElementById('hourly-rate-field').style.display = 'none';
             document.getElementById('monthly-salary-field').style.display = 'none';
-            document.getElementById('pay-frequency-field').style.display = 'none';
             document.getElementById('contact-warning').style.display = 'none';
-            document.getElementById('co-employment-fields').style.display = 'none';
-            document.getElementById('co-other-income-fields').style.display = 'none';
-            document.getElementById('co-hourly-rate-field').style.display = 'none';
-            document.getElementById('co-monthly-salary-field').style.display = 'none';
-            document.getElementById('co-pay-frequency-field').style.display = 'none';
-            document.getElementById('co-contact-warning').style.display = 'none';
             document.getElementById('rent-fields').style.display = 'none';
             document.getElementById('own-fields').style.display = 'none';
             document.getElementById('landlord-contact-warning').style.display = 'none';
+            document.getElementById('additional-income-section').style.display = 'none';
             
-            // Initialize signature saved states
-            document.getElementById('primary-signature-saved').style.display = 'none';
-            document.getElementById('co-signature-saved').style.display = 'none';
+            // Hide all pay frequency fields initially
+            document.querySelectorAll('.day-selector, .date-selector').forEach(el => {
+                el.style.display = 'none';
+            });
         };
     </script>
 </body>
