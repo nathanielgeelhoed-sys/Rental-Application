@@ -302,6 +302,13 @@
         .validation-item {
             padding: 8px;
             border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .validation-item i {
+            margin-right: 10px;
+            color: var(--primary-red);
         }
 
         .validation-buttons {
@@ -1025,9 +1032,27 @@
             if (checkbox.checked) {
                 coRenterSection.style.display = 'block';
                 coIncomeSection.style.display = 'block';
+                
+                // Make co-renter fields required
+                document.getElementById('co-first-name').required = true;
+                document.getElementById('co-last-name').required = true;
+                document.getElementById('co-birthdate').required = true;
+                document.getElementById('co-ssn').required = true;
+                document.getElementById('co-email').required = true;
+                document.getElementById('co-phone').required = true;
+                document.getElementById('co-contact-time').required = true;
             } else {
                 coRenterSection.style.display = 'none';
                 coIncomeSection.style.display = 'none';
+                
+                // Remove required attribute from co-renter fields
+                document.getElementById('co-first-name').required = false;
+                document.getElementById('co-last-name').required = false;
+                document.getElementById('co-birthdate').required = false;
+                document.getElementById('co-ssn').required = false;
+                document.getElementById('co-email').required = false;
+                document.getElementById('co-phone').required = false;
+                document.getElementById('co-contact-time').required = false;
             }
         }
 
@@ -1039,9 +1064,33 @@
             if (radio.value === 'yes') {
                 employmentFields.style.display = 'block';
                 otherIncomeFields.style.display = 'none';
+                
+                // Make employment fields required
+                document.getElementById('employer').required = true;
+                document.getElementById('job-title').required = true;
+                document.getElementById('shift').required = true;
+                document.getElementById('income-type').required = true;
+                document.getElementById('pay-frequency').required = true;
+                document.getElementById('take-home-pay').required = true;
+                
+                // Remove required from other income fields
+                document.getElementById('income-source').required = false;
+                document.getElementById('other-take-home').required = false;
             } else {
                 employmentFields.style.display = 'none';
                 otherIncomeFields.style.display = 'block';
+                
+                // Remove required from employment fields
+                document.getElementById('employer').required = false;
+                document.getElementById('job-title').required = false;
+                document.getElementById('shift').required = false;
+                document.getElementById('income-type').required = false;
+                document.getElementById('pay-frequency').required = false;
+                document.getElementById('take-home-pay').required = false;
+                
+                // Make other income fields required
+                document.getElementById('income-source').required = true;
+                document.getElementById('other-take-home').required = true;
             }
         }
 
@@ -1053,12 +1102,21 @@
             if (select.value === 'hourly') {
                 hourlyRateField.style.display = 'block';
                 monthlySalaryField.style.display = 'none';
+                
+                document.getElementById('hourly-rate').required = true;
+                document.getElementById('monthly-salary').required = false;
             } else if (select.value === 'salary') {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'block';
+                
+                document.getElementById('hourly-rate').required = false;
+                document.getElementById('monthly-salary').required = true;
             } else {
                 hourlyRateField.style.display = 'none';
                 monthlySalaryField.style.display = 'none';
+                
+                document.getElementById('hourly-rate').required = false;
+                document.getElementById('monthly-salary').required = false;
             }
         }
 
@@ -1073,13 +1131,23 @@
             semiMonthlyDates.style.display = 'none';
             monthlyDate.style.display = 'none';
             
+            // Reset required fields
+            document.getElementById('pay-day').required = false;
+            document.getElementById('first-pay-date').required = false;
+            document.getElementById('second-pay-date').required = false;
+            document.getElementById('monthly-pay-date').required = false;
+            
             // Show appropriate fields based on selection
             if (select.value === 'weekly' || select.value === 'biweekly') {
                 dayOfWeekField.style.display = 'block';
+                document.getElementById('pay-day').required = true;
             } else if (select.value === 'semimonthly') {
                 semiMonthlyDates.style.display = 'block';
+                document.getElementById('first-pay-date').required = true;
+                document.getElementById('second-pay-date').required = true;
             } else if (select.value === 'monthly') {
                 monthlyDate.style.display = 'block';
+                document.getElementById('monthly-pay-date').required = true;
             }
         }
 
@@ -1110,9 +1178,16 @@
             const rentFields = document.getElementById('rent-fields');
             const ownFields = document.getElementById('own-fields');
             
+            // Reset required fields
+            document.getElementById('landlord-name').required = false;
+            document.getElementById('landlord-phone').required = false;
+            
             if (radio.value === 'rent') {
                 rentFields.style.display = 'block';
                 ownFields.style.display = 'none';
+                
+                document.getElementById('landlord-name').required = true;
+                document.getElementById('landlord-phone').required = true;
             } else if (radio.value === 'own') {
                 rentFields.style.display = 'none';
                 ownFields.style.display = 'block';
@@ -1152,41 +1227,74 @@
                     return;
                 }
                 
+                let isValid = true;
+                let errorMessage = '';
+                
                 if (!field.value) {
+                    isValid = false;
+                    errorMessage = 'is required';
+                } else if (field.type === 'email' && !isValidEmail(field.value)) {
+                    isValid = false;
+                    errorMessage = 'must be a valid email address';
+                } else if (field.id === 'ssn' && !isValidSSN(field.value)) {
+                    isValid = false;
+                    errorMessage = 'must be a valid 9-digit SSN';
+                } else if (field.id === 'zip-code' && !isValidZipCode(field.value)) {
+                    isValid = false;
+                    errorMessage = 'must be a valid ZIP code';
+                } else if (field.type === 'checkbox' && !field.checked) {
+                    isValid = false;
+                    errorMessage = 'must be checked';
+                }
+                
+                if (!isValid) {
                     field.classList.add('validation-error');
-                    const label = form.querySelector(`label[for="${field.id}"]`) || 
-                                 field.closest('.form-group').querySelector('label') ||
-                                 field.closest('td').previousElementSibling;
                     
+                    // Find the field label
                     let fieldName = 'Field';
+                    const label = form.querySelector(`label[for="${field.id}"]`) || 
+                                 field.closest('.form-group')?.querySelector('label') ||
+                                 field.closest('td')?.previousElementSibling;
+                    
                     if (label) {
                         fieldName = label.textContent.replace('*', '').trim();
                     }
                     
                     errors.push({
                         field: field,
-                        message: `${fieldName} is required`
-                    });
-                } else if (field.type === 'email' && !isValidEmail(field.value)) {
-                    field.classList.add('validation-error');
-                    errors.push({
-                        field: field,
-                        message: 'Please enter a valid email address'
-                    });
-                } else if (field.id === 'ssn' && !isValidSSN(field.value)) {
-                    field.classList.add('validation-error');
-                    errors.push({
-                        field: field,
-                        message: 'Please enter a valid 9-digit SSN'
-                    });
-                } else if (field.id === 'zip-code' && !isValidZipCode(field.value)) {
-                    field.classList.add('validation-error');
-                    errors.push({
-                        field: field,
-                        message: 'Please enter a valid ZIP code'
+                        message: `${fieldName} ${errorMessage}`,
+                        section: field.closest('.collapsible-menu')?.querySelector('h2')?.textContent || 'General'
                     });
                 }
             });
+            
+            // Special validation for radio buttons
+            const employmentRadio = document.querySelector('input[name="employment-primary"]:checked');
+            if (!employmentRadio) {
+                errors.push({
+                    field: document.getElementById('employment-yes'),
+                    message: 'Employment primary income selection is required',
+                    section: 'Income Information'
+                });
+            }
+            
+            const residencyRadio = document.querySelector('input[name="residency-type"]:checked');
+            if (!residencyRadio) {
+                errors.push({
+                    field: document.getElementById('residency-rent'),
+                    message: 'Residency type selection is required',
+                    section: 'Residency Information'
+                });
+            }
+            
+            const employerContactRadio = document.querySelector('input[name="employer-contact"]:checked');
+            if (document.getElementById('employment-fields').style.display === 'block' && !employerContactRadio) {
+                errors.push({
+                    field: document.getElementById('contact-yes'),
+                    message: 'Employer contact selection is required',
+                    section: 'Income Information'
+                });
+            }
             
             if (errors.length > 0) {
                 showValidationErrors(errors);
@@ -1238,8 +1346,35 @@
             let html = '<h3>Please complete the following fields:</h3>';
             html += '<div class="validation-list">';
             
+            // Group errors by section
+            const sectionErrors = {};
             errors.forEach(error => {
-                html += `<div class="validation-item">${error.message}</div>`;
+                if (!sectionErrors[error.section]) {
+                    sectionErrors[error.section] = [];
+                }
+                sectionErrors[error.section].push(error);
+            });
+            
+            // Display errors in order of sections from top to bottom
+            const sections = [
+                'Primary Renter Information',
+                'Income Information',
+                'Co-Renter Income Information',
+                'Residency Information',
+                'References',
+                'Privacy and Disclosures',
+                'Additional Documents',
+                'General'
+            ];
+            
+            sections.forEach(section => {
+                if (sectionErrors[section]) {
+                    html += `<div style="font-weight: bold; margin-top: 10px; color: var(--primary-blue);">${section}</div>`;
+                    
+                    sectionErrors[section].forEach(error => {
+                        html += `<div class="validation-item"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
+                    });
+                }
             });
             
             html += '</div>';
@@ -1249,6 +1384,22 @@
             
             popup.innerHTML = html;
             document.body.appendChild(popup);
+            
+            // Scroll to first error field
+            if (errors[0] && errors[0].field) {
+                errors[0].field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                
+                // Open the section containing the error if it's collapsed
+                const section = errors[0].field.closest('.collapsible-menu');
+                if (section) {
+                    const menuHeader = section.querySelector('.menu-header');
+                    const menuContent = section.querySelector('.menu-content');
+                    
+                    if (!menuContent.classList.contains('active')) {
+                        toggleMenu(menuHeader);
+                    }
+                }
+            }
         }
 
         // Close validation popup
