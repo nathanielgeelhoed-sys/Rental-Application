@@ -345,6 +345,51 @@
             margin: 0 5px;
             font-size: 1.5rem;
         }
+
+        /* Print styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #printable-application, #printable-application * {
+                visibility: visible;
+            }
+            #printable-application {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+                font-size: 12px;
+                line-height: 1.2;
+            }
+            .print-section {
+                margin-bottom: 15px;
+                page-break-inside: avoid;
+            }
+            .print-section h3 {
+                border-bottom: 1px solid #ccc;
+                padding-bottom: 5px;
+                margin-bottom: 10px;
+            }
+            .print-row {
+                display: flex;
+                margin-bottom: 5px;
+            }
+            .print-label {
+                font-weight: bold;
+                width: 40%;
+            }
+            .print-value {
+                width: 60%;
+            }
+            .print-uploads {
+                margin-top: 10px;
+            }
+            .print-upload-item {
+                margin-bottom: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -727,7 +772,7 @@
                             <option value="MD">Maryland</option>
                             <option value="MA">Massachusetts</option>
                             <option value="MI">Michigan</option>
-                            <option value="MN">Minnesota</option>
+                            <option value="MN">Minnesia</option>
                             <option value="MS">Mississippi</option>
                             <option value="MO">Missouri</option>
                             <option value="MT">Montana</option>
@@ -827,7 +872,7 @@
             </div>
             <div class="menu-content">
                 <div class="form-group">
-                    <p><strong>Reference Note:</strong> We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</p>
+                    <p><strong>Reference Note:</strong> Please provide five personal references. We strongly prefer parental figures or other close family before friends and coworkers. We may reach out for additional references or additional information.</p>
                 </div>
 
                 <div class="references-container">
@@ -866,32 +911,32 @@
                                 <td><textarea name="ref2-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td>Reference 3 (Optional)</td>
-                                <td><input type="text" name="ref3-first"></td>
-                                <td><input type="text" name="ref3-last"></td>
-                                <td><input type="text" name="ref3-relationship"></td>
-                                <td><input type="tel" name="ref3-phone"></td>
-                                <td><input type="text" name="ref3-state"></td>
+                                <td>Reference 3 (Required)</td>
+                                <td><input type="text" name="ref3-first" required></td>
+                                <td><input type="text" name="ref3-last" required></td>
+                                <td><input type="text" name="ref3-relationship" required></td>
+                                <td><input type="tel" name="ref3-phone" required></td>
+                                <td><input type="text" name="ref3-state" required></td>
                                 <td><input type="text" name="ref3-job"></td>
                                 <td><textarea name="ref3-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td>Reference 4 (Optional)</td>
-                                <td><input type="text" name="ref4-first"></td>
-                                <td><input type="text" name="ref4-last"></td>
-                                <td><input type="text" name="ref4-relationship"></td>
-                                <td><input type="tel" name="ref4-phone"></td>
-                                <td><input type="text" name="ref4-state"></td>
+                                <td>Reference 4 (Required)</td>
+                                <td><input type="text" name="ref4-first" required></td>
+                                <td><input type="text" name="ref4-last" required></td>
+                                <td><input type="text" name="ref4-relationship" required></td>
+                                <td><input type="tel" name="ref4-phone" required></td>
+                                <td><input type="text" name="ref4-state" required></td>
                                 <td><input type="text" name="ref4-job"></td>
                                 <td><textarea name="ref4-notes" rows="2"></textarea></td>
                             </tr>
                             <tr>
-                                <td>Reference 5 (Optional)</td>
-                                <td><input type="text" name="ref5-first"></td>
-                                <td><input type="text" name="ref5-last"></td>
-                                <td><input type="text" name="ref5-relationship"></td>
-                                <td><input type="tel" name="ref5-phone"></td>
-                                <td><input type="text" name="ref5-state"></td>
+                                <td>Reference 5 (Required)</td>
+                                <td><input type="text" name="ref5-first" required></td>
+                                <td><input type="text" name="ref5-last" required></td>
+                                <td><input type="text" name="ref5-relationship" required></td>
+                                <td><input type="tel" name="ref5-phone" required></td>
+                                <td><input type="text" name="ref5-state" required></td>
                                 <td><input type="text" name="ref5-job"></td>
                                 <td><textarea name="ref5-notes" rows="2"></textarea></td>
                             </tr>
@@ -946,8 +991,8 @@
 
         <!-- Action buttons -->
         <div class="action-buttons">
-            <button type="button" onclick="validateForm()" class="btn"><i class="fas fa-print"></i> Print</button>
-            <button type="button" onclick="validateForm()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> Submit Application</button>
+            <button type="button" onclick="printForm()" class="btn"><i class="fas fa-print"></i> Print</button>
+            <button type="button" onclick="submitToCloud()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> Submit Application</button>
         </div>
     </form>
 
@@ -1148,7 +1193,6 @@
                 return false;
             }
             
-            alert('Form validation successful! This would normally submit the form.');
             return true;
         }
 
@@ -1214,6 +1258,464 @@
             
             if (popup) popup.remove();
             if (overlay) overlay.remove();
+        }
+
+        // Print form function
+        function printForm() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Create a printable version of the form
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>National TV Rental Application</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            font-size: 12px;
+                            line-height: 1.4;
+                            color: #000;
+                            padding: 20px;
+                        }
+                        .print-header {
+                            text-align: center;
+                            margin-bottom: 20px;
+                            padding-bottom: 10px;
+                            border-bottom: 2px solid #0066cc;
+                        }
+                        .print-section {
+                            margin-bottom: 15px;
+                            page-break-inside: avoid;
+                        }
+                        .print-section h3 {
+                            border-bottom: 1px solid #ccc;
+                            padding-bottom: 5px;
+                            margin-bottom: 10px;
+                            color: #0066cc;
+                        }
+                        .print-row {
+                            display: flex;
+                            margin-bottom: 5px;
+                        }
+                        .print-label {
+                            font-weight: bold;
+                            width: 40%;
+                        }
+                        .print-value {
+                            width: 60%;
+                        }
+                        .print-uploads {
+                            margin-top: 10px;
+                        }
+                        .print-upload-item {
+                            margin-bottom: 5px;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                                margin: 0;
+                            }
+                            .print-section {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="print-header">
+                        <h1>National TV Rental Application</h1>
+                        <p>Generated on ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    <div id="printable-content">
+            `);
+            
+            // Add primary renter information
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>Primary Renter Information</h3>
+                    <div class="print-row">
+                        <div class="print-label">First Name:</div>
+                        <div class="print-value">${document.getElementById('first-name').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Last Name:</div>
+                        <div class="print-value">${document.getElementById('last-name').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Maiden Name:</div>
+                        <div class="print-value">${document.getElementById('maiden-name').value || 'N/A'}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Birthdate:</div>
+                        <div class="print-value">${document.getElementById('birthdate').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">SSN:</div>
+                        <div class="print-value">${document.getElementById('ssn').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Email:</div>
+                        <div class="print-value">${document.getElementById('email').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Phone:</div>
+                        <div class="print-value">${document.getElementById('phone').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Best Time to Contact:</div>
+                        <div class="print-value">${document.getElementById('contact-time').options[document.getElementById('contact-time').selectedIndex].text}</div>
+                    </div>
+            `);
+            
+            // Add co-renter information if applicable
+            if (document.getElementById('has-corener').checked) {
+                printWindow.document.write(`
+                    <h4>Co-Renter Information</h4>
+                    <div class="print-row">
+                        <div class="print-label">First Name:</div>
+                        <div class="print-value">${document.getElementById('co-first-name').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Last Name:</div>
+                        <div class="print-value">${document.getElementById('co-last-name').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Maiden Name:</div>
+                        <div class="print-value">${document.getElementById('co-maiden-name').value || 'N/A'}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Birthdate:</div>
+                        <div class="print-value">${document.getElementById('co-birthdate').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">SSN:</div>
+                        <div class="print-value">${document.getElementById('co-ssn').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Email:</div>
+                        <div class="print-value">${document.getElementById('co-email').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Phone:</div>
+                        <div class="print-value">${document.getElementById('co-phone').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Best Time to Contact:</div>
+                        <div class="print-value">${document.getElementById('co-contact-time').options[document.getElementById('co-contact-time').selectedIndex].text}</div>
+                    </div>
+                `);
+            }
+            
+            // Add vehicle information
+            printWindow.document.write(`
+                <h4>Vehicle Information</h4>
+                <div class="print-row">
+                    <div class="print-label">Make:</div>
+                    <div class="print-value">${document.getElementById('vehicle-make').value || 'N/A'}</div>
+                </div>
+                <div class="print-row">
+                    <div class="print-label">Model:</div>
+                    <div class="print-value">${document.getElementById('vehicle-model').value || 'N/A'}</div>
+                </div>
+                <div class="print-row">
+                    <div class="print-label">License Plate:</div>
+                    <div class="print-value">${document.getElementById('license-plate').value || 'N/A'}</div>
+                </div>
+                <div class="print-row">
+                    <div class="print-label">Color:</div>
+                    <div class="print-value">${document.getElementById('vehicle-color').value || 'N/A'}</div>
+                </div>
+                </div>
+            `);
+            
+            // Add income information
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>Income Information</h3>
+            `);
+            
+            if (document.getElementById('employment-yes').checked) {
+                printWindow.document.write(`
+                    <div class="print-row">
+                        <div class="print-label">Employment Primary Income:</div>
+                        <div class="print-value">Yes</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Employer:</div>
+                        <div class="print-value">${document.getElementById('employer').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Job Title:</div>
+                        <div class="print-value">${document.getElementById('job-title').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Shift:</div>
+                        <div class="print-value">${document.getElementById('shift').options[document.getElementById('shift').selectedIndex].text}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Income Type:</div>
+                        <div class="print-value">${document.getElementById('income-type').options[document.getElementById('income-type').selectedIndex].text}</div>
+                    </div>
+                `);
+                
+                if (document.getElementById('income-type').value === 'hourly') {
+                    printWindow.document.write(`
+                        <div class="print-row">
+                            <div class="print-label">Hourly Rate:</div>
+                            <div class="print-value">$${document.getElementById('hourly-rate').value}</div>
+                        </div>
+                    `);
+                } else {
+                    printWindow.document.write(`
+                        <div class="print-row">
+                            <div class="print-label">Monthly Salary:</div>
+                            <div class="print-value">$${document.getElementById('monthly-salary').value}</div>
+                        </div>
+                    `);
+                }
+                
+                printWindow.document.write(`
+                    <div class="print-row">
+                        <div class="print-label">Pay Frequency:</div>
+                        <div class="print-value">${document.getElementById('pay-frequency').options[document.getElementById('pay-frequency').selectedIndex].text}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Take Home Pay:</div>
+                        <div class="print-value">$${document.getElementById('take-home-pay').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Employer Contactable:</div>
+                        <div class="print-value">${document.querySelector('input[name="employer-contact"]:checked').value === 'yes' ? 'Yes' : 'No'}</div>
+                    </div>
+                `);
+            } else {
+                printWindow.document.write(`
+                    <div class="print-row">
+                        <div class="print-label">Employment Primary Income:</div>
+                        <div class="print-value">No</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Income Source:</div>
+                        <div class="print-value">${document.getElementById('income-source').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Take Home Monthly Amount:</div>
+                        <div class="print-value">$${document.getElementById('other-take-home').value}</div>
+                    </div>
+                `);
+            }
+            
+            // Add additional income if applicable
+            if (document.getElementById('additional-income').checked) {
+                printWindow.document.write(`
+                    <h4>Additional Income</h4>
+                    <div class="print-row">
+                        <div class="print-label">Income Source:</div>
+                        <div class="print-value">${document.getElementById('additional-income-source').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Monthly Amount:</div>
+                        <div class="print-value">$${document.getElementById('additional-income-amount').value}</div>
+                    </div>
+                `);
+            }
+            
+            printWindow.document.write('</div>');
+            
+            // Add residency information
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>Residency Information</h3>
+                    <div class="print-row">
+                        <div class="print-label">Street Address:</div>
+                        <div class="print-value">${document.getElementById('street-address').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Apt/Unit:</div>
+                        <div class="print-value">${document.getElementById('apt-number').value || 'N/A'}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">City:</div>
+                        <div class="print-value">${document.getElementById('city').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">State:</div>
+                        <div class="print-value">${document.getElementById('state').options[document.getElementById('state').selectedIndex].text}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">ZIP Code:</div>
+                        <div class="print-value">${document.getElementById('zip-code').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Residency Type:</div>
+                        <div class="print-value">${document.querySelector('input[name="residency-type"]:checked').value}</div>
+                    </div>
+            `);
+            
+            if (document.getElementById('residency-rent').checked) {
+                printWindow.document.write(`
+                    <div class="print-row">
+                        <div class="print-label">Landlord/Property Manager:</div>
+                        <div class="print-value">${document.getElementById('landlord-name').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Landlord Phone:</div>
+                        <div class="print-value">${document.getElementById('landlord-phone').value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Landlord Contactable:</div>
+                        <div class="print-value">${document.getElementById('no-contact-landlord').checked ? 'No' : 'Yes'}</div>
+                    </div>
+                `);
+            }
+            
+            printWindow.document.write('</div>');
+            
+            // Add references
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>References</h3>
+            `);
+            
+            for (let i = 1; i <= 5; i++) {
+                printWindow.document.write(`
+                    <h4>Reference ${i}</h4>
+                    <div class="print-row">
+                        <div class="print-label">First Name:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-first"]`).value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Last Name:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-last"]`).value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Relationship:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-relationship"]`).value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Phone:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-phone"]`).value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">State:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-state"]`).value}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Job/Occupation:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-job"]`).value || 'N/A'}</div>
+                    </div>
+                    <div class="print-row">
+                        <div class="print-label">Notes:</div>
+                        <div class="print-value">${document.querySelector(`[name="ref${i}-notes"]`).value || 'N/A'}</div>
+                    </div>
+                `);
+            }
+            
+            printWindow.document.write('</div>');
+            
+            // Add uploaded files
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>Uploaded Documents</h3>
+                    <div class="print-uploads">
+            `);
+            
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        printWindow.document.write(`
+                            <div class="print-upload-item">
+                                <strong>${input.id}:</strong> ${input.files[i].name}
+                            </div>
+                        `);
+                    }
+                }
+            });
+            
+            printWindow.document.write(`
+                    </div>
+                </div>
+            `);
+            
+            // Add disclosure agreement
+            printWindow.document.write(`
+                <div class="print-section">
+                    <h3>Agreements</h3>
+                    <div class="print-row">
+                        <div class="print-label">Disclosure Agreement:</div>
+                        <div class="print-value">${document.getElementById('agree-disclosure').checked ? 'Agreed' : 'Not Agreed'}</div>
+                    </div>
+                </div>
+            `);
+            
+            printWindow.document.write(`
+                    </div>
+                </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            
+            // Print the document after a short delay to ensure it's fully loaded
+            setTimeout(() => {
+                printWindow.print();
+            }, 500);
+        }
+
+        // Submit to cloud function
+        function submitToCloud() {
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Create FormData object to collect all form data
+            const formData = new FormData(document.getElementById('rental-application'));
+            
+            // Add all uploaded files
+            const fileInputs = document.querySelectorAll('input[type="file"]');
+            fileInputs.forEach(input => {
+                if (input.files.length > 0) {
+                    for (let i = 0; i < input.files.length; i++) {
+                        formData.append(input.name, input.files[i]);
+                    }
+                }
+            });
+            
+            // Placeholder URL for Google Web Apps Script
+            const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+            
+            // Show loading state
+            const submitButton = document.querySelector('.btn-success');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
+            submitButton.disabled = true;
+            
+            // Send data to Google Web Apps Script
+            fetch(scriptURL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Application submitted successfully!');
+                } else {
+                    throw new Error('Network response was not ok.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('There was an error submitting your application. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.innerHTML = originalText;
+                submitButton.disabled = false;
+            });
         }
 
         // Initialize hidden sections
