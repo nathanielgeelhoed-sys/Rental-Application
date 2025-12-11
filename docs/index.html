@@ -1,1893 +1,977 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National TV Rental Application</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary-blue: #0066cc;
-            --primary-red: #cc0000;
-            --light-blue: #e6f0ff;
-            --light-red: #ffe6e6;
-            --dark-gray: #333;
-            --light-gray: #f5f5f5;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>National TV Sales & Rental — Customer Order Form</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<!-- Libraries -->
+<!-- pdf-lib for creating & merging PDFs -->
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+<!-- pdf.js for previewing the generated PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- html2canvas only used to rasterize the form for crisp PDF page -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-        body {
-            background-color: #f9f9f9;
-            color: var(--dark-gray);
-            line-height: 1.6;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<style>
+  :root{
+    --red:#d62828;
+    --blue:#003f88;
+    --muted:#6b7280;
+    --bg:#f3f6fb;
+    --card:#fff;
+    --radius:10px;
+    --maxw:980px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#f3f6fb 0%, #ffffff 100%);
+    color:#0b1720;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+  }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #004d99 100%);
-            border-radius: var(--border-radius);
-            color: white;
-            box-shadow: var(--box-shadow);
-        }
+  .app{
+    width:100%;
+    max-width:var(--maxw);
+  }
 
-        .logo {
-            max-width: 200px;
-            margin-bottom: 15px;
-        }
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    padding:18px;
+    border-radius:var(--radius);
+    background: linear-gradient(90deg,var(--red), var(--blue));
+    color:white;
+    box-shadow:0 8px 24px rgba(3,10,30,0.12);
+    margin-bottom:18px;
+  }
+  header h1{margin:0;font-size:20px;letter-spacing:0.2px}
+  header p{margin:0;opacity:0.95;font-size:13px}
 
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:18px;
+  }
 
-        .application-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
+  /* Form card */
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:16px;
+    box-shadow:0 8px 22px rgba(8,20,40,0.06);
+    overflow:auto;
+    max-height:78vh;
+  }
 
-        .collapsible-menu {
-            border-bottom: 1px solid #ddd;
-        }
+  /* Side panel */
+  .side{
+    background:linear-gradient(180deg,#fcfdff,#f7fbff);
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 6px 18px rgba(8,20,40,0.04);
+    height:78vh;
+    overflow:auto;
+  }
 
-        .menu-header {
-            background-color: var(--primary-red);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
+  .section-title{
+    display:flex;align-items:center;gap:10px;margin:8px 0 12px;
+  }
+  .sect-dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
+  .sect-title{font-weight:700;color:var(--blue);}
 
-        .menu-header:hover {
-            background-color: #aa0000;
-        }
+  label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+  input[type="text"], input[type="email"], input[type="date"], select, textarea {
+    width:100%; padding:9px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:14px;
+    background:#fff;
+  }
+  textarea{min-height:72px;resize:vertical}
+  .row{display:flex;gap:10px}
+  .col{flex:1;min-width:0}
 
-        .menu-header h2 {
-            margin: 0;
-            font-size: 1.4rem;
-        }
+  .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .btn{
+    padding:10px 14px;border-radius:10px;border:none;color:white;background:var(--blue);cursor:pointer;font-weight:600;
+  }
+  .btn.alt{background:var(--red)}
+  .btn.ghost{background:transparent;color:var(--blue);border:1px solid rgba(3,63,136,0.08)}
+  .muted{color:var(--muted);font-size:13px}
 
-        .menu-content {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease;
-        }
+  /* upload list */
+  .uploads{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .upload-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:#fff;border:1px solid #eef3ff;font-size:13px}
+  .small{font-size:12px;color:var(--muted)}
 
-        .menu-content.active {
-            padding: 20px;
-            max-height: 5000px;
-        }
+  /* signature canvas */
+  .sig-wrap{border:1px dashed #cbd5e1;border-radius:8px;padding:6px;background:#fff}
+  canvas{width:100%;height:120px;border-radius:6px;touch-action: none}
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
+  /* preview */
+  .preview-frame{border-radius:8px;width:100%;height:360px;border:1px solid #e6eefc;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .preview-frame canvas{max-width:100%;max-height:100%}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+  footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .note{color:var(--muted);font-size:13px}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--dark-gray);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="date"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-        }
-
-        .checkbox-group input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-        }
-
-        .conditional-section {
-            padding: 15px;
-            background-color: var(--light-blue);
-            border-radius: var(--border-radius);
-            margin-top: 15px;
-            display: none;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            background-color: var(--primary-blue);
-            color: white;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            background-color: #0055aa;
-        }
-
-        .btn-danger {
-            background-color: var(--primary-red);
-        }
-
-        .btn-danger:hover {
-            background-color: #b30000;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            margin: 15px 0;
-            transition: border 0.3s;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary-blue);
-        }
-
-        .references-container {
-            overflow-x: auto;
-            max-height: 400px;
-            margin: 20px 0;
-        }
-
-        .references-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .references-table th,
-        .references-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-            white-space: nowrap;
-        }
-
-        .references-table th {
-            background-color: var(--light-blue);
-            position: sticky;
-            top: 0;
-        }
-
-        .disclosure-box {
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            margin: 20px 0;
-            background-color: var(--light-gray);
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .menu-header h2 {
-                font-size: 1.2rem;
-            }
-            
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-            
-            .references-container {
-                overflow-x: auto;
-            }
-        }
-
-        /* Validation styles */
-        .validation-error {
-            border: 2px solid var(--primary-red) !important;
-        }
-
-        .validation-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: white;
-            border: 2px solid var(--primary-red);
-            border-radius: var(--border-radius);
-            padding: 20px;
-            z-index: 10000;
-            max-width: 500px;
-            width: 90%;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-        }
-
-        .validation-popup h3 {
-            color: var(--primary-red);
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .validation-list {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 15px;
-        }
-
-        .validation-item {
-            padding: 8px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            align-items: center;
-        }
-
-        .validation-item i {
-            margin-right: 10px;
-            color: var(--primary-red);
-        }
-
-        .validation-buttons {
-            text-align: center;
-        }
-
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 9999;
-        }
-
-        /* Day of week and date selectors */
-        .day-selector, .date-selector {
-            display: none;
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            padding: 20px;
-        }
-        
-        .action-buttons .btn {
-            flex: 1;
-            max-width: 250px;
-        }
-        
-        .fun-element {
-            text-align: center;
-            margin: 10px 0;
-        }
-        
-        .fun-element i {
-            color: var(--primary-red);
-            margin: 0 5px;
-            font-size: 1.5rem;
-        }
-
-        /* Print styles */
-        @media print {
-            body * {
-                visibility: hidden;
-            }
-            #printable-application, #printable-application * {
-                visibility: visible;
-            }
-            #printable-application {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                padding: 20px;
-                font-size: 12px;
-                line-height: 1.2;
-            }
-            .print-section {
-                margin-bottom: 15px;
-                page-break-inside: avoid;
-            }
-            .print-section h3 {
-                border-bottom: 1px solid #ccc;
-                padding-bottom: 5px;
-                margin-bottom: 10px;
-            }
-            .print-row {
-                display: flex;
-                margin-bottom: 5px;
-            }
-            .print-label {
-                font-weight: bold;
-                width: 40%;
-            }
-            .print-value {
-                width: 60%;
-            }
-            .print-uploads {
-                margin-top: 10px;
-            }
-            .print-upload-item {
-                margin-bottom: 5px;
-            }
-        }
-    </style>
+  @media (max-width: 1000px){
+    .layout{grid-template-columns: 1fr; }
+    .side{height:auto}
+    .card{max-height:none}
+    .preview-frame{height:240px}
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1>National TV Rental Application</h1>
+<div class="app">
+  <header>
+    <div>
+      <h1>National TV Sales & Rental</h1>
+      <p>Customer Order — digital, local, and secure</p>
+    </div>
+    <div style="margin-left:auto; text-align:right">
+      <div class="small">No server. No cookies. All data stays on your device.</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="card" role="main">
+      <!-- Capture the form into a printable area -->
+      <div id="printable" style="padding:10px;background:white;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-weight:800;color:var(--blue)">CUSTOMER ORDER FORM</div>
+            <div class="muted" style="font-size:12px;margin-top:4px">Please fill in the information below</div>
+          </div>
+          <div class="muted" style="font-size:12px">National TV Sales & Rental</div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="section-title" style="margin-top:14px"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Customer's Information</div></div>
+
+        <div class="row">
+          <div class="col">
+            <label for="name">Full Name</label>
+            <input id="name" type="text" placeholder="First Last">
+          </div>
+          <div class="col">
+            <label for="dob">Date of Birth</label>
+            <input id="dob" type="date">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="maiden">Maiden Name</label>
+            <input id="maiden" type="text">
+          </div>
+          <div class="col">
+            <label for="ssn">Social Security #</label>
+            <input id="ssn" type="text" inputmode="numeric" placeholder="XXX-XX-XXXX">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="dl">Driver's License # / State ID #</label>
+            <input id="dl" type="text">
+          </div>
+          <div class="col">
+            <label for="phone">Phone</label>
+            <input id="phone" type="text">
+          </div>
+        </div>
+
+        <label for="address">Address</label>
+        <input id="address" type="text" placeholder="Street address">
+
+        <div class="row">
+          <div class="col">
+            <label for="city">City / State / Zip</label>
+            <input id="city" type="text">
+          </div>
+          <div class="col">
+            <label for="howLong">How Long at this address?</label>
+            <input id="howLong" type="text" placeholder="e.g., 2 years">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="residence">Residence</label>
+            <select id="residence">
+              <option value="">-- Select --</option>
+              <option>Owned</option>
+              <option>Rented</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div id="landlordBox" class="col" style="display:none">
+            <label for="landlord">Landlord / Finance</label>
+            <input id="landlord" type="text" placeholder="Name & contact">
+          </div>
+        </div>
+
+        <!-- Source of Income -->
+        <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Source of Income</div></div>
+
+        <div class="row">
+          <div class="col">
+            <label for="employment">Employment Status</label>
+            <select id="employment">
+              <option value="">-- Select --</option>
+              <option value="full">Full Time</option>
+              <option value="part">Part Time</option>
+              <option value="self">Self-Employed</option>
+              <option value="unemployed">Not Working</option>
+            </select>
+          </div>
+          <div id="employerBox" class="col" style="display:none">
+            <label for="employer">Employer</label>
+            <input id="employer" type="text">
+          </div>
+        </div>
+
+        <div id="employerDetails" style="display:none">
+          <div class="row">
+            <div class="col">
+              <label for="jobTitle">Job Title</label>
+              <input id="jobTitle" type="text">
+            </div>
+            <div class="col">
+              <label for="hireDate">Hire Date</label>
+              <input id="hireDate" type="date">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="payFreq">Pay Frequency</label>
+              <select id="payFreq">
+                <option>Weekly</option>
+                <option>Every Two Weeks</option>
+                <option>Monthly</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="takehome">Take Home Pay</label>
+              <input id="takehome" type="text" placeholder="$">
+            </div>
+          </div>
+        </div>
+
+        <!-- References -->
+        <div class="section-title"><div class="sect-dot" style="background:var(--blue)"></div><div class="sect-title">Personal References</div></div>
+        <div class="row">
+          <div class="col">
+            <label for="ref1">Closest Relative (Name)</label>
+            <input id="ref1" type="text">
+          </div>
+          <div class="col">
+            <label for="ref1phone">Phone</label>
+            <input id="ref1phone" type="text">
+          </div>
+        </div>
+
+        <!-- additional -->
+        <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Additional</div></div>
+        <div class="row">
+          <div class="col">
+            <label for="heard">How did you hear about us?</label>
+            <select id="heard">
+              <option>Online</option>
+              <option>TV</option>
+              <option>Friend/Referral</option>
+              <option>Walk-in</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="miles">Miles from home to store</label>
+            <input id="miles" type="text">
+          </div>
+        </div>
+
+        <!-- Release & signatures -->
+        <div class="section-title"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Release & Signatures</div></div>
+        <label for="release">Release Statement</label>
+        <textarea id="release">I promise that the information I have provided is correct. I authorize verification and waive privacy rights for the purposes of verification. I have read and understand this statement.</textarea>
+
+        <div style="margin-top:8px">
+          <label>Renter 1 Signature (draw)</label>
+          <div class="sig-wrap">
+            <canvas id="sig1"></canvas>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button type="button" class="btn ghost" id="clearSig1">Clear</button>
+              <div class="muted" style="margin-left:auto;font-size:12px">Tip: draw with finger or mouse</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <label>Renter 2 Signature (draw)</label>
+          <div class="sig-wrap">
+            <canvas id="sig2"></canvas>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button type="button" class="btn ghost" id="clearSig2">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <label for="signDate">Date</label>
+          <input id="signDate" type="date">
+        </div>
+      </div> <!-- printable end -->
+
+      <footer>
+        <div class="note">All data stays on this device. Save progress locally or generate a PDF to share.</div>
+        <div style="display:flex;gap:8px">
+          <button id="saveBtn" class="btn ghost">Save Locally</button>
+          <button id="loadBtn" class="btn ghost">Load Saved</button>
+          <button id="clearBtn" class="btn ghost">Clear</button>
+          <button id="genBtn" class="btn alt">Generate & Send</button>
+        </div>
+      </footer>
     </div>
 
-    <form id="rental-application" class="application-container">
-        <!-- Primary Renter Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-user-circle"></i> Primary Renter Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="first-name">First Name *</label>
-                        <input type="text" id="first-name" name="first-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="last-name">Last Name *</label>
-                        <input type="text" id="last-name" name="last-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="maiden-name">Maiden Name (if applicable)</label>
-                        <input type="text" id="maiden-name" name="maiden-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="birthdate">Birthdate *</label>
-                        <input type="date" id="birthdate" name="birthdate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ssn">Social Security Number *</label>
-                        <input type="text" id="ssn" name="ssn" required pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="contact-time">Best Time to Contact *</label>
-                        <select id="contact-time" name="contact-time" required>
-                            <option value="">Select a time</option>
-                            <option value="morning">Morning (8AM-12PM)</option>
-                            <option value="afternoon">Afternoon (12PM-5PM)</option>
-                            <option value="evening">Evening (5PM-9PM)</option>
-                        </select>
-                    </div>
-                </div>
+    <!-- side panel -->
+    <aside class="side" aria-label="Side controls">
+      <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Uploads</div></div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="has-corener" name="has-corener" onchange="toggleCoRenterSection(this)">
-                    <label for="has-corener">I have a co-renter</label>
-                </div>
+      <label for="files">Upload supporting docs (images or PDFs)</label>
+      <input id="files" type="file" accept="image/*,application/pdf" multiple />
+      <div class="uploads" id="uploadsList"></div>
 
-                <div id="corener-section" class="conditional-section">
-                    <h3>Co-Renter Information</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-first-name">First Name *</label>
-                            <input type="text" id="co-first-name" name="co-first-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-last-name">Last Name *</label>
-                            <input type="text" id="co-last-name" name="co-last-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-maiden-name">Maiden Name (if applicable)</label>
-                            <input type="text" id="co-maiden-name" name="co-maiden-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-birthdate">Birthdate *</label>
-                            <input type="date" id="co-birthdate" name="co-birthdate">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-ssn">Social Security Number *</label>
-                            <input type="text" id="co-ssn" name="co-ssn" pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-email">Email Address *</label>
-                            <input type="email" id="co-email" name="co-email">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-phone">Phone Number *</label>
-                            <input type="tel" id="co-phone" name="co-phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-contact-time">Best Time to Contact *</label>
-                            <select id="co-contact-time" name="co-contact-time">
-                                <option value="">Select a time</option>
-                                <option value="morning">Morning (8AM-12PM)</option>
-                                <option value="afternoon">Afternoon (12PM-5PM)</option>
-                                <option value="evening">Evening (5PM-9PM)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+      <div style="height:12px"></div>
 
-                <h3>Vehicle Information</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="vehicle-make">Make</label>
-                        <input type="text" id="vehicle-make" name="vehicle-make">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicle-model">Model</label>
-                        <input type="text" id="vehicle-model" name="vehicle-model">
-                    </div>
-                    <div class="form-group">
-                        <label for="license-plate">License Plate Number</label>
-                        <input type="text" id="license-plate" name="license-plate">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicle-color">Color</label>
-                        <input type="text" id="vehicle-color" name="vehicle-color">
-                    </div>
-                </div>
+      <div class="section-title"><div class="sect-dot" style="background:var(--blue)"></div><div class="sect-title">Preview</div></div>
+      <div class="preview-frame" id="preview">
+        <div class="muted">No preview yet — generate PDF to preview</div>
+      </div>
 
-                <div class="form-group">
-                    <label>Vehicle Status</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="rented" name="vehicle-status" value="rented">
-                        <label for="rented">Rented</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="leased" name="vehicle-status" value="leased">
-                        <label for="leased">Leased</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="owned" name="vehicle-status" value="owned">
-                        <label for="owned">Owned</label>
-                    </div>
-                </div>
+      <div style="height:12px"></div>
 
-                <div class="upload-area">
-                    <h3><i class="fas fa-id-card"></i> ID Upload</h3>
-                    <p>Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store.</p>
-                    <input type="file" id="id-upload" name="id-upload" accept=".jpg,.jpeg,.png,.pdf">
-                    <label for="id-upload" class="btn"><i class="fas fa-upload"></i> Choose File</label>
-                </div>
+      <div class="section-title"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Send Options</div></div>
+      <label for="sendTo">Send To Email (optional)</label>
+      <input id="sendTo" type="email" placeholder="store@example.com (you can leave blank)" />
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="shareBtn" class="btn">Share (Web Share)</button>
+        <button id="downloadBtn" class="btn ghost">Download PDF</button>
+      </div>
 
-                <div class="fun-element">
-                    <p>We're excited to help you get the perfect rental items for your home! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
-                </div>
-            </div>
-        </div>
+      <div style="height:12px"></div>
 
-        <!-- Income Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> Income Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <label>Is employment your primary source of income? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="employment-yes" name="employment-primary" value="yes" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-yes">Yes</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="employment-no" name="employment-primary" value="no" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-no">No</label>
-                    </div>
-                </div>
+      <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Quick Actions</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="autoFillBtn" class="btn ghost">Auto-fill Demo</button>
+        <button id="previewBtn" class="btn">Generate Preview</button>
+        <button id="clearUploadsBtn" class="btn ghost">Clear Uploads</button>
+      </div>
+    </aside>
+  </div>
+</div>
 
-                <div id="employment-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="employer">Employer *</label>
-                            <input type="text" id="employer" name="employer">
-                        </div>
-                        <div class="form-group">
-                            <label for="job-title">Job Title *</label>
-                            <input type="text" id="job-title" name="job-title">
-                        </div>
-                        <div class="form-group">
-                            <label for="shift">Shift *</label>
-                            <select id="shift" name="shift">
-                                <option value="">Select shift</option>
-                                <option value="day">Day Shift</option>
-                                <option value="evening">Evening Shift</option>
-                                <option value="night">Night Shift</option>
-                                <option value="varied">Varied Shifts</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="income-type">Income Type *</label>
-                            <select id="income-type" name="income-type" onchange="toggleIncomeFields(this)">
-                                <option value="">Select type</option>
-                                <option value="hourly">Hourly Rate</option>
-                                <option value="salary">Monthly Salary</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="hourly-rate-field">
-                            <label for="hourly-rate">Hourly Rate *</label>
-                            <input type="number" id="hourly-rate" name="hourly-rate" step="0.01">
-                        </div>
-                        <div class="form-group" id="pay-frequency-field">
-                            <label for="pay-frequency">Pay Frequency *</label>
-                            <select id="pay-frequency" name="pay-frequency" onchange="togglePayFrequencyFields(this)">
-                                <option value="">Select</option>
-                                <option value="weekly">Weekly</option>
-                                <option value="biweekly">Bi-Weekly</option>
-                                <option value="semimonthly">Semi-Monthly</option>
-                                <option value="monthly">Monthly</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="monthly-salary-field">
-                            <label for="monthly-salary">Monthly Salary *</label>
-                            <input type="number" id="monthly-salary" name="monthly-salary" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="take-home-pay">Take Home Pay (after taxes) *</label>
-                            <input type="number" id="take-home-pay" name="take-home-pay" step="0.01">
-                        </div>
-                    </div>
+<script>
+/* ============================================================
+   Advanced client-side order form
+   - captures form visually (html2canvas)
+   - builds combined PDF using pdf-lib (form page + uploaded pages)
+   - previews first page using pdf.js
+   - supports Web Share and mailto fallback
+   - localStorage save/load/clear
+   - conditional UI logic and dropdowns
+   - signature capture on canvas
+   ============================================================ */
 
-                    <!-- Day of week selector for weekly/bi-weekly -->
-                    <div id="day-of-week-field" class="form-group day-selector">
-                        <label for="pay-day">Day of Week You Get Paid *</label>
-                        <select id="pay-day" name="pay-day">
-                            <option value="">Select day</option>
-                            <option value="monday">Monday</option>
-                            <option value="tuesday">Tuesday</option>
-                            <option value="wednesday">Wednesday</option>
-                            <option value="thursday">Thursday</option>
-                            <option value="friday">Friday</option>
-                            <option value="saturday">Saturday</option>
-                            <option value="sunday">Sunday</option>
-                        </select>
-                    </div>
+(async function(){
+  // Setup pdf.js worker (match the cdn version)
+  if(window['pdfjsLib']){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
 
-                    <!-- Date selectors for semi-monthly -->
-                    <div id="semi-monthly-dates" class="date-selector">
-                        <div class="form-group">
-                            <label for="first-pay-date">First Pay Date (e.g., 5th) *</label>
-                            <input type="number" id="first-pay-date" name="first-pay-date" min="1" max="31">
-                        </div>
-                        <div class="form-group">
-                            <label for="second-pay-date">Second Pay Date (e.g., 20th) *</label>
-                            <input type="number" id="second-pay-date" name="second-pay-date" min="1" max="31">
-                        </div>
-                    </div>
+  const {
+    PDFDocument,
+    StandardFonts
+  } = PDFLib;
 
-                    <!-- Date selector for monthly -->
-                    <div id="monthly-date" class="form-group date-selector">
-                        <label for="monthly-pay-date">Pay Date (e.g., 1st) *</label>
-                        <input type="number" id="monthly-pay-date" name="monthly-pay-date" min="1" max="31">
-                    </div>
+  // Elements
+  const residence = document.getElementById('residence');
+  const landlordBox = document.getElementById('landlordBox');
 
-                    <div class="form-group">
-                        <label>Is your employer able to be contacted? *</label>
-                        <div class="checkbox-group">
-                            <input type="radio" id="contact-yes" name="employer-contact" value="yes" onchange="toggleContactWarning(this)">
-                            <label for="contact-yes">Yes</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="radio" id="contact-no" name="employer-contact" value="no" onchange="toggleContactWarning(this)">
-                            <label for="contact-no">No</label>
-                        </div>
-                    </div>
+  const employment = document.getElementById('employment');
+  const employerBox = document.getElementById('employerBox');
+  const employerDetails = document.getElementById('employerDetails');
 
-                    <div id="contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
-                            <input type="file" id="paystub-upload" name="paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="paystub-upload" class="btn"><i class="fas fa-upload"></i> Upload Paystubs</label>
-                        </div>
-                    </div>
-                </div>
+  const filesInput = document.getElementById('files');
+  const uploadsList = document.getElementById('uploadsList');
 
-                <div id="other-income-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="income-source">Income Source *</label>
-                            <input type="text" id="income-source" name="income-source">
-                        </div>
-                        <div class="form-group">
-                            <label for="other-take-home">Take Home Monthly Amount *</label>
-                            <input type="number" id="other-take-home" name="other-take-home" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="upload-area">
-                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
-                        <input type="file" id="income-proof-upload" name="income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="income-proof-upload" class="btn"><i class="fas fa-upload"></i> Upload Proof of Income</label>
-                    </div>
-                </div>
+  const saveBtn = document.getElementById('saveBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const genBtn = document.getElementById('genBtn');
 
-                <!-- Optional Additional Income Source -->
-                <div class="checkbox-group">
-                    <input type="checkbox" id="additional-income" name="additional-income" onchange="toggleAdditionalIncome(this)">
-                    <label for="additional-income">Add another income source (optional)</label>
-                </div>
+  const previewEl = document.getElementById('preview');
+  const previewBtn = document.getElementById('previewBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const sendToInput = document.getElementById('sendTo');
 
-                <div id="additional-income-section" class="conditional-section">
-                    <h3>Additional Income Source (Optional)</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="additional-income-source">Income Source</label>
-                            <input type="text" id="additional-income-source" name="additional-income-source">
-                        </div>
-                        <div class="form-group">
-                            <label for="additional-income-amount">Monthly Amount</label>
-                            <input type="number" id="additional-income-amount" name="additional-income-amount" step="0.01">
-                        </div>
-                    </div>
-                </div>
+  const autoFillBtn = document.getElementById('autoFillBtn');
+  const clearUploadsBtn = document.getElementById('clearUploadsBtn');
 
-                <div class="fun-element">
-                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
-                </div>
-            </div>
-        </div>
+  // signature canvases
+  const sig1Canvas = document.getElementById('sig1');
+  const sig2Canvas = document.getElementById('sig2');
+  const clearSig1 = document.getElementById('clearSig1');
+  const clearSig2 = document.getElementById('clearSig2');
 
-        <!-- Co-Renter Income Information Section (Initially Hidden) -->
-        <div id="co-income-section" class="collapsible-menu" style="display: none;">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> Co-Renter Income Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <!-- Content would be similar to primary income section -->
-                <p>Co-renter income information would be displayed here when co-renter is selected.</p>
-            </div>
-        </div>
+  // store uploaded File objects
+  let uploadedFiles = [];
 
-        <!-- Residency Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-home"></i> Residency Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <!-- Address Fields for All Users -->
-                <h3>Address Information</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="street-address">Street Address *</label>
-                        <input type="text" id="street-address" name="street-address" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="apt-number">Apt/Unit Number</label>
-                        <input type="text" id="apt-number" name="apt-number">
-                    </div>
-                    <div class="form-group">
-                        <label for="city">City *</label>
-                        <input type="text" id="city" name="city" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="state">State *</label>
-                        <select id="state" name="state" required>
-                            <option value="">Select State</option>
-                            <option value="AL">Alabama</option>
-                            <option value="AK">Alaska</option>
-                            <option value="AZ">Arizona</option>
-                            <option value="AR">Arkansas</option>
-                            <option value="CA">California</option>
-                            <option value="CO">Colorado</option>
-                            <option value="CT">Connecticut</option>
-                            <option value="DE">Delaware</option>
-                            <option value="FL">Florida</option>
-                            <option value="GA">Georgia</option>
-                            <option value="HI">Hawaii</option>
-                            <option value="ID">Idaho</option>
-                            <option value="IL">Illinois</option>
-                            <option value="IN">Indiana</option>
-                            <option value="IA">Iowa</option>
-                            <option value="KS">Kansas</option>
-                            <option value="KY">Kentucky</option>
-                            <option value="LA">Louisiana</option>
-                            <option value="ME">Maine</option>
-                            <option value="MD">Maryland</option>
-                            <option value="MA">Massachusetts</option>
-                            <option value="MI">Michigan</option>
-                            <option value="MN">Minnesia</option>
-                            <option value="MS">Mississippi</option>
-                            <option value="MO">Missouri</option>
-                            <option value="MT">Montana</option>
-                            <option value="NE">Nebraska</option>
-                            <option value="NV">Nevada</option>
-                            <option value="NH">New Hampshire</option>
-                            <option value="NJ">New Jersey</option>
-                            <option value="NM">New Mexico</option>
-                            <option value="NY">New York</option>
-                            <option value="NC">North Carolina</option>
-                            <option value="ND">North Dakota</option>
-                            <option value="OH">Ohio</option>
-                            <option value="OK">Oklahoma</option>
-                            <option value="OR">Oregon</option>
-                            <option value="PA">Pennsylvania</option>
-                            <option value="RI">Rhode Island</option>
-                            <option value="SC">South Carolina</option>
-                            <option value="SD">South Dakota</option>
-                            <option value="TN">Tennessee</option>
-                            <option value="TX">Texas</option>
-                            <option value="UT">Utah</option>
-                            <option value="VT">Vermont</option>
-                            <option value="VA">Virginia</option>
-                            <option value="WA">Washington</option>
-                            <option value="WV">West Virginia</option>
-                            <option value="WI">Wisconsin</option>
-                            <option value="WY">Wyoming</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="zip-code">ZIP Code *</label>
-                        <input type="text" id="zip-code" name="zip-code" required pattern="[0-9]{5}(-[0-9]{4})?" title="Please enter a valid ZIP code">
-                    </div>
-                </div>
+  // Conditional logic
+  residence.addEventListener('change', (e)=>{
+    if(e.target.value === 'Rented'){
+      landlordBox.style.display = '';
+    } else {
+      landlordBox.style.display = 'none';
+      document.getElementById('landlord').value = '';
+    }
+  });
 
-                <div class="form-group">
-                    <label>Do you rent, own, or live with owner? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-rent" name="residency-type" value="rent" onchange="toggleResidencyFields(this)">
-                        <label for="residency-rent">Rent</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-own" name="residency-type" value="own" onchange="toggleResidencyFields(this)">
-                        <label for="residency-own">Own</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-live-with" name="residency-type" value="live-with" onchange="toggleResidencyFields(this)">
-                        <label for="residency-live-with">Live with Owner</label>
-                    </div>
-                </div>
+  // Employment logic
+  employment.addEventListener('change', (e)=>{
+    if(e.target.value === 'full' || e.target.value === 'part' || e.target.value === 'self'){
+      employerBox.style.display = '';
+      employerDetails.style.display = '';
+    } else {
+      employerBox.style.display = 'none';
+      employerDetails.style.display = 'none';
+      document.getElementById('employer').value = '';
+      document.getElementById('jobTitle').value = '';
+      document.getElementById('hireDate').value = '';
+      document.getElementById('payFreq').value = 'Weekly';
+      document.getElementById('takehome').value = '';
+    }
+  });
 
-                <div id="rent-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="landlord-name">Landlord/Property Manager/Apartment Complex Name *</label>
-                            <input type="text" id="landlord-name" name="landlord-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="landlord-phone">Contact Number *</label>
-                            <input type="tel" id="landlord-phone" name="landlord-phone">
-                        </div>
-                    </div>
+  // File uploads
+  filesInput.addEventListener('change', (ev)=>{
+    uploadedFiles = Array.from(ev.target.files || []);
+    renderUploads();
+  });
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="no-contact-landlord" name="no-contact-landlord" onchange="toggleLandlordContactWarning(this)">
-                        <label for="no-contact-landlord">Landlord cannot be contacted</label>
-                    </div>
+  function renderUploads(){
+    uploadsList.innerHTML = '';
+    uploadedFiles.forEach((f, idx)=>{
+      const item = document.createElement('div');
+      item.className = 'upload-item';
+      item.innerHTML = `<div style="flex:1"><strong>${escapeHtml(f.name)}</strong> <div class="small">${(f.type||'').split('/')[1] || ''} • ${formatBytes(f.size)}</div></div>`;
+      const rm = document.createElement('button');
+      rm.className = 'btn ghost';
+      rm.style.padding = '6px 8px';
+      rm.textContent = 'Remove';
+      rm.onclick = ()=>{ uploadedFiles.splice(idx,1); filesInput.value=''; renderUploads(); };
+      item.appendChild(rm);
+      uploadsList.appendChild(item);
+    });
+    if(uploadedFiles.length === 0){
+      uploadsList.innerHTML = '<div class="small muted">No uploads yet</div>';
+    }
+  }
+  renderUploads();
 
-                    <div id="landlord-contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong>Note:</strong> You will need to bring in a lease or utility bill with your legal name on the document or upload it here.</p>
-                            <input type="file" id="lease-upload" name="lease-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="lease-upload" class="btn"><i class="fas fa-upload"></i> Upload Lease or Utility Bill</label>
-                        </div>
-                    </div>
-                </div>
+  // helper
+  function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatBytes(bytes){
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(2) + ' MB';
+  }
 
-                <div id="own-fields" class="conditional-section">
-                    <div class="upload-area">
-                        <p>Please upload proof of ownership.</p>
-                        <input type="file" id="ownership-upload" name="ownership-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="ownership-upload" class="btn"><i class="fas fa-upload"></i> Upload Proof of Ownership</label>
-                    </div>
-                </div>
+  // signature capture
+  function makeSignatureCanvas(canvas){
+    // set drawing buffer size for crisp data
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    function fit(){
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#001a4d';
+      ctx.lineWidth = 2.6;
+    }
+    fit();
+    let drawing = false;
+    let last = null;
+    const ctx = canvas.getContext('2d');
 
-                <div class="fun-element">
-                    <p>Almost done! Just a few more sections to go before you can enjoy your new rental items! <i class="fas fa-home"></i> <i class="fas fa-thumbs-up"></i></p>
-                </div>
-            </div>
-        </div>
+    function pointerDown(e){
+      drawing = true;
+      const p = getPos(e);
+      last = p;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    }
+    function pointerMove(e){
+      if(!drawing) return;
+      const p = getPos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      last = p;
+    }
+    function pointerUp(e){ drawing = false; last=null; }
 
-        <!-- References Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-users"></i> References</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <p><strong>Reference Note:</strong> Please provide five personal references. We strongly prefer parental figures or other close family before friends and coworkers. We may reach out for additional references or additional information.</p>
-                </div>
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+      const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
 
-                <div class="references-container">
-                    <table class="references-table">
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>First Name *</th>
-                                <th>Last Name *</th>
-                                <th>Relationship *</th>
-                                <th>Phone Number *</th>
-                                <th>State *</th>
-                                <th>Job/Occupation</th>
-                                <th>What should we know before contacting?</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>Reference 1 (Required)</td>
-                                <td><input type="text" name="ref1-first" required></td>
-                                <td><input type="text" name="ref1-last" required></td>
-                                <td><input type="text" name="ref1-relationship" required></td>
-                                <td><input type="tel" name="ref1-phone" required></td>
-                                <td><input type="text" name="ref1-state" required></td>
-                                <td><input type="text" name="ref1-job"></td>
-                                <td><textarea name="ref1-notes" rows="2"></textarea></td>
-                            </tr>
-                            <tr>
-                                <td>Reference 2 (Required)</td>
-                                <td><input type="text" name="ref2-first" required></td>
-                                <td><input type="text" name="ref2-last" required></td>
-                                <td><input type="text" name="ref2-relationship" required></td>
-                                <td><input type="tel" name="ref2-phone" required></td>
-                                <td><input type="text" name="ref2-state" required></td>
-                                <td><input type="text" name="ref2-job"></td>
-                                <td><textarea name="ref2-notes" rows="2"></textarea></td>
-                            </tr>
-                            <tr>
-                                <td>Reference 3 (Required)</td>
-                                <td><input type="text" name="ref3-first" required></td>
-                                <td><input type="text" name="ref3-last" required></td>
-                                <td><input type="text" name="ref3-relationship" required></td>
-                                <td><input type="tel" name="ref3-phone" required></td>
-                                <td><input type="text" name="ref3-state" required></td>
-                                <td><input type="text" name="ref3-job"></td>
-                                <td><textarea name="ref3-notes" rows="2"></textarea></td>
-                            </tr>
-                            <tr>
-                                <td>Reference 4 (Required)</td>
-                                <td><input type="text" name="ref4-first" required></td>
-                                <td><input type="text" name="ref4-last" required></td>
-                                <td><input type="text" name="ref4-relationship" required></td>
-                                <td><input type="tel" name="ref4-phone" required></td>
-                                <td><input type="text" name="ref4-state" required></td>
-                                <td><input type="text" name="ref4-job"></td>
-                                <td><textarea name="ref4-notes" rows="2"></textarea></td>
-                            </tr>
-                            <tr>
-                                <td>Reference 5 (Required)</td>
-                                <td><input type="text" name="ref5-first" required></td>
-                                <td><input type="text" name="ref5-last" required></td>
-                                <td><input type="text" name="ref5-relationship" required></td>
-                                <td><input type="tel" name="ref5-phone" required></td>
-                                <td><input type="text" name="ref5-state" required></td>
-                                <td><input type="text" name="ref5-job"></td>
-                                <td><textarea name="ref5-notes" rows="2"></textarea></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+    canvas.addEventListener('pointerdown', pointerDown);
+    canvas.addEventListener('pointermove', pointerMove);
+    window.addEventListener('pointerup', pointerUp);
+    // clear
+    function clear(){ const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); }
+    return { clear, canvas };
+  }
 
-                <div class="fun-element">
-                    <p>References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
-                </div>
-            </div>
-        </div>
+  const sig1 = makeSignatureCanvas(sig1Canvas);
+  const sig2 = makeSignatureCanvas(sig2Canvas);
+  clearSig1.addEventListener('click', ()=>sig1.clear());
+  clearSig2.addEventListener('click', ()=>sig2.clear());
 
-        <!-- Privacy and Disclosures Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-shield-alt"></i> Privacy and Disclosures</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="disclosure-box">
-                    <p>The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established.</p>
-                    <p>By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion.</p>
-                </div>
+  // Save / Load / Clear (localStorage)
+  const STORAGE_KEY = 'ntv_order_v2';
+  saveBtn.addEventListener('click', ()=>{
+    const data = collectFormData();
+    // signatures as dataURLs
+    data.sign1 = sig1Canvas.toDataURL('image/png');
+    data.sign2 = sig2Canvas.toDataURL('image/png');
+    // note: we don't store uploadedFiles for privacy; only file names
+    data.uploadNames = uploadedFiles.map(f=>f.name);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    alert('Form saved locally on this device (localStorage).');
+  });
 
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="agree-disclosure" name="agree-disclosure" required>
-                        <label for="agree-disclosure">I have read and agree to the above disclosures *</label>
-                    </div>
-                </div>
+  loadBtn.addEventListener('click', ()=>{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ alert('No saved form found'); return; }
+    const data = JSON.parse(raw);
+    fillFormData(data);
+    // restore signature images (we draw them onto canvas)
+    if(data.sign1){ drawDataUrlToCanvas(data.sign1, sig1Canvas); }
+    if(data.sign2){ drawDataUrlToCanvas(data.sign2, sig2Canvas); }
+    alert('Saved form loaded (note: file uploads are not persisted for privacy).');
+  });
 
-                <div class="fun-element">
-                    <p>Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
-                </div>
-            </div>
-        </div>
+  clearBtn.addEventListener('click', ()=>{
+    if(!confirm('Clear all form fields and signatures?')) return;
+    resetForm();
+  });
 
-        <!-- Additional Documents Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-file-upload"></i> Additional Documents</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <label for="additional-docs">Upload any additional supporting documents</label>
-                    <input type="file" id="additional-docs" name="additional-docs" multiple accept=".jpg,.jpeg,.png,.pdf">
-                </div>
-            </div>
-        </div>
+  function collectFormData(){
+    return {
+      name: document.getElementById('name').value || '',
+      dob: document.getElementById('dob').value || '',
+      maiden: document.getElementById('maiden').value || '',
+      ssn: document.getElementById('ssn').value || '',
+      dl: document.getElementById('dl').value || '',
+      phone: document.getElementById('phone').value || '',
+      address: document.getElementById('address').value || '',
+      city: document.getElementById('city').value || '',
+      howLong: document.getElementById('howLong').value || '',
+      residence: document.getElementById('residence').value || '',
+      landlord: document.getElementById('landlord').value || '',
+      employment: document.getElementById('employment').value || '',
+      employer: document.getElementById('employer').value || '',
+      jobTitle: document.getElementById('jobTitle').value || '',
+      hireDate: document.getElementById('hireDate').value || '',
+      payFreq: document.getElementById('payFreq').value || '',
+      takehome: document.getElementById('takehome').value || '',
+      ref1: document.getElementById('ref1').value || '',
+      ref1phone: document.getElementById('ref1phone').value || '',
+      heard: document.getElementById('heard').value || '',
+      miles: document.getElementById('miles').value || '',
+      release: document.getElementById('release').value || '',
+      signDate: document.getElementById('signDate').value || '',
+      sendTo: document.getElementById('sendTo').value || ''
+    };
+  }
 
-        <!-- Action buttons -->
-        <div class="action-buttons">
-            <button type="button" onclick="printForm()" class="btn"><i class="fas fa-print"></i> Print</button>
-            <button type="button" onclick="submitToCloud()" class="btn btn-success"><i class="fas fa-cloud-upload-alt"></i> Submit Application</button>
-        </div>
-    </form>
+  function fillFormData(data){
+    if(!data) return;
+    Object.keys(data).forEach(k=>{
+      const el = document.getElementById(k);
+      if(el) el.value = data[k];
+    });
+    // trigger conditional displays
+    const ev = new Event('change');
+    residence.dispatchEvent(ev);
+    employment.dispatchEvent(ev);
+  }
 
-    <div class="footer">
-        <p>&copy; 2025 National TV Rental. All rights reserved.</p>
-    </div>
+  function resetForm(){
+    document.querySelectorAll('#printable input,#printable select,#printable textarea').forEach(el=>{
+      if(el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+      else el.value = '';
+    });
+    sig1.clear(); sig2.clear();
+    uploadedFiles = [];
+    filesInput.value = '';
+    renderUploads();
+    previewEl.innerHTML = '<div class="muted">No preview yet — generate PDF to preview</div>';
+  }
 
-    <script>
-        // Toggle collapsible menus
-        function toggleMenu(menuHeader) {
-            const menuContent = menuHeader.nextElementSibling;
-            const icon = menuHeader.querySelector('.menu-icon i');
-            
-            menuContent.classList.toggle('active');
-            
-            if (menuContent.classList.contains('active')) {
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-        }
+  // helper: draw dataURL to canvas
+  function drawDataUrlToCanvas(dataUrl, canvas){
+    const img = new Image();
+    img.onload = function(){
+      const ctx = canvas.getContext('2d');
+      // clear and draw scaled to canvas
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // compute scaled dims (canvas coordinate space uses devicePixelRatio scaling)
+      const cr = canvas.getBoundingClientRect();
+      // draw into canvas element's CSS size: scale handled earlier for crispness, so we draw full image centered
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = dataUrl;
+  }
 
-        // Toggle co-renter section
-        function toggleCoRenterSection(checkbox) {
-            const coRenterSection = document.getElementById('corener-section');
-            const coIncomeSection = document.getElementById('co-income-section');
-            
-            if (checkbox.checked) {
-                coRenterSection.style.display = 'block';
-                coIncomeSection.style.display = 'block';
-                
-                // Make co-renter fields required
-                document.getElementById('co-first-name').required = true;
-                document.getElementById('co-last-name').required = true;
-                document.getElementById('co-birthdate').required = true;
-                document.getElementById('co-ssn').required = true;
-                document.getElementById('co-email').required = true;
-                document.getElementById('co-phone').required = true;
-                document.getElementById('co-contact-time').required = true;
-            } else {
-                coRenterSection.style.display = 'none';
-                coIncomeSection.style.display = 'none';
-                
-                // Remove required attribute from co-renter fields
-                document.getElementById('co-first-name').required = false;
-                document.getElementById('co-last-name').required = false;
-                document.getElementById('co-birthdate').required = false;
-                document.getElementById('co-ssn').required = false;
-                document.getElementById('co-email').required = false;
-                document.getElementById('co-phone').required = false;
-                document.getElementById('co-contact-time').required = false;
-            }
-        }
+  // Auto-fill demo for convenience
+  autoFillBtn.addEventListener('click', ()=>{
+    const demo = {
+      name: 'Jamie Parker',
+      dob: '1988-04-09',
+      maiden: '',
+      ssn: '111-22-3333',
+      dl: 'D1234567',
+      phone: '555-321-9876',
+      address: '123 Main St',
+      city: 'Hometown, ST 12345',
+      howLong: '3 years',
+      residence: 'Owned',
+      employment: 'full',
+      employer: 'Acme Electronics',
+      jobTitle: 'Store Manager',
+      hireDate: '2018-06-01',
+      payFreq: 'Every Two Weeks',
+      takehome: '$1,200',
+      ref1: 'Taylor Morgan',
+      ref1phone: '555-654-3210',
+      heard: 'Friend/Referral',
+      miles: '5',
+      release: document.getElementById('release').value,
+      signDate: new Date().toISOString().slice(0,10),
+      sendTo: ''
+    };
+    fillFormData(demo);
+    employment.dispatchEvent(new Event('change'));
+  });
 
-        // Toggle employment fields
-        function toggleEmploymentFields(radio) {
-            const employmentFields = document.getElementById('employment-fields');
-            const otherIncomeFields = document.getElementById('other-income-fields');
-            
-            if (radio.value === 'yes') {
-                employmentFields.style.display = 'block';
-                otherIncomeFields.style.display = 'none';
-                
-                // Make employment fields required
-                document.getElementById('employer').required = true;
-                document.getElementById('job-title').required = true;
-                document.getElementById('shift').required = true;
-                document.getElementById('income-type').required = true;
-                document.getElementById('pay-frequency').required = true;
-                document.getElementById('take-home-pay').required = true;
-                
-                // Remove required from other income fields
-                document.getElementById('income-source').required = false;
-                document.getElementById('other-take-home').required = false;
-            } else {
-                employmentFields.style.display = 'none';
-                otherIncomeFields.style.display = 'block';
-                
-                // Remove required from employment fields
-                document.getElementById('employer').required = false;
-                document.getElementById('job-title').required = false;
-                document.getElementById('shift').required = false;
-                document.getElementById('income-type').required = false;
-                document.getElementById('pay-frequency').required = false;
-                document.getElementById('take-home-pay').required = false;
-                
-                // Make other income fields required
-                document.getElementById('income-source').required = true;
-                document.getElementById('other-take-home').required = true;
-            }
-        }
+  // Clear uploads
+  clearUploadsBtn.addEventListener('click', ()=>{
+    uploadedFiles = [];
+    filesInput.value = '';
+    renderUploads();
+  });
 
-        // Toggle income type fields
-        function toggleIncomeFields(select) {
-            const hourlyRateField = document.getElementById('hourly-rate-field');
-            const monthlySalaryField = document.getElementById('monthly-salary-field');
-            
-            if (select.value === 'hourly') {
-                hourlyRateField.style.display = 'block';
-                monthlySalaryField.style.display = 'none';
-                
-                document.getElementById('hourly-rate').required = true;
-                document.getElementById('monthly-salary').required = false;
-            } else if (select.value === 'salary') {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'block';
-                
-                document.getElementById('hourly-rate').required = false;
-                document.getElementById('monthly-salary').required = true;
-            } else {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'none';
-                
-                document.getElementById('hourly-rate').required = false;
-                document.getElementById('monthly-salary').required = false;
-            }
-        }
+  // PDF creation
+  async function generateCombinedPdfBlob(){
+    // 1) render the printable area to an image via html2canvas for crisp layout
+    const printable = document.getElementById('printable');
 
-        // Toggle pay frequency fields
-        function togglePayFrequencyFields(select) {
-            const dayOfWeekField = document.getElementById('day-of-week-field');
-            const semiMonthlyDates = document.getElementById('semi-monthly-dates');
-            const monthlyDate = document.getElementById('monthly-date');
-            
-            // Hide all first
-            dayOfWeekField.style.display = 'none';
-            semiMonthlyDates.style.display = 'none';
-            monthlyDate.style.display = 'none';
-            
-            // Reset required fields
-            document.getElementById('pay-day').required = false;
-            document.getElementById('first-pay-date').required = false;
-            document.getElementById('second-pay-date').required = false;
-            document.getElementById('monthly-pay-date').required = false;
-            
-            // Show appropriate fields based on selection
-            if (select.value === 'weekly' || select.value === 'biweekly') {
-                dayOfWeekField.style.display = 'block';
-                document.getElementById('pay-day').required = true;
-            } else if (select.value === 'semimonthly') {
-                semiMonthlyDates.style.display = 'block';
-                document.getElementById('first-pay-date').required = true;
-                document.getElementById('second-pay-date').required = true;
-            } else if (select.value === 'monthly') {
-                monthlyDate.style.display = 'block';
-                document.getElementById('monthly-pay-date').required = true;
-            }
-        }
+    // Copy the printable node to a detached clone to avoid UI artifacts
+    const clone = printable.cloneNode(true);
+    // Ensure canvas signatures in clone contain the drawn images
+    clone.querySelectorAll('canvas').forEach(c=>{
+      const id = c.id;
+      const original = document.getElementById(id);
+      if(original){
+        const dataUrl = original.toDataURL('image/png');
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.style.width = original.style.width || '100%';
+        img.style.height = original.style.height || '120px';
+        img.style.objectFit = 'contain';
+        // replace canvas with img in the clone
+        c.parentNode.replaceChild(img, c);
+      }
+    });
 
-        // Toggle additional income section
-        function toggleAdditionalIncome(checkbox) {
-            const additionalIncomeSection = document.getElementById('additional-income-section');
-            
-            if (checkbox.checked) {
-                additionalIncomeSection.style.display = 'block';
-            } else {
-                additionalIncomeSection.style.display = 'none';
-            }
-        }
+    // Place clone off-screen for rendering
+    clone.style.boxSizing = 'border-box';
+    clone.style.width = '816px'; // approximates 8.5in * 96dpi to get good resolution
+    clone.style.position = 'fixed';
+    clone.style.left = '-5000px';
+    clone.style.top = '0';
+    document.body.appendChild(clone);
 
-        // Toggle employer contact warning
-        function toggleContactWarning(radio) {
-            const contactWarning = document.getElementById('contact-warning');
-            
-            if (radio.value === 'no') {
-                contactWarning.style.display = 'block';
-            } else {
-                contactWarning.style.display = 'none';
-            }
-        }
+    // Render with html2canvas at a higher scale for print quality
+    const canvas = await html2canvas(clone, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    document.body.removeChild(clone);
 
-        // Toggle residency fields
-        function toggleResidencyFields(radio) {
-            const rentFields = document.getElementById('rent-fields');
-            const ownFields = document.getElementById('own-fields');
-            
-            // Reset required fields
-            document.getElementById('landlord-name').required = false;
-            document.getElementById('landlord-phone').required = false;
-            
-            if (radio.value === 'rent') {
-                rentFields.style.display = 'block';
-                ownFields.style.display = 'none';
-                
-                document.getElementById('landlord-name').required = true;
-                document.getElementById('landlord-phone').required = true;
-            } else if (radio.value === 'own') {
-                rentFields.style.display = 'none';
-                ownFields.style.display = 'block';
-            } else {
-                rentFields.style.display = 'none';
-                ownFields.style.display = 'none';
-            }
-        }
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-        // Toggle landlord contact warning
-        function toggleLandlordContactWarning(checkbox) {
-            const landlordContactWarning = document.getElementById('landlord-contact-warning');
-            
-            if (checkbox.checked) {
-                landlordContactWarning.style.display = 'block';
-            } else {
-                landlordContactWarning.style.display = 'none';
-            }
-        }
+    // Create PDF and add the image as the first page (US Letter 612 x 792 pts)
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([612, 792]);
+    const imgBytes = dataURLToUint8Array(imgData);
+    // try embedding JPEG; if fails, try PNG
+    let embeddedImage;
+    if(imgData.startsWith('data:image/jpeg')){
+      embeddedImage = await pdfDoc.embedJpg(imgBytes);
+    } else {
+      embeddedImage = await pdfDoc.embedPng(imgBytes);
+    }
+    // fit image to page while keeping margins
+    const { width: iw, height: ih } = embeddedImage.scale(1);
+    const pageW = 612, pageH = 792;
+    const ratio = Math.min(pageW / iw, pageH / ih);
+    const drawW = iw * ratio;
+    const drawH = ih * ratio;
+    const x = (pageW - drawW) / 2;
+    const y = (pageH - drawH) / 2;
+    page.drawImage(embeddedImage, { x, y, width: drawW, height: drawH });
 
-        // Validation function
-        function validateForm() {
-            // Clear previous validation errors
-            document.querySelectorAll('.validation-error').forEach(el => {
-                el.classList.remove('validation-error');
+    // 2) Append uploadedFiles: for PDF files, copy pages using pdf-lib; for images, embed each image as a new page
+    for(const file of uploadedFiles){
+      const name = file.name || 'upload';
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      try{
+        if(file.type === 'application/pdf' || ext === 'pdf'){
+          // load external pdf and copy pages
+          const arrayBuffer = await file.arrayBuffer();
+          const externalPdf = await PDFDocument.load(arrayBuffer);
+          const copiedPages = await pdfDoc.copyPages(externalPdf, externalPdf.getPageIndices());
+          for(const cp of copiedPages) pdfDoc.addPage(cp);
+        } else if(file.type.startsWith('image/')){
+          const arrayBuffer = await file.arrayBuffer();
+          // embed accordingly
+          let imgEmbed;
+          if(file.type === 'image/png'){
+            imgEmbed = await pdfDoc.embedPng(new Uint8Array(arrayBuffer));
+          } else {
+            imgEmbed = await pdfDoc.embedJpg(new Uint8Array(arrayBuffer)).catch(async ()=>{
+              // fallback convert PNG->JPG via canvas if embedJpg fails
+              const durl = await fileToDataURL(file);
+              const jpg = await convertDataUrlToJpeg(durl);
+              const bytes = dataURLToUint8Array(jpg);
+              return pdfDoc.embedJpg(bytes);
             });
-            
-            const errors = [];
-            const form = document.getElementById('rental-application');
-            
-            // Check all visible required fields
-            const requiredFields = form.querySelectorAll('[required]');
-            
-            requiredFields.forEach(field => {
-                // Skip validation for hidden fields
-                if (!field.offsetParent || field.closest('[style*="display: none"]')) {
-                    return;
-                }
-                
-                let isValid = true;
-                let errorMessage = '';
-                
-                if (!field.value) {
-                    isValid = false;
-                    errorMessage = 'is required';
-                } else if (field.type === 'email' && !isValidEmail(field.value)) {
-                    isValid = false;
-                    errorMessage = 'must be a valid email address';
-                } else if (field.id === 'ssn' && !isValidSSN(field.value)) {
-                    isValid = false;
-                    errorMessage = 'must be a valid 9-digit SSN';
-                } else if (field.id === 'zip-code' && !isValidZipCode(field.value)) {
-                    isValid = false;
-                    errorMessage = 'must be a valid ZIP code';
-                } else if (field.type === 'checkbox' && !field.checked) {
-                    isValid = false;
-                    errorMessage = 'must be checked';
-                }
-                
-                if (!isValid) {
-                    field.classList.add('validation-error');
-                    
-                    // Find the field label
-                    let fieldName = 'Field';
-                    const label = form.querySelector(`label[for="${field.id}"]`) || 
-                                 field.closest('.form-group')?.querySelector('label') ||
-                                 field.closest('td')?.previousElementSibling;
-                    
-                    if (label) {
-                        fieldName = label.textContent.replace('*', '').trim();
-                    }
-                    
-                    errors.push({
-                        field: field,
-                        message: `${fieldName} ${errorMessage}`,
-                        section: field.closest('.collapsible-menu')?.querySelector('h2')?.textContent || 'General'
-                    });
-                }
-            });
-            
-            // Special validation for radio buttons
-            const employmentRadio = document.querySelector('input[name="employment-primary"]:checked');
-            if (!employmentRadio) {
-                errors.push({
-                    field: document.getElementById('employment-yes'),
-                    message: 'Employment primary income selection is required',
-                    section: 'Income Information'
-                });
-            }
-            
-            const residencyRadio = document.querySelector('input[name="residency-type"]:checked');
-            if (!residencyRadio) {
-                errors.push({
-                    field: document.getElementById('residency-rent'),
-                    message: 'Residency type selection is required',
-                    section: 'Residency Information'
-                });
-            }
-            
-            const employerContactRadio = document.querySelector('input[name="employer-contact"]:checked');
-            if (document.getElementById('employment-fields').style.display === 'block' && !employerContactRadio) {
-                errors.push({
-                    field: document.getElementById('contact-yes'),
-                    message: 'Employer contact selection is required',
-                    section: 'Income Information'
-                });
-            }
-            
-            if (errors.length > 0) {
-                showValidationErrors(errors);
-                return false;
-            }
-            
-            return true;
+          }
+          const { width: iw2, height: ih2 } = imgEmbed.scale(1);
+          const page2 = pdfDoc.addPage([612,792]);
+          const ratio2 = Math.min(612 / iw2, 792 / ih2);
+          const w2 = iw2 * ratio2;
+          const h2 = ih2 * ratio2;
+          page2.drawImage(imgEmbed, { x: (612 - w2)/2, y: (792 - h2)/2, width: w2, height: h2 });
+        } else {
+          // attempt to handle unknowns as images
+          const durl = await fileToDataURL(file);
+          const jpg = await convertDataUrlToJpeg(durl);
+          const bytes = dataURLToUint8Array(jpg);
+          const imgEmbed = await pdfDoc.embedJpg(bytes);
+          const { width: iw3, height: ih3 } = imgEmbed.scale(1);
+          const page3 = pdfDoc.addPage([612,792]);
+          const ratio3 = Math.min(612 / iw3, 792 / ih3);
+          const w3 = iw3 * ratio3;
+          const h3 = ih3 * ratio3;
+          page3.drawImage(imgEmbed, { x: (612 - w3)/2, y: (792 - h3)/2, width: w3, height: h3 });
         }
+      }catch(err){
+        console.warn('Failed to append upload:', name, err);
+        // append a simple page explaining failure
+        const pg = pdfDoc.addPage([612,792]);
+        const times = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        pg.drawText(`Could not append file: ${name}`, { x:40, y:720, size:12, font: times, color: PDFLib.rgb(0,0,0) });
+      }
+    }
 
-        // Helper validation functions
-        function isValidEmail(email) {
-            const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            return re.test(email);
-        }
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    return blob;
+  }
 
-        function isValidSSN(ssn) {
-            const re = /^\d{9}$/;
-            return re.test(ssn.replace(/-/g, ''));
-        }
+  // Helpers for image/pdf conversions
+  function dataURLToUint8Array(dataurl){
+    const base64 = dataurl.split(',')[1];
+    const raw = atob(base64);
+    const u8 = new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++) u8[i]=raw.charCodeAt(i);
+    return u8;
+  }
+  function fileToDataURL(file){
+    return new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+  async function convertDataUrlToJpeg(dataUrl){
+    // create img and draw to canvas then return JPEG dataURL
+    return new Promise((res)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const cvs = document.createElement('canvas');
+        cvs.width = img.width;
+        cvs.height = img.height;
+        const ctx = cvs.getContext('2d');
+        ctx.drawImage(img,0,0);
+        const out = cvs.toDataURL('image/jpeg', 0.92);
+        res(out);
+      };
+      img.src = dataUrl;
+    });
+  }
 
-        function isValidZipCode(zip) {
-            const re = /^\d{5}(-\d{4})?$/;
-            return re.test(zip);
-        }
+  // Render first page of blob PDF into preview using pdf.js
+  async function previewPdfBlob(blob){
+    previewEl.innerHTML = ''; // clear
+    const url = URL.createObjectURL(blob);
+    try{
+      const loading = pdfjsLib.getDocument({ url });
+      const pdf = await loading.promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1.4 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const renderContext = { canvasContext: context, viewport };
+      await page.render(renderContext).promise;
+      previewEl.appendChild(canvas);
+      URL.revokeObjectURL(url);
+    }catch(err){
+      console.error('Preview failed', err);
+      previewEl.innerHTML = '<div class="muted">Preview not available</div>';
+      URL.revokeObjectURL(url);
+    }
+  }
 
-        // Show validation errors in a popup
-        function showValidationErrors(errors) {
-            // Remove any existing validation popup
-            const existingPopup = document.getElementById('validation-popup');
-            if (existingPopup) {
-                existingPopup.remove();
-            }
-            
-            const existingOverlay = document.querySelector('.overlay');
-            if (existingOverlay) {
-                existingOverlay.remove();
-            }
-            
-            // Create overlay
-            const overlay = document.createElement('div');
-            overlay.className = 'overlay';
-            document.body.appendChild(overlay);
-            
-            // Create popup
-            const popup = document.createElement('div');
-            popup.className = 'validation-popup';
-            popup.id = 'validation-popup';
-            
-            let html = '<h3>Please complete the following fields:</h3>';
-            html += '<div class="validation-list">';
-            
-            // Group errors by section
-            const sectionErrors = {};
-            errors.forEach(error => {
-                if (!sectionErrors[error.section]) {
-                    sectionErrors[error.section] = [];
-                }
-                sectionErrors[error.section].push(error);
-            });
-            
-            // Display errors in order of sections from top to bottom
-            const sections = [
-                'Primary Renter Information',
-                'Income Information',
-                'Co-Renter Income Information',
-                'Residency Information',
-                'References',
-                'Privacy and Disclosures',
-                'Additional Documents',
-                'General'
-            ];
-            
-            sections.forEach(section => {
-                if (sectionErrors[section]) {
-                    html += `<div style="font-weight: bold; margin-top: 10px; color: var(--primary-blue);">${section}</div>`;
-                    
-                    sectionErrors[section].forEach(error => {
-                        html += `<div class="validation-item"><i class="fas fa-exclamation-circle"></i> ${error.message}</div>`;
-                    });
-                }
-            });
-            
-            html += '</div>';
-            html += '<div class="validation-buttons">';
-            html += '<button class="btn btn-primary" onclick="closeValidationPopup()">OK</button>';
-            html += '</div>';
-            
-            popup.innerHTML = html;
-            document.body.appendChild(popup);
-            
-            // Scroll to first error field
-            if (errors[0] && errors[0].field) {
-                errors[0].field.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                
-                // Open the section containing the error if it's collapsed
-                const section = errors[0].field.closest('.collapsible-menu');
-                if (section) {
-                    const menuHeader = section.querySelector('.menu-header');
-                    const menuContent = section.querySelector('.menu-content');
-                    
-                    if (!menuContent.classList.contains('active')) {
-                        toggleMenu(menuHeader);
-                    }
-                }
-            }
-        }
+  // Web Share / download / mailto behaviors
+  async function shareOrDownload(blob){
+    const file = new File([blob], `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`, { type:'application/pdf' });
+    // Use navigator.canShare where available
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({
+          title: 'National TV Sales — Customer Order',
+          text: `Order for ${document.getElementById('name').value || ''}`,
+          files: [file]
+        });
+        alert('Share dialog opened. Choose your email or app to send.');
+        return;
+      }catch(err){
+        console.warn('Share canceled or failed', err);
+      }
+    }
 
-        // Close validation popup
-        function closeValidationPopup() {
-            const popup = document.getElementById('validation-popup');
-            const overlay = document.querySelector('.overlay');
-            
-            if (popup) popup.remove();
-            if (overlay) overlay.remove();
-        }
+    // fallback: trigger download, open mailto
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
 
-        // Print form function
-        function printForm() {
-            if (!validateForm()) {
-                return;
-            }
-            
-            // Create a printable version of the form
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>National TV Rental Application</title>
-                    <style>
-                        body {
-                            font-family: Arial, sans-serif;
-                            font-size: 12px;
-                            line-height: 1.4;
-                            color: #000;
-                            padding: 20px;
-                        }
-                        .print-header {
-                            text-align: center;
-                            margin-bottom: 20px;
-                            padding-bottom: 10px;
-                            border-bottom: 2px solid #0066cc;
-                        }
-                        .print-section {
-                            margin-bottom: 15px;
-                            page-break-inside: avoid;
-                        }
-                        .print-section h3 {
-                            border-bottom: 1px solid #ccc;
-                            padding-bottom: 5px;
-                            margin-bottom: 10px;
-                            color: #0066cc;
-                        }
-                        .print-row {
-                            display: flex;
-                            margin-bottom: 5px;
-                        }
-                        .print-label {
-                            font-weight: bold;
-                            width: 40%;
-                        }
-                        .print-value {
-                            width: 60%;
-                        }
-                        .print-uploads {
-                            margin-top: 10px;
-                        }
-                        .print-upload-item {
-                            margin-bottom: 5px;
-                        }
-                        @media print {
-                            body {
-                                padding: 0;
-                                margin: 0;
-                            }
-                            .print-section {
-                                page-break-inside: avoid;
-                            }
-                        }
-                    </style>
-                </head>
-                <body>
-                    <div class="print-header">
-                        <h1>National TV Rental Application</h1>
-                        <p>Generated on ${new Date().toLocaleDateString()}</p>
-                    </div>
-                    <div id="printable-content">
-            `);
-            
-            // Add primary renter information
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>Primary Renter Information</h3>
-                    <div class="print-row">
-                        <div class="print-label">First Name:</div>
-                        <div class="print-value">${document.getElementById('first-name').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Last Name:</div>
-                        <div class="print-value">${document.getElementById('last-name').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Maiden Name:</div>
-                        <div class="print-value">${document.getElementById('maiden-name').value || 'N/A'}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Birthdate:</div>
-                        <div class="print-value">${document.getElementById('birthdate').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">SSN:</div>
-                        <div class="print-value">${document.getElementById('ssn').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Email:</div>
-                        <div class="print-value">${document.getElementById('email').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Phone:</div>
-                        <div class="print-value">${document.getElementById('phone').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Best Time to Contact:</div>
-                        <div class="print-value">${document.getElementById('contact-time').options[document.getElementById('contact-time').selectedIndex].text}</div>
-                    </div>
-            `);
-            
-            // Add co-renter information if applicable
-            if (document.getElementById('has-corener').checked) {
-                printWindow.document.write(`
-                    <h4>Co-Renter Information</h4>
-                    <div class="print-row">
-                        <div class="print-label">First Name:</div>
-                        <div class="print-value">${document.getElementById('co-first-name').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Last Name:</div>
-                        <div class="print-value">${document.getElementById('co-last-name').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Maiden Name:</div>
-                        <div class="print-value">${document.getElementById('co-maiden-name').value || 'N/A'}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Birthdate:</div>
-                        <div class="print-value">${document.getElementById('co-birthdate').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">SSN:</div>
-                        <div class="print-value">${document.getElementById('co-ssn').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Email:</div>
-                        <div class="print-value">${document.getElementById('co-email').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Phone:</div>
-                        <div class="print-value">${document.getElementById('co-phone').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Best Time to Contact:</div>
-                        <div class="print-value">${document.getElementById('co-contact-time').options[document.getElementById('co-contact-time').selectedIndex].text}</div>
-                    </div>
-                `);
-            }
-            
-            // Add vehicle information
-            printWindow.document.write(`
-                <h4>Vehicle Information</h4>
-                <div class="print-row">
-                    <div class="print-label">Make:</div>
-                    <div class="print-value">${document.getElementById('vehicle-make').value || 'N/A'}</div>
-                </div>
-                <div class="print-row">
-                    <div class="print-label">Model:</div>
-                    <div class="print-value">${document.getElementById('vehicle-model').value || 'N/A'}</div>
-                </div>
-                <div class="print-row">
-                    <div class="print-label">License Plate:</div>
-                    <div class="print-value">${document.getElementById('license-plate').value || 'N/A'}</div>
-                </div>
-                <div class="print-row">
-                    <div class="print-label">Color:</div>
-                    <div class="print-value">${document.getElementById('vehicle-color').value || 'N/A'}</div>
-                </div>
-                </div>
-            `);
-            
-            // Add income information
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>Income Information</h3>
-            `);
-            
-            if (document.getElementById('employment-yes').checked) {
-                printWindow.document.write(`
-                    <div class="print-row">
-                        <div class="print-label">Employment Primary Income:</div>
-                        <div class="print-value">Yes</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Employer:</div>
-                        <div class="print-value">${document.getElementById('employer').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Job Title:</div>
-                        <div class="print-value">${document.getElementById('job-title').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Shift:</div>
-                        <div class="print-value">${document.getElementById('shift').options[document.getElementById('shift').selectedIndex].text}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Income Type:</div>
-                        <div class="print-value">${document.getElementById('income-type').options[document.getElementById('income-type').selectedIndex].text}</div>
-                    </div>
-                `);
-                
-                if (document.getElementById('income-type').value === 'hourly') {
-                    printWindow.document.write(`
-                        <div class="print-row">
-                            <div class="print-label">Hourly Rate:</div>
-                            <div class="print-value">$${document.getElementById('hourly-rate').value}</div>
-                        </div>
-                    `);
-                } else {
-                    printWindow.document.write(`
-                        <div class="print-row">
-                            <div class="print-label">Monthly Salary:</div>
-                            <div class="print-value">$${document.getElementById('monthly-salary').value}</div>
-                        </div>
-                    `);
-                }
-                
-                printWindow.document.write(`
-                    <div class="print-row">
-                        <div class="print-label">Pay Frequency:</div>
-                        <div class="print-value">${document.getElementById('pay-frequency').options[document.getElementById('pay-frequency').selectedIndex].text}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Take Home Pay:</div>
-                        <div class="print-value">$${document.getElementById('take-home-pay').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Employer Contactable:</div>
-                        <div class="print-value">${document.querySelector('input[name="employer-contact"]:checked').value === 'yes' ? 'Yes' : 'No'}</div>
-                    </div>
-                `);
-            } else {
-                printWindow.document.write(`
-                    <div class="print-row">
-                        <div class="print-label">Employment Primary Income:</div>
-                        <div class="print-value">No</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Income Source:</div>
-                        <div class="print-value">${document.getElementById('income-source').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Take Home Monthly Amount:</div>
-                        <div class="print-value">$${document.getElementById('other-take-home').value}</div>
-                    </div>
-                `);
-            }
-            
-            // Add additional income if applicable
-            if (document.getElementById('additional-income').checked) {
-                printWindow.document.write(`
-                    <h4>Additional Income</h4>
-                    <div class="print-row">
-                        <div class="print-label">Income Source:</div>
-                        <div class="print-value">${document.getElementById('additional-income-source').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Monthly Amount:</div>
-                        <div class="print-value">$${document.getElementById('additional-income-amount').value}</div>
-                    </div>
-                `);
-            }
-            
-            printWindow.document.write('</div>');
-            
-            // Add residency information
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>Residency Information</h3>
-                    <div class="print-row">
-                        <div class="print-label">Street Address:</div>
-                        <div class="print-value">${document.getElementById('street-address').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Apt/Unit:</div>
-                        <div class="print-value">${document.getElementById('apt-number').value || 'N/A'}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">City:</div>
-                        <div class="print-value">${document.getElementById('city').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">State:</div>
-                        <div class="print-value">${document.getElementById('state').options[document.getElementById('state').selectedIndex].text}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">ZIP Code:</div>
-                        <div class="print-value">${document.getElementById('zip-code').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Residency Type:</div>
-                        <div class="print-value">${document.querySelector('input[name="residency-type"]:checked').value}</div>
-                    </div>
-            `);
-            
-            if (document.getElementById('residency-rent').checked) {
-                printWindow.document.write(`
-                    <div class="print-row">
-                        <div class="print-label">Landlord/Property Manager:</div>
-                        <div class="print-value">${document.getElementById('landlord-name').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Landlord Phone:</div>
-                        <div class="print-value">${document.getElementById('landlord-phone').value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Landlord Contactable:</div>
-                        <div class="print-value">${document.getElementById('no-contact-landlord').checked ? 'No' : 'Yes'}</div>
-                    </div>
-                `);
-            }
-            
-            printWindow.document.write('</div>');
-            
-            // Add references
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>References</h3>
-            `);
-            
-            for (let i = 1; i <= 5; i++) {
-                printWindow.document.write(`
-                    <h4>Reference ${i}</h4>
-                    <div class="print-row">
-                        <div class="print-label">First Name:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-first"]`).value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Last Name:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-last"]`).value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Relationship:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-relationship"]`).value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Phone:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-phone"]`).value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">State:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-state"]`).value}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Job/Occupation:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-job"]`).value || 'N/A'}</div>
-                    </div>
-                    <div class="print-row">
-                        <div class="print-label">Notes:</div>
-                        <div class="print-value">${document.querySelector(`[name="ref${i}-notes"]`).value || 'N/A'}</div>
-                    </div>
-                `);
-            }
-            
-            printWindow.document.write('</div>');
-            
-            // Add uploaded files
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>Uploaded Documents</h3>
-                    <div class="print-uploads">
-            `);
-            
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                if (input.files.length > 0) {
-                    for (let i = 0; i < input.files.length; i++) {
-                        printWindow.document.write(`
-                            <div class="print-upload-item">
-                                <strong>${input.id}:</strong> ${input.files[i].name}
-                            </div>
-                        `);
-                    }
-                }
-            });
-            
-            printWindow.document.write(`
-                    </div>
-                </div>
-            `);
-            
-            // Add disclosure agreement
-            printWindow.document.write(`
-                <div class="print-section">
-                    <h3>Agreements</h3>
-                    <div class="print-row">
-                        <div class="print-label">Disclosure Agreement:</div>
-                        <div class="print-value">${document.getElementById('agree-disclosure').checked ? 'Agreed' : 'Not Agreed'}</div>
-                    </div>
-                </div>
-            `);
-            
-            printWindow.document.write(`
-                    </div>
-                </body>
-                </html>
-            `);
-            
-            printWindow.document.close();
-            
-            // Print the document after a short delay to ensure it's fully loaded
-            setTimeout(() => {
-                printWindow.print();
-            }, 500);
-        }
+    // build mailto with subject/body (cannot attach automatically here)
+    const sendTo = document.getElementById('sendTo').value || '';
+    const subject = encodeURIComponent('Customer Order - National TV Sales & Rental');
+    let body = `Order for ${document.getElementById('name').value || ''}\n\nPlease attach the downloaded PDF: ${file.name}\n\nGenerated locally via web form.`;
+    window.location.href = `mailto:${encodeURIComponent(sendTo)}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    alert('PDF downloaded. A mail window was opened — please attach the downloaded PDF if it was not attached automatically.');
+  }
 
-        // Submit to cloud function
-        function submitToCloud() {
-            if (!validateForm()) {
-                return;
-            }
-            
-            // Create FormData object to collect all form data
-            const formData = new FormData(document.getElementById('rental-application'));
-            
-            // Add all uploaded files
-            const fileInputs = document.querySelectorAll('input[type="file"]');
-            fileInputs.forEach(input => {
-                if (input.files.length > 0) {
-                    for (let i = 0; i < input.files.length; i++) {
-                        formData.append(input.name, input.files[i]);
-                    }
-                }
-            });
-            
-            // Placeholder URL for Google Web Apps Script
-            const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-            
-            // Show loading state
-            const submitButton = document.querySelector('.btn-success');
-            const originalText = submitButton.innerHTML;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-            submitButton.disabled = true;
-            
-            // Send data to Google Web Apps Script
-            fetch(scriptURL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    alert('Application submitted successfully!');
-                } else {
-                    throw new Error('Network response was not ok.');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('There was an error submitting your application. Please try again.');
-            })
-            .finally(() => {
-                // Restore button state
-                submitButton.innerHTML = originalText;
-                submitButton.disabled = false;
-            });
-        }
+  // Generate + preview + share
+  async function generateAndPreview(alsoShare=false, alsoDownload=false){
+    genBtn.disabled = true;
+    genBtn.textContent = 'Generating...';
+    try{
+      const blob = await generateCombinedPdfBlob();
+      await previewPdfBlob(blob);
+      // store the last blob for share/download actions
+      lastGeneratedBlob = blob;
+      if(alsoShare){
+        await shareOrDownload(blob);
+      }
+      if(alsoDownload){
+        // trigger direct download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+    }catch(err){
+      console.error('Generate failed', err);
+      alert('Failed to generate PDF: ' + (err.message || err));
+    }finally{
+      genBtn.disabled = false;
+      genBtn.textContent = 'Generate & Send';
+    }
+  }
 
-        // Initialize hidden sections
-        window.onload = function() {
-            document.getElementById('corener-section').style.display = 'none';
-            document.getElementById('co-income-section').style.display = 'none';
-            document.getElementById('employment-fields').style.display = 'none';
-            document.getElementById('other-income-fields').style.display = 'none';
-            document.getElementById('hourly-rate-field').style.display = 'none';
-            document.getElementById('monthly-salary-field').style.display = 'none';
-            document.getElementById('contact-warning').style.display = 'none';
-            document.getElementById('rent-fields').style.display = 'none';
-            document.getElementById('own-fields').style.display = 'none';
-            document.getElementById('landlord-contact-warning').style.display = 'none';
-            document.getElementById('additional-income-section').style.display = 'none';
-            
-            // Hide all pay frequency fields initially
-            document.querySelectorAll('.day-selector, .date-selector').forEach(el => {
-                el.style.display = 'none';
-            });
-        };
-    </script>
+  // wire buttons
+  let lastGeneratedBlob = null;
+  genBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(true, false);
+  });
+  previewBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(false, false);
+  });
+  shareBtn.addEventListener('click', async ()=> {
+    if(lastGeneratedBlob){
+      await shareOrDownload(lastGeneratedBlob);
+    } else {
+      // create, then share
+      await generateAndPreview(true, false);
+    }
+  });
+  downloadBtn.addEventListener('click', async ()=>{
+    if(lastGeneratedBlob){
+      const url = URL.createObjectURL(lastGeneratedBlob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } else {
+      await generateAndPreview(false, true);
+    }
+  });
+
+  // preview via side "Generate Preview" or auto after create
+  previewBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(false, false);
+  });
+
+  // initial states
+  document.getElementById('residence').dispatchEvent(new Event('change'));
+  document.getElementById('employment').dispatchEvent(new Event('change'));
+  renderUploads();
+
+  // small usability: enter key doesn't submit the page accidentally
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault(); });
+
+})();
+</script>
 </body>
 </html>
