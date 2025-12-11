@@ -1,1335 +1,977 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>National TV Rental Application</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.3.5/signature_pad.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
-    <style>
-        :root {
-            --primary-blue: #0066cc;
-            --primary-red: #cc0000;
-            --light-blue: #e6f0ff;
-            --light-red: #ffe6e6;
-            --dark-gray: #333;
-            --light-gray: #f5f5f5;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>National TV Sales & Rental — Customer Order Form</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+<!-- Libraries -->
+<!-- pdf-lib for creating & merging PDFs -->
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib/dist/pdf-lib.min.js"></script>
+<!-- pdf.js for previewing the generated PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<!-- html2canvas only used to rasterize the form for crisp PDF page -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-        body {
-            background-color: #f9f9f9;
-            color: var(--dark-gray);
-            line-height: 1.6;
-            padding: 20px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
+<style>
+  :root{
+    --red:#d62828;
+    --blue:#003f88;
+    --muted:#6b7280;
+    --bg:#f3f6fb;
+    --card:#fff;
+    --radius:10px;
+    --maxw:980px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family:Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    background: linear-gradient(180deg,#f3f6fb 0%, #ffffff 100%);
+    color:#0b1720;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    padding:20px;
+    display:flex;
+    justify-content:center;
+  }
 
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-blue) 0%, #004d99 100%);
-            border-radius: var(--border-radius);
-            color: white;
-            box-shadow: var(--box-shadow);
-        }
+  .app{
+    width:100%;
+    max-width:var(--maxw);
+  }
 
-        .logo {
-            max-width: 200px;
-            margin-bottom: 15px;
-        }
+  header{
+    display:flex;
+    gap:16px;
+    align-items:center;
+    padding:18px;
+    border-radius:var(--radius);
+    background: linear-gradient(90deg,var(--red), var(--blue));
+    color:white;
+    box-shadow:0 8px 24px rgba(3,10,30,0.12);
+    margin-bottom:18px;
+  }
+  header h1{margin:0;font-size:20px;letter-spacing:0.2px}
+  header p{margin:0;opacity:0.95;font-size:13px}
 
-        h1 {
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
+  .layout{
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:18px;
+  }
 
-        .application-container {
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-            overflow: hidden;
-            margin-bottom: 30px;
-        }
+  /* Form card */
+  .card{
+    background:var(--card);
+    border-radius:12px;
+    padding:16px;
+    box-shadow:0 8px 22px rgba(8,20,40,0.06);
+    overflow:auto;
+    max-height:78vh;
+  }
 
-        .collapsible-menu {
-            border-bottom: 1px solid #ddd;
-        }
+  /* Side panel */
+  .side{
+    background:linear-gradient(180deg,#fcfdff,#f7fbff);
+    border-radius:12px;
+    padding:14px;
+    box-shadow:0 6px 18px rgba(8,20,40,0.04);
+    height:78vh;
+    overflow:auto;
+  }
 
-        .menu-header {
-            background-color: var(--primary-blue);
-            color: white;
-            padding: 15px 20px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background-color 0.3s;
-        }
+  .section-title{
+    display:flex;align-items:center;gap:10px;margin:8px 0 12px;
+  }
+  .sect-dot{width:8px;height:8px;border-radius:999px;background:var(--blue)}
+  .sect-title{font-weight:700;color:var(--blue);}
 
-        .menu-header:hover {
-            background-color: #0055aa;
-        }
+  label{display:block;font-size:13px;color:var(--muted);margin-top:8px}
+  input[type="text"], input[type="email"], input[type="date"], select, textarea {
+    width:100%; padding:9px 10px; border-radius:8px; border:1px solid #e2e8f0; font-size:14px;
+    background:#fff;
+  }
+  textarea{min-height:72px;resize:vertical}
+  .row{display:flex;gap:10px}
+  .col{flex:1;min-width:0}
 
-        .menu-header h2 {
-            margin: 0;
-            font-size: 1.4rem;
-        }
+  .controls{display:flex;gap:8px;align-items:center;margin-top:12px}
+  .btn{
+    padding:10px 14px;border-radius:10px;border:none;color:white;background:var(--blue);cursor:pointer;font-weight:600;
+  }
+  .btn.alt{background:var(--red)}
+  .btn.ghost{background:transparent;color:var(--blue);border:1px solid rgba(3,63,136,0.08)}
+  .muted{color:var(--muted);font-size:13px}
 
-        .menu-content {
-            padding: 0;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease-out, padding 0.3s ease;
-        }
+  /* upload list */
+  .uploads{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+  .upload-item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;background:#fff;border:1px solid #eef3ff;font-size:13px}
+  .small{font-size:12px;color:var(--muted)}
 
-        .menu-content.active {
-            padding: 20px;
-            max-height: 5000px;
-        }
+  /* signature canvas */
+  .sig-wrap{border:1px dashed #cbd5e1;border-radius:8px;padding:6px;background:#fff}
+  canvas{width:100%;height:120px;border-radius:6px;touch-action: none}
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 20px;
-        }
+  /* preview */
+  .preview-frame{border-radius:8px;width:100%;height:360px;border:1px solid #e6eefc;background:#fff;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .preview-frame canvas{max-width:100%;max-height:100%}
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+  footer{display:flex;justify-content:space-between;align-items:center;margin-top:12px}
+  .note{color:var(--muted);font-size:13px}
 
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: var(--dark-gray);
-        }
-
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        input[type="date"],
-        input[type="number"],
-        select,
-        textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--primary-blue);
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(0, 102, 204, 0.2);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin: 15px 0;
-        }
-
-        .checkbox-group input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-        }
-
-        .conditional-section {
-            padding: 15px;
-            background-color: var(--light-blue);
-            border-radius: var(--border-radius);
-            margin-top: 15px;
-            display: none;
-        }
-
-        .signature-pad-container {
-            margin: 20px 0;
-            border: 2px solid var(--primary-blue);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-        }
-
-        .signature-pad {
-            width: 100%;
-            height: 200px;
-            background-color: white;
-            cursor: crosshair;
-        }
-
-        .signature-actions {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-        }
-
-        .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: var(--border-radius);
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-
-        .btn-primary {
-            background-color: var(--primary-blue);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: #0055aa;
-        }
-
-        .btn-danger {
-            background-color: var(--primary-red);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #b30000;
-        }
-
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-
-        .btn-success:hover {
-            background-color: #218838;
-        }
-
-        .upload-area {
-            border: 2px dashed #ccc;
-            border-radius: var(--border-radius);
-            padding: 20px;
-            text-align: center;
-            margin: 15px 0;
-            transition: border 0.3s;
-        }
-
-        .upload-area:hover {
-            border-color: var(--primary-blue);
-        }
-
-        .references-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-
-        .references-table th,
-        .references-table td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-
-        .references-table th {
-            background-color: var(--light-blue);
-        }
-
-        .disclosure-box {
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            margin: 20px 0;
-            background-color: var(--light-gray);
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
-            color: #666;
-        }
-
-        @media (max-width: 768px) {
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .menu-header h2 {
-                font-size: 1.2rem;
-            }
-            
-            .signature-actions {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-
-        .fun-element {
-            text-align: center;
-            margin: 10px 0;
-        }
-
-        .fun-element i {
-            color: var(--primary-red);
-            margin: 0 5px;
-            font-size: 1.5rem;
-        }
-    </style>
+  @media (max-width: 1000px){
+    .layout{grid-template-columns: 1fr; }
+    .side{height:auto}
+    .card{max-height:none}
+    .preview-frame{height:240px}
+  }
+</style>
 </head>
 <body>
-    <div class="header">
-        <img src="https://nationaltvrental.com/wp-content/uploads/2023/02/ntr-logo-white-1.png" alt="National TV Rental Logo" class="logo">
-        <h1>National TV Rental Application</h1>
+<div class="app">
+  <header>
+    <div>
+      <h1>National TV Sales & Rental</h1>
+      <p>Customer Order — digital, local, and secure</p>
+    </div>
+    <div style="margin-left:auto; text-align:right">
+      <div class="small">No server. No cookies. All data stays on your device.</div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <div class="card" role="main">
+      <!-- Capture the form into a printable area -->
+      <div id="printable" style="padding:10px;background:white;border-radius:8px">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div style="font-weight:800;color:var(--blue)">CUSTOMER ORDER FORM</div>
+            <div class="muted" style="font-size:12px;margin-top:4px">Please fill in the information below</div>
+          </div>
+          <div class="muted" style="font-size:12px">National TV Sales & Rental</div>
+        </div>
+
+        <!-- Customer Info -->
+        <div class="section-title" style="margin-top:14px"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Customer's Information</div></div>
+
+        <div class="row">
+          <div class="col">
+            <label for="name">Full Name</label>
+            <input id="name" type="text" placeholder="First Last">
+          </div>
+          <div class="col">
+            <label for="dob">Date of Birth</label>
+            <input id="dob" type="date">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="maiden">Maiden Name</label>
+            <input id="maiden" type="text">
+          </div>
+          <div class="col">
+            <label for="ssn">Social Security #</label>
+            <input id="ssn" type="text" inputmode="numeric" placeholder="XXX-XX-XXXX">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="dl">Driver's License # / State ID #</label>
+            <input id="dl" type="text">
+          </div>
+          <div class="col">
+            <label for="phone">Phone</label>
+            <input id="phone" type="text">
+          </div>
+        </div>
+
+        <label for="address">Address</label>
+        <input id="address" type="text" placeholder="Street address">
+
+        <div class="row">
+          <div class="col">
+            <label for="city">City / State / Zip</label>
+            <input id="city" type="text">
+          </div>
+          <div class="col">
+            <label for="howLong">How Long at this address?</label>
+            <input id="howLong" type="text" placeholder="e.g., 2 years">
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="residence">Residence</label>
+            <select id="residence">
+              <option value="">-- Select --</option>
+              <option>Owned</option>
+              <option>Rented</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div id="landlordBox" class="col" style="display:none">
+            <label for="landlord">Landlord / Finance</label>
+            <input id="landlord" type="text" placeholder="Name & contact">
+          </div>
+        </div>
+
+        <!-- Source of Income -->
+        <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Source of Income</div></div>
+
+        <div class="row">
+          <div class="col">
+            <label for="employment">Employment Status</label>
+            <select id="employment">
+              <option value="">-- Select --</option>
+              <option value="full">Full Time</option>
+              <option value="part">Part Time</option>
+              <option value="self">Self-Employed</option>
+              <option value="unemployed">Not Working</option>
+            </select>
+          </div>
+          <div id="employerBox" class="col" style="display:none">
+            <label for="employer">Employer</label>
+            <input id="employer" type="text">
+          </div>
+        </div>
+
+        <div id="employerDetails" style="display:none">
+          <div class="row">
+            <div class="col">
+              <label for="jobTitle">Job Title</label>
+              <input id="jobTitle" type="text">
+            </div>
+            <div class="col">
+              <label for="hireDate">Hire Date</label>
+              <input id="hireDate" type="date">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="payFreq">Pay Frequency</label>
+              <select id="payFreq">
+                <option>Weekly</option>
+                <option>Every Two Weeks</option>
+                <option>Monthly</option>
+              </select>
+            </div>
+            <div class="col">
+              <label for="takehome">Take Home Pay</label>
+              <input id="takehome" type="text" placeholder="$">
+            </div>
+          </div>
+        </div>
+
+        <!-- References -->
+        <div class="section-title"><div class="sect-dot" style="background:var(--blue)"></div><div class="sect-title">Personal References</div></div>
+        <div class="row">
+          <div class="col">
+            <label for="ref1">Closest Relative (Name)</label>
+            <input id="ref1" type="text">
+          </div>
+          <div class="col">
+            <label for="ref1phone">Phone</label>
+            <input id="ref1phone" type="text">
+          </div>
+        </div>
+
+        <!-- additional -->
+        <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Additional</div></div>
+        <div class="row">
+          <div class="col">
+            <label for="heard">How did you hear about us?</label>
+            <select id="heard">
+              <option>Online</option>
+              <option>TV</option>
+              <option>Friend/Referral</option>
+              <option>Walk-in</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="col">
+            <label for="miles">Miles from home to store</label>
+            <input id="miles" type="text">
+          </div>
+        </div>
+
+        <!-- Release & signatures -->
+        <div class="section-title"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Release & Signatures</div></div>
+        <label for="release">Release Statement</label>
+        <textarea id="release">I promise that the information I have provided is correct. I authorize verification and waive privacy rights for the purposes of verification. I have read and understand this statement.</textarea>
+
+        <div style="margin-top:8px">
+          <label>Renter 1 Signature (draw)</label>
+          <div class="sig-wrap">
+            <canvas id="sig1"></canvas>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button type="button" class="btn ghost" id="clearSig1">Clear</button>
+              <div class="muted" style="margin-left:auto;font-size:12px">Tip: draw with finger or mouse</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <label>Renter 2 Signature (draw)</label>
+          <div class="sig-wrap">
+            <canvas id="sig2"></canvas>
+            <div style="display:flex;gap:8px;margin-top:6px">
+              <button type="button" class="btn ghost" id="clearSig2">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px">
+          <label for="signDate">Date</label>
+          <input id="signDate" type="date">
+        </div>
+      </div> <!-- printable end -->
+
+      <footer>
+        <div class="note">All data stays on this device. Save progress locally or generate a PDF to share.</div>
+        <div style="display:flex;gap:8px">
+          <button id="saveBtn" class="btn ghost">Save Locally</button>
+          <button id="loadBtn" class="btn ghost">Load Saved</button>
+          <button id="clearBtn" class="btn ghost">Clear</button>
+          <button id="genBtn" class="btn alt">Generate & Send</button>
+        </div>
+      </footer>
     </div>
 
-    <form id="rental-application" class="application-container">
-        <!-- Primary Renter Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-user-circle"></i> Primary Renter Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="first-name">First Name *</label>
-                        <input type="text" id="first-name" name="first-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="last-name">Last Name *</label>
-                        <input type="text" id="last-name" name="last-name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="maiden-name">Maiden Name (if applicable)</label>
-                        <input type="text" id="maiden-name" name="maiden-name">
-                    </div>
-                    <div class="form-group">
-                        <label for="birthdate">Birthdate *</label>
-                        <input type="date" id="birthdate" name="birthdate" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="ssn">Social Security Number *</label>
-                        <input type="text" id="ssn" name="ssn" required pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
-                    </div>
-                    <div class="form-group">
-                        <label for="email">Email Address *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="phone">Phone Number *</label>
-                        <input type="tel" id="phone" name="phone" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="contact-time">Best Time to Contact *</label>
-                        <select id="contact-time" name="contact-time" required>
-                            <option value="">Select a time</option>
-                            <option value="morning">Morning (8AM-12PM)</option>
-                            <option value="afternoon">Afternoon (12PM-5PM)</option>
-                            <option value="evening">Evening (5PM-9PM)</option>
-                        </select>
-                    </div>
-                </div>
+    <!-- side panel -->
+    <aside class="side" aria-label="Side controls">
+      <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Uploads</div></div>
 
-                <div class="checkbox-group">
-                    <input type="checkbox" id="has-corener" name="has-corener" onchange="toggleCoRenterSection(this)">
-                    <label for="has-corener">I have a co-renter</label>
-                </div>
+      <label for="files">Upload supporting docs (images or PDFs)</label>
+      <input id="files" type="file" accept="image/*,application/pdf" multiple />
+      <div class="uploads" id="uploadsList"></div>
 
-                <div id="corener-section" class="conditional-section">
-                    <h3>Co-Renter Information</h3>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-first-name">First Name *</label>
-                            <input type="text" id="co-first-name" name="co-first-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-last-name">Last Name *</label>
-                            <input type="text" id="co-last-name" name="co-last-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-maiden-name">Maiden Name (if applicable)</label>
-                            <input type="text" id="co-maiden-name" name="co-maiden-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-birthdate">Birthdate *</label>
-                            <input type="date" id="co-birthdate" name="co-birthdate">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-ssn">Social Security Number *</label>
-                            <input type="text" id="co-ssn" name="co-ssn" pattern="[0-9]{9}" title="Please enter a valid 9-digit SSN">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-email">Email Address *</label>
-                            <input type="email" id="co-email" name="co-email">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-phone">Phone Number *</label>
-                            <input type="tel" id="co-phone" name="co-phone">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-contact-time">Best Time to Contact *</label>
-                            <select id="co-contact-time" name="co-contact-time">
-                                <option value="">Select a time</option>
-                                <option value="morning">Morning (8AM-12PM)</option>
-                                <option value="afternoon">Afternoon (12PM-5PM)</option>
-                                <option value="evening">Evening (5PM-9PM)</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+      <div style="height:12px"></div>
 
-                <h3>Vehicle Information</h3>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="vehicle-make">Make</label>
-                        <input type="text" id="vehicle-make" name="vehicle-make">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicle-model">Model</label>
-                        <input type="text" id="vehicle-model" name="vehicle-model">
-                    </div>
-                    <div class="form-group">
-                        <label for="license-plate">License Plate Number</label>
-                        <input type="text" id="license-plate" name="license-plate">
-                    </div>
-                    <div class="form-group">
-                        <label for="vehicle-color">Color</label>
-                        <input type="text" id="vehicle-color" name="vehicle-color">
-                    </div>
-                </div>
+      <div class="section-title"><div class="sect-dot" style="background:var(--blue)"></div><div class="sect-title">Preview</div></div>
+      <div class="preview-frame" id="preview">
+        <div class="muted">No preview yet — generate PDF to preview</div>
+      </div>
 
-                <div class="form-group">
-                    <label>Vehicle Status</label>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="rented" name="vehicle-status" value="rented">
-                        <label for="rented">Rented</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="leased" name="vehicle-status" value="leased">
-                        <label for="leased">Leased</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="owned" name="vehicle-status" value="owned">
-                        <label for="owned">Owned</label>
-                    </div>
-                </div>
+      <div style="height:12px"></div>
 
-                <div class="upload-area">
-                    <h3><i class="fas fa-id-card"></i> ID Upload</h3>
-                    <p>Please upload a copy of your government-issued ID. If you don't upload now, you'll need to bring an unexpired copy to the store.</p>
-                    <input type="file" id="id-upload" name="id-upload" accept=".jpg,.jpeg,.png,.pdf">
-                    <label for="id-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Choose File</label>
-                </div>
+      <div class="section-title"><div class="sect-dot" style="background:var(--red)"></div><div class="sect-title">Send Options</div></div>
+      <label for="sendTo">Send To Email (optional)</label>
+      <input id="sendTo" type="email" placeholder="store@example.com (you can leave blank)" />
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button id="shareBtn" class="btn">Share (Web Share)</button>
+        <button id="downloadBtn" class="btn ghost">Download PDF</button>
+      </div>
 
-                <div class="fun-element">
-                    <p>We're excited to help you get the perfect rental items for your home! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
-                </div>
-            </div>
-        </div>
+      <div style="height:12px"></div>
 
-        <!-- Income Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> Income Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <label>Is employment your primary source of income? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="employment-yes" name="employment-primary" value="yes" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-yes">Yes</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="employment-no" name="employment-primary" value="no" onchange="toggleEmploymentFields(this)">
-                        <label for="employment-no">No</label>
-                    </div>
-                </div>
+      <div class="section-title"><div class="sect-dot"></div><div class="sect-title">Quick Actions</div></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="autoFillBtn" class="btn ghost">Auto-fill Demo</button>
+        <button id="previewBtn" class="btn">Generate Preview</button>
+        <button id="clearUploadsBtn" class="btn ghost">Clear Uploads</button>
+      </div>
+    </aside>
+  </div>
+</div>
 
-                <div id="employment-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="employer">Employer *</label>
-                            <input type="text" id="employer" name="employer">
-                        </div>
-                        <div class="form-group">
-                            <label for="job-title">Job Title *</label>
-                            <input type="text" id="job-title" name="job-title">
-                        </div>
-                        <div class="form-group">
-                            <label for="shift">Shift *</label>
-                            <select id="shift" name="shift">
-                                <option value="">Select shift</option>
-                                <option value="day">Day Shift</option>
-                                <option value="evening">Evening Shift</option>
-                                <option value="night">Night Shift</option>
-                                <option value="varied">Varied Shifts</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="income-type">Income Type *</label>
-                            <select id="income-type" name="income-type" onchange="toggleIncomeFields(this)">
-                                <option value="">Select type</option>
-                                <option value="hourly">Hourly Rate</option>
-                                <option value="salary">Monthly Salary</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="hourly-rate-field">
-                            <label for="hourly-rate">Hourly Rate *</label>
-                            <input type="number" id="hourly-rate" name="hourly-rate" step="0.01">
-                        </div>
-                        <div class="form-group" id="monthly-salary-field">
-                            <label for="monthly-salary">Monthly Salary *</label>
-                            <input type="number" id="monthly-salary" name="monthly-salary" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="take-home-pay">Take Home Pay (after taxes) *</label>
-                            <input type="number" id="take-home-pay" name="take-home-pay" step="0.01">
-                        </div>
-                    </div>
+<script>
+/* ============================================================
+   Advanced client-side order form
+   - captures form visually (html2canvas)
+   - builds combined PDF using pdf-lib (form page + uploaded pages)
+   - previews first page using pdf.js
+   - supports Web Share and mailto fallback
+   - localStorage save/load/clear
+   - conditional UI logic and dropdowns
+   - signature capture on canvas
+   ============================================================ */
 
-                    <div class="form-group">
-                        <label>Is your employer able to be contacted? *</label>
-                        <div class="checkbox-group">
-                            <input type="radio" id="contact-yes" name="employer-contact" value="yes" onchange="toggleContactWarning(this)">
-                            <label for="contact-yes">Yes</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="radio" id="contact-no" name="employer-contact" value="no" onchange="toggleContactWarning(this)">
-                            <label for="contact-no">No</label>
-                        </div>
-                    </div>
+(async function(){
+  // Setup pdf.js worker (match the cdn version)
+  if(window['pdfjsLib']){
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  }
 
-                    <div id="contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
-                            <input type="file" id="paystub-upload" name="paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Paystubs</label>
-                        </div>
-                    </div>
-                </div>
+  const {
+    PDFDocument,
+    StandardFonts
+  } = PDFLib;
 
-                <div id="other-income-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="income-source">Income Source *</label>
-                            <input type="text" id="income-source" name="income-source">
-                        </div>
-                        <div class="form-group">
-                            <label for="other-take-home">Take Home Monthly Amount *</label>
-                            <input type="number" id="other-take-home" name="other-take-home" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="upload-area">
-                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
-                        <input type="file" id="income-proof-upload" name="income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Income</label>
-                    </div>
-                </div>
+  // Elements
+  const residence = document.getElementById('residence');
+  const landlordBox = document.getElementById('landlordBox');
 
-                <div class="fun-element">
-                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
-                </div>
-            </div>
-        </div>
+  const employment = document.getElementById('employment');
+  const employerBox = document.getElementById('employerBox');
+  const employerDetails = document.getElementById('employerDetails');
 
-        <!-- Co-Renter Income Information Section (Initially Hidden) -->
-        <div id="co-income-section" class="collapsible-menu" style="display: none;">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-money-bill-wave"></i> Co-Renter Income Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <label>Is employment your primary source of income? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="co-employment-yes" name="co-employment-primary" value="yes" onchange="toggleCoEmploymentFields(this)">
-                        <label for="co-employment-yes">Yes</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="co-employment-no" name="co-employment-primary" value="no" onchange="toggleCoEmploymentFields(this)">
-                        <label for="co-employment-no">No</label>
-                    </div>
-                </div>
+  const filesInput = document.getElementById('files');
+  const uploadsList = document.getElementById('uploadsList');
 
-                <div id="co-employment-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-employer">Employer *</label>
-                            <input type="text" id="co-employer" name="co-employer">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-job-title">Job Title *</label>
-                            <input type="text" id="co-job-title" name="co-job-title">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-shift">Shift *</label>
-                            <select id="co-shift" name="co-shift">
-                                <option value="">Select shift</option>
-                                <option value="day">Day Shift</option>
-                                <option value="evening">Evening Shift</option>
-                                <option value="night">Night Shift</option>
-                                <option value="varied">Varied Shifts</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="co-income-type">Income Type *</label>
-                            <select id="co-income-type" name="co-income-type" onchange="toggleCoIncomeFields(this)">
-                                <option value="">Select type</option>
-                                <option value="hourly">Hourly Rate</option>
-                                <option value="salary">Monthly Salary</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="co-hourly-rate-field">
-                            <label for="co-hourly-rate">Hourly Rate *</label>
-                            <input type="number" id="co-hourly-rate" name="co-hourly-rate" step="0.01">
-                        </div>
-                        <div class="form-group" id="co-monthly-salary-field">
-                            <label for="co-monthly-salary">Monthly Salary *</label>
-                            <input type="number" id="co-monthly-salary" name="co-monthly-salary" step="0.01">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-take-home-pay">Take Home Pay (after taxes) *</label>
-                            <input type="number" id="co-take-home-pay" name="co-take-home-pay" step="0.01">
-                        </div>
-                    </div>
+  const saveBtn = document.getElementById('saveBtn');
+  const loadBtn = document.getElementById('loadBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const genBtn = document.getElementById('genBtn');
 
-                    <div class="form-group">
-                        <label>Is your employer able to be contacted? *</label>
-                        <div class="checkbox-group">
-                            <input type="radio" id="co-contact-yes" name="co-employer-contact" value="yes" onchange="toggleCoContactWarning(this)">
-                            <label for="co-contact-yes">Yes</label>
-                        </div>
-                        <div class="checkbox-group">
-                            <input type="radio" id="co-contact-no" name="co-employer-contact" value="no" onchange="toggleCoContactWarning(this)">
-                            <label for="co-contact-no">No</label>
-                        </div>
-                    </div>
+  const previewEl = document.getElementById('preview');
+  const previewBtn = document.getElementById('previewBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const sendToInput = document.getElementById('sendTo');
 
-                    <div id="co-contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong>Note:</strong> You must provide paystubs either in person or upload them here.</p>
-                            <input type="file" id="co-paystub-upload" name="co-paystub-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="co-paystub-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Paystubs</label>
-                        </div>
-                    </div>
-                </div>
+  const autoFillBtn = document.getElementById('autoFillBtn');
+  const clearUploadsBtn = document.getElementById('clearUploadsBtn');
 
-                <div id="co-other-income-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="co-income-source">Income Source *</label>
-                            <input type="text" id="co-income-source" name="co-income-source">
-                        </div>
-                        <div class="form-group">
-                            <label for="co-other-take-home">Take Home Monthly Amount *</label>
-                            <input type="number" id="co-other-take-home" name="co-other-take-home" step="0.01">
-                        </div>
-                    </div>
-                    
-                    <div class="upload-area">
-                        <p><strong>Note:</strong> You will be required to bring in official proof of income to the store or upload it here.</p>
-                        <input type="file" id="co-income-proof-upload" name="co-income-proof-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="co-income-proof-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Income</label>
-                    </div>
-                </div>
+  // signature canvases
+  const sig1Canvas = document.getElementById('sig1');
+  const sig2Canvas = document.getElementById('sig2');
+  const clearSig1 = document.getElementById('clearSig1');
+  const clearSig2 = document.getElementById('clearSig2');
 
-                <div class="fun-element">
-                    <p>We know talking about money isn't always fun, but it helps us help you find the perfect rental items! <i class="fas fa-piggy-bank"></i> <i class="fas fa-chart-line"></i></p>
-                </div>
-            </div>
-        </div>
+  // store uploaded File objects
+  let uploadedFiles = [];
 
-        <!-- Residency Information Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-home"></i> Residency Information</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <label>Do you rent, own, or live with owner? *</label>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-rent" name="residency-type" value="rent" onchange="toggleResidencyFields(this)">
-                        <label for="residency-rent">Rent</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-own" name="residency-type" value="own" onchange="toggleResidencyFields(this)">
-                        <label for="residency-own">Own</label>
-                    </div>
-                    <div class="checkbox-group">
-                        <input type="radio" id="residency-live-with" name="residency-type" value="live-with" onchange="toggleResidencyFields(this)">
-                        <label for="residency-live-with">Live with Owner</label>
-                    </div>
-                </div>
+  // Conditional logic
+  residence.addEventListener('change', (e)=>{
+    if(e.target.value === 'Rented'){
+      landlordBox.style.display = '';
+    } else {
+      landlordBox.style.display = 'none';
+      document.getElementById('landlord').value = '';
+    }
+  });
 
-                <div id="rent-fields" class="conditional-section">
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label for="landlord-name">Landlord/Property Manager/Apartment Complex Name *</label>
-                            <input type="text" id="landlord-name" name="landlord-name">
-                        </div>
-                        <div class="form-group">
-                            <label for="landlord-phone">Contact Number *</label>
-                            <input type="tel" id="landlord-phone" name="landlord-phone">
-                        </div>
-                    </div>
+  // Employment logic
+  employment.addEventListener('change', (e)=>{
+    if(e.target.value === 'full' || e.target.value === 'part' || e.target.value === 'self'){
+      employerBox.style.display = '';
+      employerDetails.style.display = '';
+    } else {
+      employerBox.style.display = 'none';
+      employerDetails.style.display = 'none';
+      document.getElementById('employer').value = '';
+      document.getElementById('jobTitle').value = '';
+      document.getElementById('hireDate').value = '';
+      document.getElementById('payFreq').value = 'Weekly';
+      document.getElementById('takehome').value = '';
+    }
+  });
 
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="no-contact-landlord" name="no-contact-landlord" onchange="toggleLandlordContactWarning(this)">
-                        <label for="no-contact-landlord">Landlord cannot be contacted</label>
-                    </div>
+  // File uploads
+  filesInput.addEventListener('change', (ev)=>{
+    uploadedFiles = Array.from(ev.target.files || []);
+    renderUploads();
+  });
 
-                    <div id="landlord-contact-warning" class="conditional-section">
-                        <div class="upload-area">
-                            <p><strong>Note:</strong> You will need to bring in a lease or utility bill with your legal name on the document or upload it here.</p>
-                            <input type="file" id="lease-upload" name="lease-upload" accept=".jpg,.jpeg,.png,.pdf">
-                            <label for="lease-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Lease or Utility Bill</label>
-                        </div>
-                    </div>
-                </div>
+  function renderUploads(){
+    uploadsList.innerHTML = '';
+    uploadedFiles.forEach((f, idx)=>{
+      const item = document.createElement('div');
+      item.className = 'upload-item';
+      item.innerHTML = `<div style="flex:1"><strong>${escapeHtml(f.name)}</strong> <div class="small">${(f.type||'').split('/')[1] || ''} • ${formatBytes(f.size)}</div></div>`;
+      const rm = document.createElement('button');
+      rm.className = 'btn ghost';
+      rm.style.padding = '6px 8px';
+      rm.textContent = 'Remove';
+      rm.onclick = ()=>{ uploadedFiles.splice(idx,1); filesInput.value=''; renderUploads(); };
+      item.appendChild(rm);
+      uploadsList.appendChild(item);
+    });
+    if(uploadedFiles.length === 0){
+      uploadsList.innerHTML = '<div class="small muted">No uploads yet</div>';
+    }
+  }
+  renderUploads();
 
-                <div id="own-fields" class="conditional-section">
-                    <div class="upload-area">
-                        <p>Please upload proof of ownership.</p>
-                        <input type="file" id="ownership-upload" name="ownership-upload" accept=".jpg,.jpeg,.png,.pdf">
-                        <label for="ownership-upload" class="btn btn-primary"><i class="fas fa-upload"></i> Upload Proof of Ownership</label>
-                    </div>
-                </div>
+  // helper
+  function escapeHtml(s){ return (s+'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function formatBytes(bytes){
+    if(bytes < 1024) return bytes + ' B';
+    if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/(1024*1024)).toFixed(2) + ' MB';
+  }
 
-                <div class="fun-element">
-                    <p>Almost done! Just a few more sections to go before you can enjoy your new rental items! <i class="fas fa-home"></i> <i class="fas fa-thumbs-up"></i></p>
-                </div>
-            </div>
-        </div>
+  // signature capture
+  function makeSignatureCanvas(canvas){
+    // set drawing buffer size for crisp data
+    const dpr = Math.max(1, window.devicePixelRatio || 1);
+    function fit(){
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+      ctx.lineCap = 'round';
+      ctx.strokeStyle = '#001a4d';
+      ctx.lineWidth = 2.6;
+    }
+    fit();
+    let drawing = false;
+    let last = null;
+    const ctx = canvas.getContext('2d');
 
-        <!-- References Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-users"></i> References</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="form-group">
-                    <p><strong>Reference Note:</strong> We strongly prefer parental/familial references such as parents or grandparents, then close family, then friends or coworkers. Two references must be provided, but five is highly preferred.</p>
-                </div>
+    function pointerDown(e){
+      drawing = true;
+      const p = getPos(e);
+      last = p;
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y);
+      e.preventDefault();
+    }
+    function pointerMove(e){
+      if(!drawing) return;
+      const p = getPos(e);
+      ctx.lineTo(p.x, p.y);
+      ctx.stroke();
+      last = p;
+    }
+    function pointerUp(e){ drawing = false; last=null; }
 
-                <table class="references-table">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>First Name *</th>
-                            <th>Last Name *</th>
-                            <th>Phone Number *</th>
-                            <th>State *</th>
-                            <th>Job/Occupation</th>
-                            <th>What should we know before contacting?</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Reference 1 (Required)</td>
-                            <td><input type="text" name="ref1-first" required></td>
-                            <td><input type="text" name="ref1-last" required></td>
-                            <td><input type="tel" name="ref1-phone" required></td>
-                            <td><input type="text" name="ref1-state" required></td>
-                            <td><input type="text" name="ref1-job"></td>
-                            <td><textarea name="ref1-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 2 (Required)</td>
-                            <td><input type="text" name="ref2-first" required></td>
-                            <td><input type="text" name="ref2-last" required></td>
-                            <td><input type="tel" name="ref2-phone" required></td>
-                            <td><input type="text" name="ref2-state" required></td>
-                            <td><input type="text" name="ref2-job"></td>
-                            <td><textarea name="ref2-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 3 (Optional)</td>
-                            <td><input type="text" name="ref3-first"></td>
-                            <td><input type="text" name="ref3-last"></td>
-                            <td><input type="tel" name="ref3-phone"></td>
-                            <td><input type="text" name="ref3-state"></td>
-                            <td><input type="text" name="ref3-job"></td>
-                            <td><textarea name="ref3-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 4 (Optional)</td>
-                            <td><input type="text" name="ref4-first"></td>
-                            <td><input type="text" name="ref4-last"></td>
-                            <td><input type="tel" name="ref4-phone"></td>
-                            <td><input type="text" name="ref4-state"></td>
-                            <td><input type="text" name="ref4-job"></td>
-                            <td><textarea name="ref4-notes" rows="2"></textarea></td>
-                        </tr>
-                        <tr>
-                            <td>Reference 5 (Optional)</td>
-                            <td><input type="text" name="ref5-first"></td>
-                            <td><input type="text" name="ref5-last"></td>
-                            <td><input type="tel" name="ref5-phone"></td>
-                            <td><input type="text" name="ref5-state"></td>
-                            <td><input type="text" name="ref5-job"></td>
-                            <td><textarea name="ref5-notes" rows="2"></textarea></td>
-                        </tr>
-                    </tbody>
-                </table>
+    function getPos(e){
+      const rect = canvas.getBoundingClientRect();
+      const clientX = (e.touches ? e.touches[0].clientX : e.clientX);
+      const clientY = (e.touches ? e.touches[0].clientY : e.clientY);
+      return { x: clientX - rect.left, y: clientY - rect.top };
+    }
 
-                <div class="fun-element">
-                    <p>References help us get to know you better! <i class="fas fa-handshake"></i> <i class="fas fa-user-friends"></i></p>
-                </div>
-            </div>
-        </div>
+    canvas.addEventListener('pointerdown', pointerDown);
+    canvas.addEventListener('pointermove', pointerMove);
+    window.addEventListener('pointerup', pointerUp);
+    // clear
+    function clear(){ const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); }
+    return { clear, canvas };
+  }
 
-        <!-- Privacy and Disclosures Section -->
-        <div class="collapsible-menu">
-            <div class="menu-header" onclick="toggleMenu(this)">
-                <h2><i class="fas fa-shield-alt"></i> Privacy and Disclosures</h2>
-                <span class="menu-icon"><i class="fas fa-chevron-down"></i></span>
-            </div>
-            <div class="menu-content">
-                <div class="disclosure-box">
-                    <p>The information collected in this form is solely used by National TV to process rental applications. All contacts may be contacted for the sole purpose of processing this application. All information will be securely discarded in the event that rental application is denied or a proper consumer/business relationship is not established.</p>
-                    <p>By submitting this form to National TV I certify that all information provided is accurate to the best of my knowledge and that I consent for National TV, or its delegates, at their sole discretion to use this information for the purpose of processing my application. I understand that by submitting this form that National TV reserves its right to approve or deny this application at its discretion.</p>
-                </div>
+  const sig1 = makeSignatureCanvas(sig1Canvas);
+  const sig2 = makeSignatureCanvas(sig2Canvas);
+  clearSig1.addEventListener('click', ()=>sig1.clear());
+  clearSig2.addEventListener('click', ()=>sig2.clear());
 
-                <div class="form-group">
-                    <div class="checkbox-group">
-                        <input type="checkbox" id="agree-disclosure" name="agree-disclosure" required>
-                        <label for="agree-disclosure">I have read and agree to the above disclosures *</label>
-                    </div>
-                </div>
+  // Save / Load / Clear (localStorage)
+  const STORAGE_KEY = 'ntv_order_v2';
+  saveBtn.addEventListener('click', ()=>{
+    const data = collectFormData();
+    // signatures as dataURLs
+    data.sign1 = sig1Canvas.toDataURL('image/png');
+    data.sign2 = sig2Canvas.toDataURL('image/png');
+    // note: we don't store uploadedFiles for privacy; only file names
+    data.uploadNames = uploadedFiles.map(f=>f.name);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    alert('Form saved locally on this device (localStorage).');
+  });
 
-                <div class="signature-pad-container">
-                    <p><strong>Primary Renter Signature:</strong></p>
-                    <canvas id="signature-pad" width="600" height="200" class="signature-pad"></canvas>
-                    <div class="signature-actions">
-                        <button type="button" class="btn btn-danger" onclick="clearSignature()"><i class="fas fa-trash"></i> Clear Signature</button>
-                        <button type="button" class="btn btn-primary" onclick="saveSignature()"><i class="fas fa-save"></i> Save Signature</button>
-                    </div>
-                </div>
+  loadBtn.addEventListener('click', ()=>{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ alert('No saved form found'); return; }
+    const data = JSON.parse(raw);
+    fillFormData(data);
+    // restore signature images (we draw them onto canvas)
+    if(data.sign1){ drawDataUrlToCanvas(data.sign1, sig1Canvas); }
+    if(data.sign2){ drawDataUrlToCanvas(data.sign2, sig2Canvas); }
+    alert('Saved form loaded (note: file uploads are not persisted for privacy).');
+  });
 
-                <!-- Co-Renter Signature Section (Initially Hidden) -->
-                <div id="co-signature-section" class="signature-pad-container" style="display: none;">
-                    <p><strong>Co-Renter Signature:</strong></p>
-                    <canvas id="co-signature-pad" width="600" height="200" class="signature-pad"></canvas>
-                    <div class="signature-actions">
-                        <button type="button" class="btn btn-danger" onclick="clearCoSignature()"><i class="fas fa-trash"></i> Clear Signature</button>
-                        <button type="button" class="btn btn-primary" onclick="saveCoSignature()"><i class="fas fa-save"></i> Save Signature</button>
-                    </div>
-                </div>
+  clearBtn.addEventListener('click', ()=>{
+    if(!confirm('Clear all form fields and signatures?')) return;
+    resetForm();
+  });
 
-                <div class="fun-element">
-                    <p>Thank you for completing our application! We look forward to helping you find the perfect appliances, furniture, and electronics! <i class="fas fa-tv"></i> <i class="fas fa-couch"></i> <i class="fas fa-blender"></i> <i class="fas fa-laptop"></i></p>
-                </div>
-            </div>
-        </div>
+  function collectFormData(){
+    return {
+      name: document.getElementById('name').value || '',
+      dob: document.getElementById('dob').value || '',
+      maiden: document.getElementById('maiden').value || '',
+      ssn: document.getElementById('ssn').value || '',
+      dl: document.getElementById('dl').value || '',
+      phone: document.getElementById('phone').value || '',
+      address: document.getElementById('address').value || '',
+      city: document.getElementById('city').value || '',
+      howLong: document.getElementById('howLong').value || '',
+      residence: document.getElementById('residence').value || '',
+      landlord: document.getElementById('landlord').value || '',
+      employment: document.getElementById('employment').value || '',
+      employer: document.getElementById('employer').value || '',
+      jobTitle: document.getElementById('jobTitle').value || '',
+      hireDate: document.getElementById('hireDate').value || '',
+      payFreq: document.getElementById('payFreq').value || '',
+      takehome: document.getElementById('takehome').value || '',
+      ref1: document.getElementById('ref1').value || '',
+      ref1phone: document.getElementById('ref1phone').value || '',
+      heard: document.getElementById('heard').value || '',
+      miles: document.getElementById('miles').value || '',
+      release: document.getElementById('release').value || '',
+      signDate: document.getElementById('signDate').value || '',
+      sendTo: document.getElementById('sendTo').value || ''
+    };
+  }
 
-        <div class="form-group" style="padding: 20px; text-align: center;">
-            <button type="button" onclick="generatePDF()" class="btn btn-success"><i class="fas fa-file-pdf"></i> Save & Download Application</button>
-            <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Submit Application</button>
-        </div>
-    </form>
+  function fillFormData(data){
+    if(!data) return;
+    Object.keys(data).forEach(k=>{
+      const el = document.getElementById(k);
+      if(el) el.value = data[k];
+    });
+    // trigger conditional displays
+    const ev = new Event('change');
+    residence.dispatchEvent(ev);
+    employment.dispatchEvent(ev);
+  }
 
-    <div class="footer">
-        <p>&copy; 2025 National TV Rental. All rights reserved.</p>
-    </div>
+  function resetForm(){
+    document.querySelectorAll('#printable input,#printable select,#printable textarea').forEach(el=>{
+      if(el.type === 'checkbox' || el.type === 'radio') el.checked = false;
+      else el.value = '';
+    });
+    sig1.clear(); sig2.clear();
+    uploadedFiles = [];
+    filesInput.value = '';
+    renderUploads();
+    previewEl.innerHTML = '<div class="muted">No preview yet — generate PDF to preview</div>';
+  }
 
-    <script>
-        // Initialize signature pads
-        const canvas = document.getElementById('signature-pad');
-        const signaturePad = new SignaturePad(canvas, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
+  // helper: draw dataURL to canvas
+  function drawDataUrlToCanvas(dataUrl, canvas){
+    const img = new Image();
+    img.onload = function(){
+      const ctx = canvas.getContext('2d');
+      // clear and draw scaled to canvas
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      // compute scaled dims (canvas coordinate space uses devicePixelRatio scaling)
+      const cr = canvas.getBoundingClientRect();
+      // draw into canvas element's CSS size: scale handled earlier for crispness, so we draw full image centered
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+    img.src = dataUrl;
+  }
 
-        const coCanvas = document.getElementById('co-signature-pad');
-        const coSignaturePad = new SignaturePad(coCanvas, {
-            backgroundColor: 'rgb(255, 255, 255)'
-        });
+  // Auto-fill demo for convenience
+  autoFillBtn.addEventListener('click', ()=>{
+    const demo = {
+      name: 'Jamie Parker',
+      dob: '1988-04-09',
+      maiden: '',
+      ssn: '111-22-3333',
+      dl: 'D1234567',
+      phone: '555-321-9876',
+      address: '123 Main St',
+      city: 'Hometown, ST 12345',
+      howLong: '3 years',
+      residence: 'Owned',
+      employment: 'full',
+      employer: 'Acme Electronics',
+      jobTitle: 'Store Manager',
+      hireDate: '2018-06-01',
+      payFreq: 'Every Two Weeks',
+      takehome: '$1,200',
+      ref1: 'Taylor Morgan',
+      ref1phone: '555-654-3210',
+      heard: 'Friend/Referral',
+      miles: '5',
+      release: document.getElementById('release').value,
+      signDate: new Date().toISOString().slice(0,10),
+      sendTo: ''
+    };
+    fillFormData(demo);
+    employment.dispatchEvent(new Event('change'));
+  });
 
-        // Adjust canvas for high DPI displays
-        function resizeCanvas() {
-            const ratio = Math.max(window.devicePixelRatio || 1, 1);
-            
-            canvas.width = canvas.offsetWidth * ratio;
-            canvas.height = canvas.offsetHeight * ratio;
-            canvas.getContext('2d').scale(ratio, ratio);
-            
-            coCanvas.width = coCanvas.offsetWidth * ratio;
-            coCanvas.height = coCanvas.offsetHeight * ratio;
-            coCanvas.getContext('2d').scale(ratio, ratio);
-            
-            signaturePad.clear();
-            coSignaturePad.clear();
-        }
+  // Clear uploads
+  clearUploadsBtn.addEventListener('click', ()=>{
+    uploadedFiles = [];
+    filesInput.value = '';
+    renderUploads();
+  });
 
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
+  // PDF creation
+  async function generateCombinedPdfBlob(){
+    // 1) render the printable area to an image via html2canvas for crisp layout
+    const printable = document.getElementById('printable');
 
-        // Toggle collapsible menus
-        function toggleMenu(menuHeader) {
-            const menuContent = menuHeader.nextElementSibling;
-            const icon = menuHeader.querySelector('.menu-icon i');
-            
-            menuContent.classList.toggle('active');
-            
-            if (menuContent.classList.contains('active')) {
-                icon.classList.remove('fa-chevron-down');
-                icon.classList.add('fa-chevron-up');
-            } else {
-                icon.classList.remove('fa-chevron-up');
-                icon.classList.add('fa-chevron-down');
-            }
-        }
+    // Copy the printable node to a detached clone to avoid UI artifacts
+    const clone = printable.cloneNode(true);
+    // Ensure canvas signatures in clone contain the drawn images
+    clone.querySelectorAll('canvas').forEach(c=>{
+      const id = c.id;
+      const original = document.getElementById(id);
+      if(original){
+        const dataUrl = original.toDataURL('image/png');
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        img.style.width = original.style.width || '100%';
+        img.style.height = original.style.height || '120px';
+        img.style.objectFit = 'contain';
+        // replace canvas with img in the clone
+        c.parentNode.replaceChild(img, c);
+      }
+    });
 
-        // Toggle co-renter section
-        function toggleCoRenterSection(checkbox) {
-            const coRenterSection = document.getElementById('corener-section');
-            const coIncomeSection = document.getElementById('co-income-section');
-            const coSignatureSection = document.getElementById('co-signature-section');
-            const coRenterInputs = coRenterSection.querySelectorAll('input, select');
-            
-            if (checkbox.checked) {
-                coRenterSection.style.display = 'block';
-                coIncomeSection.style.display = 'block';
-                coSignatureSection.style.display = 'block';
-                coRenterInputs.forEach(input => input.setAttribute('required', 'true'));
-            } else {
-                coRenterSection.style.display = 'none';
-                coIncomeSection.style.display = 'none';
-                coSignatureSection.style.display = 'none';
-                coRenterInputs.forEach(input => input.removeAttribute('required'));
-            }
-        }
+    // Place clone off-screen for rendering
+    clone.style.boxSizing = 'border-box';
+    clone.style.width = '816px'; // approximates 8.5in * 96dpi to get good resolution
+    clone.style.position = 'fixed';
+    clone.style.left = '-5000px';
+    clone.style.top = '0';
+    document.body.appendChild(clone);
 
-        // Toggle employment fields for primary renter
-        function toggleEmploymentFields(radio) {
-            const employmentFields = document.getElementById('employment-fields');
-            const otherIncomeFields = document.getElementById('other-income-fields');
-            
-            if (radio.value === 'yes') {
-                employmentFields.style.display = 'block';
-                otherIncomeFields.style.display = 'none';
-                
-                // Set required attributes for employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => {
-                    if (input.name !== 'employer-contact') {
-                        input.setAttribute('required', 'true');
-                    }
-                });
-                
-                // Remove required attributes from other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
-            } else {
-                employmentFields.style.display = 'none';
-                otherIncomeFields.style.display = 'block';
-                
-                // Remove required attributes from employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
-            }
-        }
+    // Render with html2canvas at a higher scale for print quality
+    const canvas = await html2canvas(clone, { scale: 2, backgroundColor: '#ffffff', useCORS: true });
+    document.body.removeChild(clone);
 
-        // Toggle employment fields for co-renter
-        function toggleCoEmploymentFields(radio) {
-            const employmentFields = document.getElementById('co-employment-fields');
-            const otherIncomeFields = document.getElementById('co-other-income-fields');
-            
-            if (radio.value === 'yes') {
-                employmentFields.style.display = 'block';
-                otherIncomeFields.style.display = 'none';
-                
-                // Set required attributes for employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => {
-                    if (input.name !== 'co-employer-contact') {
-                        input.setAttribute('required', 'true');
-                    }
-                });
-                
-                // Remove required attributes from other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.removeAttribute('required'));
-            } else {
-                employmentFields.style.display = 'none';
-                otherIncomeFields.style.display = 'block';
-                
-                // Remove required attributes from employment fields
-                const employmentInputs = employmentFields.querySelectorAll('input, select');
-                employmentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for other income fields
-                const otherIncomeInputs = otherIncomeFields.querySelectorAll('input');
-                otherIncomeInputs.forEach(input => input.setAttribute('required', 'true'));
-            }
-        }
+    const imgData = canvas.toDataURL('image/jpeg', 0.95);
 
-        // Toggle income type fields for primary renter
-        function toggleIncomeFields(select) {
-            const hourlyRateField = document.getElementById('hourly-rate-field');
-            const monthlySalaryField = document.getElementById('monthly-salary-field');
-            
-            if (select.value === 'hourly') {
-                hourlyRateField.style.display = 'block';
-                monthlySalaryField.style.display = 'none';
-                document.getElementById('hourly-rate').setAttribute('required', 'true');
-                document.getElementById('monthly-salary').removeAttribute('required');
-            } else if (select.value === 'salary') {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'block';
-                document.getElementById('hourly-rate').removeAttribute('required');
-                document.getElementById('monthly-salary').setAttribute('required', 'true');
-            } else {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'none';
-                document.getElementById('hourly-rate').removeAttribute('required');
-                document.getElementById('monthly-salary').removeAttribute('required');
-            }
-        }
+    // Create PDF and add the image as the first page (US Letter 612 x 792 pts)
+    const pdfDoc = await PDFDocument.create();
+    const page = pdfDoc.addPage([612, 792]);
+    const imgBytes = dataURLToUint8Array(imgData);
+    // try embedding JPEG; if fails, try PNG
+    let embeddedImage;
+    if(imgData.startsWith('data:image/jpeg')){
+      embeddedImage = await pdfDoc.embedJpg(imgBytes);
+    } else {
+      embeddedImage = await pdfDoc.embedPng(imgBytes);
+    }
+    // fit image to page while keeping margins
+    const { width: iw, height: ih } = embeddedImage.scale(1);
+    const pageW = 612, pageH = 792;
+    const ratio = Math.min(pageW / iw, pageH / ih);
+    const drawW = iw * ratio;
+    const drawH = ih * ratio;
+    const x = (pageW - drawW) / 2;
+    const y = (pageH - drawH) / 2;
+    page.drawImage(embeddedImage, { x, y, width: drawW, height: drawH });
 
-        // Toggle income type fields for co-renter
-        function toggleCoIncomeFields(select) {
-            const hourlyRateField = document.getElementById('co-hourly-rate-field');
-            const monthlySalaryField = document.getElementById('co-monthly-salary-field');
-            
-            if (select.value === 'hourly') {
-                hourlyRateField.style.display = 'block';
-                monthlySalaryField.style.display = 'none';
-                document.getElementById('co-hourly-rate').setAttribute('required', 'true');
-                document.getElementById('co-monthly-salary').removeAttribute('required');
-            } else if (select.value === 'salary') {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'block';
-                document.getElementById('co-hourly-rate').removeAttribute('required');
-                document.getElementById('co-monthly-salary').setAttribute('required', 'true');
-            } else {
-                hourlyRateField.style.display = 'none';
-                monthlySalaryField.style.display = 'none';
-                document.getElementById('co-hourly-rate').removeAttribute('required');
-                document.getElementById('co-monthly-salary').removeAttribute('required');
-            }
-        }
-
-        // Toggle employer contact warning for primary renter
-        function toggleContactWarning(radio) {
-            const contactWarning = document.getElementById('contact-warning');
-            
-            if (radio.value === 'no') {
-                contactWarning.style.display = 'block';
-            } else {
-                contactWarning.style.display = 'none';
-            }
-        }
-
-        // Toggle employer contact warning for co-renter
-        function toggleCoContactWarning(radio) {
-            const contactWarning = document.getElementById('co-contact-warning');
-            
-            if (radio.value === 'no') {
-                contactWarning.style.display = 'block';
-            } else {
-                contactWarning.style.display = 'none';
-            }
-        }
-
-        // Toggle residency fields
-        function toggleResidencyFields(radio) {
-            const rentFields = document.getElementById('rent-fields');
-            const ownFields = document.getElementById('own-fields');
-            
-            if (radio.value === 'rent') {
-                rentFields.style.display = 'block';
-                ownFields.style.display = 'none';
-                
-                // Set required attributes for rent fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.setAttribute('required', 'true'));
-                
-                // Remove required attributes from own fields
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.removeAttribute('required'));
-            } else if (radio.value === 'own') {
-                rentFields.style.display = 'none';
-                ownFields.style.display = 'block';
-                
-                // Remove required attributes from rent fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.removeAttribute('required'));
-                
-                // Set required attributes for own fields
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.setAttribute('required', 'true'));
-            } else {
-                rentFields.style.display = 'none';
-                ownFields.style.display = 'none';
-                
-                // Remove required attributes from all fields
-                const rentInputs = rentFields.querySelectorAll('input');
-                rentInputs.forEach(input => input.removeAttribute('required'));
-                
-                const ownInputs = ownFields.querySelectorAll('input');
-                ownInputs.forEach(input => input.removeAttribute('required'));
-            }
-        }
-
-        // Toggle landlord contact warning
-        function toggleLandlordContactWarning(checkbox) {
-            const landlordContactWarning = document.getElementById('landlord-contact-warning');
-            
-            if (checkbox.checked) {
-                landlordContactWarning.style.display = 'block';
-            } else {
-                landlordContactWarning.style.display = 'none';
-            }
-        }
-
-        // Clear signature pad for primary renter
-        function clearSignature() {
-            signaturePad.clear();
-        }
-
-        // Clear signature pad for co-renter
-        function clearCoSignature() {
-            coSignaturePad.clear();
-        }
-
-        // Save signature for primary renter
-        function saveSignature() {
-            if (signaturePad.isEmpty()) {
-                alert("Please provide a signature first.");
-            } else {
-                alert("Signature saved successfully!");
-            }
-        }
-
-        // Save signature for co-renter
-        function saveCoSignature() {
-            if (coSignaturePad.isEmpty()) {
-                alert("Please provide a signature first.");
-            } else {
-                alert("Co-renter signature saved successfully!");
-            }
-        }
-
-        // Generate PDF
-        function generatePDF() {
-            // Validate form first
-            const form = document.getElementById('rental-application');
-            if (!form.checkValidity()) {
-                alert("Please fill out all required fields before generating the PDF.");
-                form.reportValidity();
-                return;
-            }
-            
-            // Validate signature
-            if (signaturePad.isEmpty()) {
-                alert("Please provide a signature before generating the PDF.");
-                return;
-            }
-            
-            // Validate co-signature if co-renter exists
-            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert("Please provide a co-renter signature before generating the PDF.");
-                return;
-            }
-            
-            // Create PDF
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            
-            // Add date
-            const now = new Date();
-            const dateString = now.toLocaleDateString();
-            doc.setFontSize(10);
-            doc.text(`Application Date: ${dateString}`, 160, 15);
-            
-            // Add logo and title
-            doc.setFontSize(20);
-            doc.setTextColor(0, 102, 204);
-            doc.text("National TV Rental Application", 105, 30, null, null, "center");
-            
-            // Add line separator
-            doc.setDrawColor(204, 0, 0);
-            doc.line(20, 35, 190, 35);
-            
-            // Add content from form
-            doc.setFontSize(12);
-            doc.setTextColor(0, 0, 0);
-            
-            // Primary Renter Information
-            doc.setFont(undefined, 'bold');
-            doc.text("Primary Renter Information", 20, 45);
-            doc.setFont(undefined, 'normal');
-            
-            let yPosition = 55;
-            
-            const primaryFields = [
-                `Name: ${document.getElementById('first-name').value} ${document.getElementById('last-name').value}`,
-                `Maiden Name: ${document.getElementById('maiden-name').value || 'N/A'}`,
-                `Birthdate: ${document.getElementById('birthdate').value}`,
-                `SSN: ${document.getElementById('ssn').value}`,
-                `Email: ${document.getElementById('email').value}`,
-                `Phone: ${document.getElementById('phone').value}`,
-                `Best Time to Contact: ${document.getElementById('contact-time').value}`
-            ];
-            
-            primaryFields.forEach(field => {
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                doc.text(field, 20, yPosition);
-                yPosition += 7;
+    // 2) Append uploadedFiles: for PDF files, copy pages using pdf-lib; for images, embed each image as a new page
+    for(const file of uploadedFiles){
+      const name = file.name || 'upload';
+      const ext = (name.split('.').pop() || '').toLowerCase();
+      try{
+        if(file.type === 'application/pdf' || ext === 'pdf'){
+          // load external pdf and copy pages
+          const arrayBuffer = await file.arrayBuffer();
+          const externalPdf = await PDFDocument.load(arrayBuffer);
+          const copiedPages = await pdfDoc.copyPages(externalPdf, externalPdf.getPageIndices());
+          for(const cp of copiedPages) pdfDoc.addPage(cp);
+        } else if(file.type.startsWith('image/')){
+          const arrayBuffer = await file.arrayBuffer();
+          // embed accordingly
+          let imgEmbed;
+          if(file.type === 'image/png'){
+            imgEmbed = await pdfDoc.embedPng(new Uint8Array(arrayBuffer));
+          } else {
+            imgEmbed = await pdfDoc.embedJpg(new Uint8Array(arrayBuffer)).catch(async ()=>{
+              // fallback convert PNG->JPG via canvas if embedJpg fails
+              const durl = await fileToDataURL(file);
+              const jpg = await convertDataUrlToJpeg(durl);
+              const bytes = dataURLToUint8Array(jpg);
+              return pdfDoc.embedJpg(bytes);
             });
-            
-            // Check if co-renter exists
-            if (document.getElementById('has-corener').checked) {
-                yPosition += 3;
-                doc.setFont(undefined, 'bold');
-                doc.text("Co-Renter Information", 20, yPosition);
-                doc.setFont(undefined, 'normal');
-                yPosition += 7;
-                
-                const coRenterFields = [
-                    `Name: ${document.getElementById('co-first-name').value} ${document.getElementById('co-last-name').value}`,
-                    `Maiden Name: ${document.getElementById('co-maiden-name').value || 'N/A'}`,
-                    `Birthdate: ${document.getElementById('co-birthdate').value}`,
-                    `SSN: ${document.getElementById('co-ssn').value}`,
-                    `Email: ${document.getElementById('co-email').value}`,
-                    `Phone: ${document.getElementById('co-phone').value}`,
-                    `Best Time to Contact: ${document.getElementById('co-contact-time').value}`
-                ];
-                
-                coRenterFields.forEach(field => {
-                    if (yPosition > 270) {
-                        doc.addPage();
-                        yPosition = 20;
-                    }
-                    doc.text(field, 20, yPosition);
-                    yPosition += 7;
-                });
-            }
-            
-            // Vehicle Information
-            yPosition += 5;
-            doc.setFont(undefined, 'bold');
-            doc.text("Vehicle Information", 20, yPosition);
-            doc.setFont(undefined, 'normal');
-            yPosition += 7;
-            
-            const vehicleFields = [
-                `Make: ${document.getElementById('vehicle-make').value || 'N/A'}`,
-                `Model: ${document.getElementById('vehicle-model').value || 'N/A'}`,
-                `License Plate: ${document.getElementById('license-plate').value || 'N/A'}`,
-                `Color: ${document.getElementById('vehicle-color').value || 'N/A'}`
-            ];
-            
-            vehicleFields.forEach(field => {
-                if (yPosition > 270) {
-                    doc.addPage();
-                    yPosition = 20;
-                }
-                doc.text(field, 20, yPosition);
-                yPosition += 7;
-            });
-            
-            // Add more sections similarly for income, residency, references, etc.
-            
-            // Add signatures
-            const signatureDataURL = signaturePad.toDataURL();
-            doc.addPage();
-            doc.text("Primary Renter Signature", 20, 20);
-            doc.addImage(signatureDataURL, 'PNG', 20, 30, 100, 40);
-            
-            if (document.getElementById('has-corener').checked) {
-                const coSignatureDataURL = coSignaturePad.toDataURL();
-                doc.text("Co-Renter Signature", 20, 80);
-                doc.addImage(coSignatureDataURL, 'PNG', 20, 90, 100, 40);
-            }
-            
-            // Save the PDF
-            doc.save('National-TV-Rental-Application.pdf');
-            
-            alert("PDF generated successfully! Please also remember to bring any required documents to the store.");
+          }
+          const { width: iw2, height: ih2 } = imgEmbed.scale(1);
+          const page2 = pdfDoc.addPage([612,792]);
+          const ratio2 = Math.min(612 / iw2, 792 / ih2);
+          const w2 = iw2 * ratio2;
+          const h2 = ih2 * ratio2;
+          page2.drawImage(imgEmbed, { x: (612 - w2)/2, y: (792 - h2)/2, width: w2, height: h2 });
+        } else {
+          // attempt to handle unknowns as images
+          const durl = await fileToDataURL(file);
+          const jpg = await convertDataUrlToJpeg(durl);
+          const bytes = dataURLToUint8Array(jpg);
+          const imgEmbed = await pdfDoc.embedJpg(bytes);
+          const { width: iw3, height: ih3 } = imgEmbed.scale(1);
+          const page3 = pdfDoc.addPage([612,792]);
+          const ratio3 = Math.min(612 / iw3, 792 / ih3);
+          const w3 = iw3 * ratio3;
+          const h3 = ih3 * ratio3;
+          page3.drawImage(imgEmbed, { x: (612 - w3)/2, y: (792 - h3)/2, width: w3, height: h3 });
         }
+      }catch(err){
+        console.warn('Failed to append upload:', name, err);
+        // append a simple page explaining failure
+        const pg = pdfDoc.addPage([612,792]);
+        const times = await pdfDoc.embedFont(StandardFonts.Helvetica);
+        pg.drawText(`Could not append file: ${name}`, { x:40, y:720, size:12, font: times, color: PDFLib.rgb(0,0,0) });
+      }
+    }
 
-        // Form submission
-        document.getElementById('rental-application').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            // Validate form
-            if (!this.checkValidity()) {
-                alert("Please fill out all required fields before submitting.");
-                this.reportValidity();
-                return;
-            }
-            
-            // Validate signature
-            if (signaturePad.isEmpty()) {
-                alert("Please provide a signature before submitting.");
-                return;
-            }
-            
-            // Validate co-signature if co-renter exists
-            if (document.getElementById('has-corener').checked && coSignaturePad.isEmpty()) {
-                alert("Please provide a co-renter signature before submitting.");
-                return;
-            }
-            
-            // If all valid, show success message
-            alert("Application submitted successfully! Please remember to bring any required documents to the store.");
-            // In a real application, you would send the data to a server here
+    const pdfBytes = await pdfDoc.save();
+    const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+    return blob;
+  }
+
+  // Helpers for image/pdf conversions
+  function dataURLToUint8Array(dataurl){
+    const base64 = dataurl.split(',')[1];
+    const raw = atob(base64);
+    const u8 = new Uint8Array(raw.length);
+    for(let i=0;i<raw.length;i++) u8[i]=raw.charCodeAt(i);
+    return u8;
+  }
+  function fileToDataURL(file){
+    return new Promise((res, rej)=>{
+      const r = new FileReader();
+      r.onload = ()=>res(r.result);
+      r.onerror = rej;
+      r.readAsDataURL(file);
+    });
+  }
+  async function convertDataUrlToJpeg(dataUrl){
+    // create img and draw to canvas then return JPEG dataURL
+    return new Promise((res)=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const cvs = document.createElement('canvas');
+        cvs.width = img.width;
+        cvs.height = img.height;
+        const ctx = cvs.getContext('2d');
+        ctx.drawImage(img,0,0);
+        const out = cvs.toDataURL('image/jpeg', 0.92);
+        res(out);
+      };
+      img.src = dataUrl;
+    });
+  }
+
+  // Render first page of blob PDF into preview using pdf.js
+  async function previewPdfBlob(blob){
+    previewEl.innerHTML = ''; // clear
+    const url = URL.createObjectURL(blob);
+    try{
+      const loading = pdfjsLib.getDocument({ url });
+      const pdf = await loading.promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1.4 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const renderContext = { canvasContext: context, viewport };
+      await page.render(renderContext).promise;
+      previewEl.appendChild(canvas);
+      URL.revokeObjectURL(url);
+    }catch(err){
+      console.error('Preview failed', err);
+      previewEl.innerHTML = '<div class="muted">Preview not available</div>';
+      URL.revokeObjectURL(url);
+    }
+  }
+
+  // Web Share / download / mailto behaviors
+  async function shareOrDownload(blob){
+    const file = new File([blob], `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`, { type:'application/pdf' });
+    // Use navigator.canShare where available
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      try{
+        await navigator.share({
+          title: 'National TV Sales — Customer Order',
+          text: `Order for ${document.getElementById('name').value || ''}`,
+          files: [file]
         });
+        alert('Share dialog opened. Choose your email or app to send.');
+        return;
+      }catch(err){
+        console.warn('Share canceled or failed', err);
+      }
+    }
 
-        // Initialize hidden sections
-        window.onload = function() {
-            document.getElementById('corener-section').style.display = 'none';
-            document.getElementById('co-income-section').style.display = 'none';
-            document.getElementById('co-signature-section').style.display = 'none';
-            document.getElementById('employment-fields').style.display = 'none';
-            document.getElementById('other-income-fields').style.display = 'none';
-            document.getElementById('hourly-rate-field').style.display = 'none';
-            document.getElementById('monthly-salary-field').style.display = 'none';
-            document.getElementById('contact-warning').style.display = 'none';
-            document.getElementById('co-employment-fields').style.display = 'none';
-            document.getElementById('co-other-income-fields').style.display = 'none';
-            document.getElementById('co-hourly-rate-field').style.display = 'none';
-            document.getElementById('co-monthly-salary-field').style.display = 'none';
-            document.getElementById('co-contact-warning').style.display = 'none';
-            document.getElementById('rent-fields').style.display = 'none';
-            document.getElementById('own-fields').style.display = 'none';
-            document.getElementById('landlord-contact-warning').style.display = 'none';
-        };
-    </script>
+    // fallback: trigger download, open mailto
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file.name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+
+    // build mailto with subject/body (cannot attach automatically here)
+    const sendTo = document.getElementById('sendTo').value || '';
+    const subject = encodeURIComponent('Customer Order - National TV Sales & Rental');
+    let body = `Order for ${document.getElementById('name').value || ''}\n\nPlease attach the downloaded PDF: ${file.name}\n\nGenerated locally via web form.`;
+    window.location.href = `mailto:${encodeURIComponent(sendTo)}?subject=${subject}&body=${encodeURIComponent(body)}`;
+    alert('PDF downloaded. A mail window was opened — please attach the downloaded PDF if it was not attached automatically.');
+  }
+
+  // Generate + preview + share
+  async function generateAndPreview(alsoShare=false, alsoDownload=false){
+    genBtn.disabled = true;
+    genBtn.textContent = 'Generating...';
+    try{
+      const blob = await generateCombinedPdfBlob();
+      await previewPdfBlob(blob);
+      // store the last blob for share/download actions
+      lastGeneratedBlob = blob;
+      if(alsoShare){
+        await shareOrDownload(blob);
+      }
+      if(alsoDownload){
+        // trigger direct download
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+    }catch(err){
+      console.error('Generate failed', err);
+      alert('Failed to generate PDF: ' + (err.message || err));
+    }finally{
+      genBtn.disabled = false;
+      genBtn.textContent = 'Generate & Send';
+    }
+  }
+
+  // wire buttons
+  let lastGeneratedBlob = null;
+  genBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(true, false);
+  });
+  previewBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(false, false);
+  });
+  shareBtn.addEventListener('click', async ()=> {
+    if(lastGeneratedBlob){
+      await shareOrDownload(lastGeneratedBlob);
+    } else {
+      // create, then share
+      await generateAndPreview(true, false);
+    }
+  });
+  downloadBtn.addEventListener('click', async ()=>{
+    if(lastGeneratedBlob){
+      const url = URL.createObjectURL(lastGeneratedBlob);
+      const a = document.createElement('a'); a.href = url;
+      a.download = `NationalTV_Order_${(document.getElementById('name').value || 'customer').replace(/\s+/g,'_')}.pdf`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    } else {
+      await generateAndPreview(false, true);
+    }
+  });
+
+  // preview via side "Generate Preview" or auto after create
+  previewBtn.addEventListener('click', async ()=> {
+    await generateAndPreview(false, false);
+  });
+
+  // initial states
+  document.getElementById('residence').dispatchEvent(new Event('change'));
+  document.getElementById('employment').dispatchEvent(new Event('change'));
+  renderUploads();
+
+  // small usability: enter key doesn't submit the page accidentally
+  window.addEventListener('keydown', (e)=>{ if(e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') e.preventDefault(); });
+
+})();
+</script>
 </body>
 </html>
